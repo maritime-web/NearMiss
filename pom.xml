@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>dk.dma.nearmiss</groupId>
+	<artifactId>nearmiss-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>NearMiss Parent</name>
+	<description>NearMiss parent module</description>
+
+	<scm>
+		<connection>scm:git:git@github.com:maritime-web/NearMiss.git</connection>
+		<developerConnection>scm:git:git@github.com:maritime-web/NearMiss.git</developerConnection>
+		<url>https://github.com/maritime-web/NearMiss.git</url>
+	</scm>
+
+    <developers>
+        <developer>
+            <id>strategdk</id>
+            <name>Klaus Kirkelund Andersen</name>
+            <email>klaus1@strateg.dk</email>
+            <organization>Danish Maritime Authority</organization>
+            <organizationUrl>http://www.dma.dk</organizationUrl>
+            <timezone>+1</timezone>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<modules>
+		<module>gps-simulator</module>
+		<module>ais-simulator</module>
+	</modules>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>dk.dma.nearmiss</groupId>
+				<artifactId>gsp-simulator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dk.dma.nearmiss</groupId>
+				<artifactId>ais-simulator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>
