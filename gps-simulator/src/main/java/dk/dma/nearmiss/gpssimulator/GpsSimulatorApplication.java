@@ -1,13 +1,13 @@
 package dk.dma.nearmiss.gpssimulator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import static java.lang.Thread.sleep;
+import java.io.IOException;
+import java.net.ServerSocket;
 
 @SpringBootApplication
 public class GpsSimulatorApplication implements CommandLineRunner {
@@ -18,12 +18,20 @@ public class GpsSimulatorApplication implements CommandLineRunner {
 		SpringApplication.run(GpsSimulatorApplication.class, args);
 	}
 
+    @SuppressWarnings({"InfiniteLoopStatement", "LoopStatementThatDoesntLoop"})
     @Override
-    public void run(String... args) throws InterruptedException {
-        //noinspection InfiniteLoopStatement
-        while (true) {
-            logger.info("Hello GpsSimulatorApplication");
-            sleep(1000);
+    public void run(String... args) throws IOException {
+        logger.info("Starting GpsSimulatorApplication...");
+
+        ServerSocket listener = new ServerSocket(9898);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            int clientNumber = 0;
+            while (true) {
+                new GpsSimulator(listener.accept(), clientNumber++).start();
+            }
+        } finally {
+            listener.close();
         }
     }
 }
