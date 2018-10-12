@@ -48,6 +48,7 @@
 		<module>gps-simulator</module>
 		<module>ais-simulator</module>
 		<module>pilot-plug-simulator</module>
+		<module>near-miss-engine</module>
 	</modules>
 	
 	<dependencyManagement>
@@ -65,6 +66,11 @@
 			<dependency>
 				<groupId>dk.dma.nearmiss</groupId>
 				<artifactId>pilot-plug-simulator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dk.dma.nearmiss</groupId>
+				<artifactId>near-miss-engine</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
