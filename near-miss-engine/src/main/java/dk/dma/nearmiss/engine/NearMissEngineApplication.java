@@ -16,7 +16,7 @@ public class NearMissEngineApplication implements CommandLineRunner {
 	}
 
     @Override
-    public void run(String... args) throws InterruptedException {
+    public void run(String... args) {
         logger.info("Running NearMissEngineApplication");
     }
 
