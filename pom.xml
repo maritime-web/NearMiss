@@ -48,6 +48,7 @@
 		<module>gps-simulator</module>
 		<module>ais-simulator</module>
 		<module>pilot-plug-simulator</module>
+		<module>near-miss-db</module>		
 		<module>near-miss-engine</module>
 		<module>near-miss-web</module>
 	</modules>
@@ -71,9 +72,15 @@
 			</dependency>
 			<dependency>
 				<groupId>dk.dma.nearmiss</groupId>
+				<artifactId>near-miss-db</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dk.dma.nearmiss</groupId>
 				<artifactId>near-miss-engine</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			
 			<dependency>
 				<groupId>dk.dma.nearmiss</groupId>
 				<artifactId>near-miss-web</artifactId>
