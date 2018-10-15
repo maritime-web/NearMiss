@@ -7,7 +7,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 
 @SpringBootApplication
 public class GpsSimulatorApplication implements CommandLineRunner {
@@ -18,20 +17,21 @@ public class GpsSimulatorApplication implements CommandLineRunner {
 		SpringApplication.run(GpsSimulatorApplication.class, args);
 	}
 
-    @SuppressWarnings({"InfiniteLoopStatement", "LoopStatementThatDoesntLoop"})
     @Override
     public void run(String... args) throws IOException {
         logger.info("Starting GpsSimulatorApplication...");
 
-        ServerSocket listener = new ServerSocket(9898);
-        //noinspection TryFinallyCanBeTryWithResources
-        try {
-            int clientNumber = 0;
-            while (true) {
-                new GpsSimulator(listener.accept(), clientNumber++).start();
-            }
-        } finally {
-            listener.close();
-        }
+        Gps gps = new Gps();
+        gps.start();
+        gps.addListener(new GpsLogSimulator(gps));
+
+        new GpsSimulatorServer(gps).start();
+
+
+        GpsSimulatorClient client = new GpsSimulatorClient();
+        client.addListener(new GpsReceiver(client));
+        client.start();
+
+
     }
 }

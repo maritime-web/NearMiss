@@ -1,0 +1,18 @@
+package dk.dma.nearmiss.gpssimulator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class GpsReceiver implements Observer {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final GpsSimulatorClient client;
+
+    public GpsReceiver(GpsSimulatorClient client) {
+        this.client = client;
+    }
+
+    @Override
+    public void update() {
+        logger.info(String.format("Client has received: %s", client.getAnswer()));
+    }
+}
