@@ -2,17 +2,20 @@ package dk.dma.nearmiss.gpssimulator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
-public class GpsSimulatorServer extends Thread {
+@Component
+public class GpsSimulatorServer implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final Gps gps;
+    private final GpsSimulator gps;
     private ServerSocket serverSocketListener;
     private int clientNumber = 0;
 
-    GpsSimulatorServer(Gps gps) {
+    GpsSimulatorServer(GpsSimulator gps) {
         this.gps = gps;
         init();
     }
@@ -29,7 +32,8 @@ public class GpsSimulatorServer extends Thread {
         try {
             //noinspection InfiniteLoopStatement
             while (true) {
-                gps.addListener(new GpsSocketSimulator(serverSocketListener.accept(), clientNumber++, gps));
+                Socket socket = serverSocketListener.accept();
+                gps.addListener(new GpsSimulatorSocketConnection(socket, clientNumber++, gps));
             }
         } catch (IOException e) {
             logger.error(String.format("Error communicating with server socket: %s", e.getMessage()));
@@ -48,4 +52,7 @@ public class GpsSimulatorServer extends Thread {
         }
     }
 
+    public GpsSimulator getGpsSimulator() {
+        return gps;
+    }
 }

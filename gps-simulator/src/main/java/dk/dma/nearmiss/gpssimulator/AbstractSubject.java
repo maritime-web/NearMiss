@@ -3,7 +3,10 @@ package dk.dma.nearmiss.gpssimulator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractGps extends Thread implements Subject {
+/**
+ *
+ */
+public abstract class AbstractSubject implements Subject {
     private List<Observer> listeners = new ArrayList<>();
 
     @Override

@@ -7,15 +7,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class GpsSocketSimulator implements Observer {
+public class GpsSimulatorSocketConnection implements Observer {
     private final Socket socket;
     private final int clientNumber;
-    private final Gps gps;
+    private final GpsSimulator gps;
 
     private PrintWriter out;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    GpsSocketSimulator(Socket socket, int clientNumber, Gps gps) {
+    GpsSimulatorSocketConnection(Socket socket, int clientNumber, GpsSimulator gps) {
         this.socket = socket;
         this.clientNumber = clientNumber;
         this.gps = gps;
@@ -36,7 +36,7 @@ public class GpsSocketSimulator implements Observer {
     @Override
     public void update() {
         String time = gps.getMessage();
-        print(String.format("%s : Message from GpsSocketSimulator to client# %s", time, clientNumber));
+        print(String.format("%s : Message from GpsSimulatorSocketConnection to client# %s", time, clientNumber));
     }
 
 }

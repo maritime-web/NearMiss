@@ -6,31 +6,35 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.IOException;
-
 @SpringBootApplication
 public class GpsSimulatorApplication implements CommandLineRunner {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public static void main(String[] args) {
+    //private GpsSimulator gps;
+    private GpsSimulatorServer gpsSimulatorServer;
+    private GpsReceiver gpsReceiver;
+
+
+    public GpsSimulatorApplication(GpsSimulatorServer gpsSimulatorServer, GpsReceiver gpsReceiver) {
+        //this.gps = gps;
+        this.gpsSimulatorServer = gpsSimulatorServer;
+        this.gpsReceiver = gpsReceiver;
+    }
+
+    public static void main(String[] args) {
 		SpringApplication.run(GpsSimulatorApplication.class, args);
 	}
 
     @Override
-    public void run(String... args) throws IOException {
+    public void run(String... args)  {
         logger.info("Starting GpsSimulatorApplication...");
 
-        Gps gps = new Gps();
-        gps.start();
-        gps.addListener(new GpsLogSimulator(gps));
+        // No more need to start GpsLogServer since it is a Spring component.
 
-        new GpsSimulatorServer(gps).start();
-
-
-        GpsSimulatorClient client = new GpsSimulatorClient();
-        client.addListener(new GpsReceiver(client));
-        client.start();
+        new Thread(gpsSimulatorServer.getGpsSimulator()).start();
+        new Thread(gpsSimulatorServer).start();
+        new Thread(gpsReceiver.getClient()).start();
 
 
     }
