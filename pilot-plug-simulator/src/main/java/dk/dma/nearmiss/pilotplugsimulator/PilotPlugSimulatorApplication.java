@@ -14,6 +14,9 @@ import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
@@ -47,17 +50,18 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
 
         // Configure line readers
 
-        Thread lineReader1 = new Thread(new LineReader(messageQueue, "localhost", 8008));
-        lineReader1.setDaemon(true);
-        lineReader1.start();
-
-        Thread lineReader2 = new Thread(new LineReader(messageQueue, "localhost", 8002));
-        lineReader2.setDaemon(true);
-        lineReader2.start();
+        connectTo.forEach(remote -> {
+            HostnamePortnumber hp = parseRemoteAddresses(remote);
+            if (hp != null) {
+                Thread lineReader = new Thread(new LineReader(messageQueue, hp.getHostname(), hp.getPort()));
+                lineReader.setDaemon(true);
+                lineReader.start();
+            }
+        });
 
         // Configure listener for line writers
 
-        Thread t = new Thread( () -> {
+        Thread t = new Thread(() -> {
             ServerSocket serverSocket = null;
             try {
                 serverSocket = new ServerSocket(port);
@@ -87,18 +91,55 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
 
         // Just wait
 
-        while(true)
+        while (true)
             Thread.sleep(10000);
     }
 
+    private final static Pattern HOSTNAME_PORT_PATTERN = Pattern.compile("^\\s*(.*?):(\\d+)\\s*$");
+
+    public class HostnamePortnumber {
+        private final String hostname;
+        private final int port;
+
+        public HostnamePortnumber(String hostname, int port) {
+            this.hostname = hostname;
+            this.port = port;
+        }
+
+        public String getHostname() {
+            return hostname;
+        }
+
+        public int getPort() {
+            return port;
+        }
+    }
+
+    private HostnamePortnumber parseRemoteAddresses(String remoteAddress) {
+        HostnamePortnumber hostnamePortnumber = null;
+
+        Matcher m = HOSTNAME_PORT_PATTERN.matcher(remoteAddress);
+
+        if (m.matches()) {
+            String hostname = m.group(1);
+            int port = Integer.parseInt(m.group(2));
+            hostnamePortnumber = new HostnamePortnumber(hostname, port);
+        }
+
+        return hostnamePortnumber;
+    }
 
     private void checkArguments(ApplicationArguments args) {
-        if (!args.containsOption("port") )
+        if (!args.containsOption("port"))
             fail("Missing mandatory --port option.");
         if (args.getOptionValues("port").size() > 1)
             fail("There must be exacly one --port option.");
-        if (!args.containsOption("connect") )
+        if (!args.containsOption("connect"))
             fail("Missing one or more --connect option(s).");
+
+        Predicate<String> hostnamePortnumberFormat = HOSTNAME_PORT_PATTERN.asPredicate();
+        if (!args.getOptionValues("connect").stream().allMatch(hostnamePortnumberFormat))
+            fail("Option values for 'connect' must match format {hostname}:{port}");
     }
 
     private static void fail(String message) {
