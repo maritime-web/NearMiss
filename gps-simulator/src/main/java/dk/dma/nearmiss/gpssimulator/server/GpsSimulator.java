@@ -1,5 +1,6 @@
-package dk.dma.nearmiss.gpssimulator;
+package dk.dma.nearmiss.gpssimulator.server;
 
+import dk.dma.nearmiss.gpssimulator.observer.AbstractSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

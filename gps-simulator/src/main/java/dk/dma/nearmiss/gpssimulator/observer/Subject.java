@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.gpssimulator;
+package dk.dma.nearmiss.gpssimulator.observer;
 
 
 interface Subject {

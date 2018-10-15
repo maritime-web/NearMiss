@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.gpssimulator;
+package dk.dma.nearmiss.gpssimulator.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

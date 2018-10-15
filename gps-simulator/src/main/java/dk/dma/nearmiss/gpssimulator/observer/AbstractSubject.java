@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.gpssimulator;
+package dk.dma.nearmiss.gpssimulator.observer;
 
 import java.util.ArrayList;
 import java.util.List;

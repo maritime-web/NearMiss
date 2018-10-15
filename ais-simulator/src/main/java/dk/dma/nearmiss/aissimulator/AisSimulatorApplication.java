@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import static java.lang.Thread.sleep;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"dk.dma.nearmiss.gpssimulator.observer", "dk.dma.nearmiss.gpssimulator.client", "dk.dma.nearmiss.aissimulator"})
 public class AisSimulatorApplication implements CommandLineRunner {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -26,7 +26,7 @@ public class AisSimulatorApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
         logger.info("Starting AisSimulatorApplication...");
-		new Thread(aisSimulator).start();
+		new Thread(aisSimulator.getGpsSimulatorClient()).start();
 	}
 
 }
