@@ -7,7 +7,7 @@
 	<artifactId>nearmiss-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>NearMiss Parent</name>
+	<name>nearmiss-parent</name>
 	<description>NearMiss parent module</description>
 
 	<scm>
@@ -53,40 +53,4 @@
 		<module>near-miss-web</module>
 	</modules>
 	
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>dk.dma.nearmiss</groupId>
-				<artifactId>gsp-simulator</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>dk.dma.nearmiss</groupId>
-				<artifactId>ais-simulator</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>dk.dma.nearmiss</groupId>
-				<artifactId>pilot-plug-simulator</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>dk.dma.nearmiss</groupId>
-				<artifactId>near-miss-db</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>dk.dma.nearmiss</groupId>
-				<artifactId>near-miss-engine</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>dk.dma.nearmiss</groupId>
-				<artifactId>near-miss-web</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 </project>
