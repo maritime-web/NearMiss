@@ -34,7 +34,8 @@ public class GpsSimulatorClient extends AbstractSubject implements Runnable {
 
     public void run() {
         //noinspection InfiniteLoopStatement
-        while (true) {
+        boolean continueLoop = true;
+        while (continueLoop) {
             if (input != null) {
                 try {
                     answer = input.readLine();
@@ -44,6 +45,7 @@ public class GpsSimulatorClient extends AbstractSubject implements Runnable {
                 }
             } else {
                 logger.error("Client: No stream to read from");
+                continueLoop = false;
             }
         }
     }
