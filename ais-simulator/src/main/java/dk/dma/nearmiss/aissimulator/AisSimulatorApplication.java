@@ -13,17 +13,20 @@ public class AisSimulatorApplication implements CommandLineRunner {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	private AisSimulator aisSimulator;
+
+	public AisSimulatorApplication(AisSimulator aisSimulator) {
+		this.aisSimulator = aisSimulator;
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(AisSimulatorApplication.class, args);
 	}
 
 	@Override
-	public void run(String... args) throws InterruptedException {
-		//noinspection InfiniteLoopStatement
-		while (true) {
-			logger.info("Hello AisSimulatorApplication");
-			sleep(1000);
-		}
+	public void run(String... args) {
+        logger.info("Starting AisSimulatorApplication...");
+		new Thread(aisSimulator).start();
 	}
 
 }
