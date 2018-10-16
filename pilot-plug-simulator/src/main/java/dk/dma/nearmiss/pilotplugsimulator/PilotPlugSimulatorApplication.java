@@ -24,7 +24,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final static String USAGE = "(--connect={hostname:port})+ --port={port}";
+    private final static String USAGE = "--port==localPort [--connectTo==remoteHost:remotePort]...";
 
     public static void main(String[] args) {
         SpringApplication.run(PilotPlugSimulatorApplication.class, args);
