@@ -25,13 +25,14 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final static String USAGE = "--port==localPort [--connectTo==remoteHost:remotePort]...";
+    private final static Pattern HOSTNAME_PORT_PATTERN = Pattern.compile("^\\s*(.*?):(\\d+)\\s*$");
+
+    private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<PrintWriter> outboundPrintWriters = new LinkedBlockingQueue<>();
 
     public static void main(String[] args) {
         SpringApplication.run(PilotPlugSimulatorApplication.class, args);
     }
-
-    private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
-    private final BlockingQueue<PrintWriter> outboundPrintWriters = new LinkedBlockingQueue<>();
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -53,7 +54,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
         connectTo.forEach(remote -> {
             HostnamePortnumber hp = parseRemoteAddresses(remote);
             if (hp != null) {
-                Thread lineReader = new Thread(new LineReader(messageQueue, hp.getHostname(), hp.getPort()));
+                Thread lineReader = new Thread(new LineReader(messageQueue, hp.hostname, hp.port));
                 lineReader.setDaemon(true);
                 lineReader.start();
             }
@@ -95,23 +96,13 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
             Thread.sleep(10000);
     }
 
-    private final static Pattern HOSTNAME_PORT_PATTERN = Pattern.compile("^\\s*(.*?):(\\d+)\\s*$");
-
-    public class HostnamePortnumber {
+    private class HostnamePortnumber {
         private final String hostname;
         private final int port;
 
         public HostnamePortnumber(String hostname, int port) {
             this.hostname = hostname;
             this.port = port;
-        }
-
-        public String getHostname() {
-            return hostname;
-        }
-
-        public int getPort() {
-            return port;
         }
     }
 
