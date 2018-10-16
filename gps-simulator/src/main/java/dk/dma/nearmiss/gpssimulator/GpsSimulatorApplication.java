@@ -14,13 +14,11 @@ public class GpsSimulatorApplication implements CommandLineRunner {
 
     //private GpsSimulator gps;
     private GpsSimulatorServer gpsSimulatorServer;
-    private GpsReceiver gpsReceiver;
 
 
-    public GpsSimulatorApplication(GpsSimulatorServer gpsSimulatorServer, GpsReceiver gpsReceiver) {
+    public GpsSimulatorApplication(GpsSimulatorServer gpsSimulatorServer) {
         //this.gps = gps;
         this.gpsSimulatorServer = gpsSimulatorServer;
-        this.gpsReceiver = gpsReceiver;
     }
 
     public static void main(String[] args) {
@@ -31,12 +29,11 @@ public class GpsSimulatorApplication implements CommandLineRunner {
     public void run(String... args)  {
         logger.info("Starting GpsSimulatorApplication...");
 
-        // No more need to start GpsLogServer since it is a Spring component.
-
+        // Start GPS simulator
         new Thread(gpsSimulatorServer.getGpsSimulator()).start();
-        new Thread(gpsSimulatorServer).start();
-        new Thread(gpsReceiver.getClient()).start();
 
+        // Start TCP server
+        new Thread(gpsSimulatorServer).start();
 
     }
 }
