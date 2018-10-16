@@ -72,3 +72,12 @@ This will
 * launch the pilot plug simulator
 * Make it connect to `localhost:7000` and `localhost:7001` as text sources.
 * Make a service available on the local host's port 9000 from which the merged text stream is available to any number of clients.
+
+The general form of the command line syntax is:
+
+`java -jar pilot-plug-simulator-0.0.1-SNAPSHOT.jar --port==localPort [--connectTo==remoteHost:remotePort]...`
+
+where
+
+- `localPort` is the local port on which the merged text data are available, and
+- `remoteHost:remotePort` are the hostname and port no. of the remote text source(s) that the application should connect to.
