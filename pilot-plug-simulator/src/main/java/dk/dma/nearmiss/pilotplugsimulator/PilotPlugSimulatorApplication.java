@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class PilotPlugSimulatorApplication implements ApplicationRunner {
@@ -47,6 +46,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
         createAndStartListener(port);
         createAndStartLineDistributor();
 
+        //noinspection InfiniteLoopStatement
         while (true) {
             TimeUnit.HOURS.sleep(1);
             logger.info("Heartbeat");
@@ -74,7 +74,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
 
     private List<String> parseConnectTo(ApplicationArguments args) {
         List<String> connect = args.getOptionValues("connect");
-        logger.info("connect: {}", connect.stream().collect(Collectors.joining(", ")));
+        logger.info("connect: {}", String.join(", ", connect));
         return connect;
     }
 
@@ -89,7 +89,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
         private final String hostname;
         private final int port;
 
-        public HostnamePortnumber(String hostname, int port) {
+        HostnamePortnumber(String hostname, int port) {
             this.hostname = hostname;
             this.port = port;
         }
@@ -117,10 +117,11 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
 
     private void createAndStartListener(int port) {
         Thread t = new Thread(() -> {
-            ServerSocket serverSocket = null;
+            ServerSocket serverSocket;
             try {
                 serverSocket = new ServerSocket(port);
 
+                //noinspection InfiniteLoopStatement
                 while (true) {
                     try {
                         Socket socket = serverSocket.accept();

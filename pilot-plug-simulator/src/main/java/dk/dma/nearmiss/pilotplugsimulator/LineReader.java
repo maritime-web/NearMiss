@@ -16,7 +16,7 @@ public class LineReader implements Runnable {
     private final int remotePort;
     private final Queue<String> messageQueue;
 
-    public LineReader(Queue<String> messageQueue, String remoteHost, int remotePort) {
+    LineReader(Queue<String> messageQueue, String remoteHost, int remotePort) {
         this.messageQueue = messageQueue;
         this.remoteHost = remoteHost;
         this.remotePort = remotePort;
@@ -30,6 +30,7 @@ public class LineReader implements Runnable {
             Socket client = new Socket(remoteHost, remotePort);
             Scanner scanner = new Scanner(client.getInputStream());
 
+            //noinspection InfiniteLoopStatement
             while (true) {
                 String line = scanner.nextLine();
                 messageQueue.add(line);
