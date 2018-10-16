@@ -26,6 +26,8 @@ public class AisSimulatorApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
         logger.info("Starting AisSimulatorApplication...");
+
+        // Start GPS TCP client
 		new Thread(aisSimulator.getGpsSimulatorClient()).start();
 	}
 
