@@ -1,0 +1,74 @@
+= Pilot-plug-simulator
+
+== Purpose
+
+This pilot-plug-simulator is developed in context of the DMA near-miss project.
+
+Its intended use is to merge NMEA line based text data streams from different sources into a single TCP/IP stream available to any no. of clients.
+
+This makes the output pilot-plug-simulator equivalent to the output of a real pilot plug, so that the near-miss algorithm can be developed and tested in a development setup as a supplement to being on-board an actual vessel.
+
+A diagram form the pilot-plug-simulator shall work in the following surrroundings, where it connects to _text source_ as a TCP client, and offers the merged data stream as a TCP service on a port available to any no. of clients.
+[ditaa]
+....
+
+/----------\
+|          |
+|   Text   |
+| source 1 +-o <-\
+|          |     |                            /----------\
+\----------/     |                            |          |
+                 |                        /-- |   Text   +
+/----------\     |   /------------\       |   | Client   |
+|          |     \---|cGRE        |       |   |          |
+|   Text   +-o <-----|   Pilot    |     <-/   \----------/
+| source 1 |         |    Plug    +---O             .
+|          |     /---|  Simulator |     <-\         .
+\----------/     |   |            |       |   /----------\
+      .          |   \------------/       |   |          |
+      .          |                        \-- |   Text   +
+/----------\     |                            | dest. m  |
+|          |     |                            |          |
+|   Text   +-o <-/                            \----------/
+| source n |
+|          |
+\----------/
+            -=------------------------------->
+                  Direction of data flow
+....
+
+In the primarily intended usage scenario, the text sources are AIS and GPS (simulators or real) and the only client is the _near miss engine_:
+
+[ditaa]
+....
+
+/----------\
+|          |
+|   AIS    +-o <-\
+|          |     |   /------------\          /-----------\
+\----------/     \---|cGRE        |          |           |
+                     |    Plug    +---O <----| Near miss |
+/----------\     /---|  Simulator |          |  engine   |
+|          |     |   |            |          |           |
+|   GPS    +-o <-/   \------------/          \-----------/
+|          |
+\----------/
+            -=------------------------------->
+                  Direction of data flow
+....
+
+
+== Build
+
+The software is built as part of the parent maven build. To build this maven module separately just run `mvn package` or similar.
+
+== Usage
+To run the software, make `target/` the current directory, and then:
+
+`$ java -jar pilot-plug-simulator-0.0.1-SNAPSHOT.jar --port=9000 --connectTo=localhost:7000 --connectTo=loalhost:7001`
+
+This will
+
+* launch the pilot plug simulator
+* Make it connect to `localhost:7000` and `localhost:7001` as text sources.
+* Make a service available on the local host's port 9000 from which the merged text stream is available to any number of clients.
