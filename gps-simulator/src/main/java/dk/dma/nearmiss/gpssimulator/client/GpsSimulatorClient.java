@@ -51,7 +51,7 @@ public class GpsSimulatorClient extends AbstractSubject implements Runnable {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public String getAnswer() {
+    public String getMessage() {
         return answer;
     }
 }

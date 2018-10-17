@@ -18,7 +18,7 @@ public class AisSimulator implements Observer {
 
     @Override
     public void update() {
-        logger.info(String.format("AisSimulator has received: %s", gpsSimulatorClient.getAnswer()));
+        logger.info(String.format("AisSimulator has received: %s", gpsSimulatorClient.getMessage()));
     }
 
     GpsSimulatorClient getGpsSimulatorClient() {
