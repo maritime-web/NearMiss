@@ -14,7 +14,7 @@ public class LineDistributor implements Runnable {
     private final BlockingQueue<PrintWriter> printWriters;
     private long messageCounter = 0;
 
-    public LineDistributor(BlockingQueue<String> messageQueue, BlockingQueue<PrintWriter> printWriters) {
+    LineDistributor(BlockingQueue<String> messageQueue, BlockingQueue<PrintWriter> printWriters) {
         this.messageQueue = messageQueue;
         this.printWriters = printWriters;
     }
@@ -23,6 +23,7 @@ public class LineDistributor implements Runnable {
     public void run() {
         logger.info("LineDistributor running.");
 
+        //noinspection InfiniteLoopStatement
         while (true) {
             try {
                 String line = messageQueue.take();
