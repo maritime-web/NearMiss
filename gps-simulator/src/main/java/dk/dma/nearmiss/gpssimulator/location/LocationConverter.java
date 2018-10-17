@@ -10,7 +10,7 @@ public class LocationConverter {
         this.location = location;
     }
 
-    private String pad(int number, int padLength) {
+    String pad(int number, int padLength) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < padLength; i++) {
             sb.append("0");
