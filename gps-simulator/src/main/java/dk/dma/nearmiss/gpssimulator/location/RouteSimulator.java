@@ -36,9 +36,6 @@ public class RouteSimulator {
             if (waypointCounter > simulatedRoute.getWaypoints().length-1) {
                 arrived = true;
                 return;
-
-                //currentLocation = simulatedRoute.getInitialLocation().copy("currentLocation");
-                //waypointCounter = 0;
             }
             nextWaypoint = simulatedRoute.getWaypoints()[waypointCounter];
         }
@@ -52,28 +49,5 @@ public class RouteSimulator {
    public boolean hasArrived() {
        return arrived;
    }
-
-    public static void main(String[] args) {
-
-        Location initialLocation = new Location("Initial Location", 48.138083, 11.561102);
-
-        Route simulatedRoute = new Route(
-                initialLocation,
-                new Location("Waypoint 1", 48.137413, 11.561020),
-                new Location("Waypoint 2", 48.137370, 11.564539),
-                new Location("Waypoint 3", 48.137449, 11.565000),
-                new Location("Waypoint 4", 48.137578, 11.565311));
-
-
-        RouteSimulator gpsSimulator = new RouteSimulator(simulatedRoute);
-        //while (!gpsSimulator.hasArrived()) {
-        //    gpsSimulator.move();
-        //}
-        System.out.println(("00" + String.valueOf(10)).substring(String.valueOf(10).length()));
-
-        //for (int i = 0; i < 500; i++) { // testing 500 steps of the simulator
-        //    gpsSimulator.move();
-        //}
-    }
 
 }
