@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,24 +28,27 @@ public class GpsSimulator extends AbstractSubject implements Runnable {
         return new SimpleDateFormat("HHmmss").format(new Date());
     }
 
+    private String getRemainingDistance(Location currentLocation, Location lastWaypoint) {
+        DecimalFormat df = new DecimalFormat("#.###");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return df.format(GeoHelper.calcGeoDistanceInKm(currentLocation, lastWaypoint));
+    }
+
     private void makeTrip(Route trip) throws InterruptedException {
         RouteSimulator sim = new RouteSimulator(trip);
         //noinspection InfiniteLoopStatement
         while (!sim.hasArrived()) {
-            String time = getTime();
 
-            logger.info(String.format("Distance to %s is %s m", trip.lastWaypoint().getName(), GeoHelper.calcGeoDistanceInKm(sim.currentLocation, trip.lastWaypoint())));
+            logger.info(String.format("Remaining distance to %s is %s km", trip.lastWaypoint().getName(), getRemainingDistance(sim.currentLocation, trip.lastWaypoint())));
             //OBS. High speed. Loop five times to optain approx. 20 knots.(?)
             for (int i = 0; i < 500; ++i) { // Iterate to create speed. Break if arrived.
                 sim.move();
                 if (sim.hasArrived()) break;
             }
 
-            String gpsLocation = new LocationConverter(sim.currentLocation).toDegreeMinutesSeconds();
             message = new Gpgll(sim.currentLocation).toString();
             notifyListeners();
             sleep(1000);
-
         }
     }
 
