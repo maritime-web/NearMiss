@@ -1,10 +1,12 @@
 package dk.dma.nearmiss.gpssimulator.server;
 
+import dk.dma.nearmiss.gpssimulator.location.*;
 import dk.dma.nearmiss.gpssimulator.observer.AbstractSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static java.lang.Thread.sleep;
@@ -19,17 +21,48 @@ public class GpsSimulator extends AbstractSubject implements Runnable {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private String message;
 
+    private String getTime() {
+        return new SimpleDateFormat("HHmmss").format(new Date());
+    }
+
+    private void makeTrip(Route trip) throws InterruptedException {
+        RouteSimulator sim = new RouteSimulator(trip);
+        //noinspection InfiniteLoopStatement
+        while (!sim.hasArrived()) {
+            String time = getTime();
+
+            logger.info(String.format("Distance to %s is %s m", trip.lastWaypoint().getName(), GeoHelper.calcGeoDistanceInKm(sim.currentLocation, trip.lastWaypoint())));
+            for (int i = 0; i < 500; ++i) { // Iterate to create speed. Break if arrived.
+                sim.move();
+                if (sim.hasArrived()) break;
+            }
+
+            String gpsLocation = new LocationConverter(sim.currentLocation).toDegreeMinutesSeconds();
+            message = String.format("$GPGLL,%s,%s,A,*1D", gpsLocation, time);
+            //message = String.format("$GPGLL,4916.45,N,12311.12,W,%s,A,*1D", time);
+            notifyListeners();
+            sleep(1000);
+
+        }
+    }
+
     public void run() {
+        Location tripStart = new Location("Hundested", 56.02250000, 11.73222222);
+        Location tripEnd = new Location("Göteborg", 57.67500000, 11.73222222);
+        Route route = new Route(tripStart, tripEnd);
+
+        //noinspection InfiniteLoopStatement
+        for (;;) {
             try {
-                //noinspection InfiniteLoopStatement
-                while (true) {
-                    message = new Date().toString();
-                    notifyListeners();
-                    sleep(1000);
-                }
+                logger.info(String.format("Sailing from %s to %s.", route.getInitialLocation().getName(), route.lastWaypoint().getName()));
+                makeTrip(route);
+                logger.info(String.format("Arrived at %s.", route.lastWaypoint().getName()));
+                logger.info("Turning around.");
+                route = new Route(route.lastWaypoint(), route.getInitialLocation());
             } catch (InterruptedException e) {
                 logger.info("Sleep Interruption");
             }
+        }
     }
 
     String getMessage() {
