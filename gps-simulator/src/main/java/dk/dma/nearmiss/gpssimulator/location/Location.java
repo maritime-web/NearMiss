@@ -1,7 +1,5 @@
 package dk.dma.nearmiss.gpssimulator.location;
 
-import java.time.LocalDateTime;
-
 /**
  * Initial code. Thank you to: Mobility Services Lab
  * See <a href="https://www.mobility-services.in.tum.de/?p=2335">https://www.mobility-services.in.tum.de/?p=2335</a>
@@ -39,7 +37,6 @@ public class Location {
     public double getLongitude() {
         return longitude;
     }
-
 
 
 }

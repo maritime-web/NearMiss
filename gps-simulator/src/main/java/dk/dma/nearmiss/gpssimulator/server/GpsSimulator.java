@@ -32,6 +32,7 @@ public class GpsSimulator extends AbstractSubject implements Runnable {
             String time = getTime();
 
             logger.info(String.format("Distance to %s is %s m", trip.lastWaypoint().getName(), GeoHelper.calcGeoDistanceInKm(sim.currentLocation, trip.lastWaypoint())));
+            //OBS. High speed. Loop five times to optain approx. 20 knots.(?)
             for (int i = 0; i < 500; ++i) { // Iterate to create speed. Break if arrived.
                 sim.move();
                 if (sim.hasArrived()) break;
@@ -52,7 +53,7 @@ public class GpsSimulator extends AbstractSubject implements Runnable {
         Route route = new Route(tripStart, tripEnd);
 
         //noinspection InfiniteLoopStatement
-        for (;;) {
+        for (; ; ) {
             try {
                 logger.info(String.format("Sailing from %s to %s.", route.getInitialLocation().getName(), route.lastWaypoint().getName()));
                 makeTrip(route);
