@@ -1,6 +1,7 @@
 package dk.dma.nearmiss.gpssimulator.server;
 
 import dk.dma.nearmiss.gpssimulator.location.*;
+import dk.dma.nearmiss.gpssimulator.nmea.Gpgll;
 import dk.dma.nearmiss.gpssimulator.observer.AbstractSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,7 @@ public class GpsSimulator extends AbstractSubject implements Runnable {
             }
 
             String gpsLocation = new LocationConverter(sim.currentLocation).toDegreeMinutesSeconds();
-            message = String.format("$GPGLL,%s,%s,A,*1D", gpsLocation, time);
-            //message = String.format("$GPGLL,4916.45,N,12311.12,W,%s,A,*1D", time);
+            message = new Gpgll(sim.currentLocation).toString();
             notifyListeners();
             sleep(1000);
 
