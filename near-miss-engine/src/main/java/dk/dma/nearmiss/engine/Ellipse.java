@@ -30,11 +30,11 @@ public class Ellipse {
     /**
      * Create an Ellipse
      *
-     * @param centreLatitude Latitude of the ellipse's centre in degrees
-     * @param centreLongitude Longitude of the ellipse's center in degrees
-     * @param lengthOfAxisAlongCourse Length of the ellipse's vertical semi axis before rotation in meters
-     * @param lengthOfAxisAcrossCourse Length of the ellipse's horizontal semi axis before rotation in meters. The values supplied for this parameters are only valid in meters around latitude 55 degrees North or South.
-     * @param course Counter-clockwise rotation angle of the ellipse in degrees
+     * @param centreLatitude Latitude of the ellipse's centre in degrees.
+     * @param centreLongitude Longitude of the ellipse's center in degrees.
+     * @param lengthOfAxisAlongCourse Length of the ellipse's vertical axis before rotation in meters.
+     * @param lengthOfAxisAcrossCourse Length of the ellipse's horizontal axis before rotation in meters. The values supplied for this parameters are only valid in meters around latitude 55 degrees North or South.
+     * @param course Counter-clockwise rotation angle of the ellipse in degrees.
      */
     public Ellipse(double centreLatitude, double centreLongitude, double lengthOfAxisAlongCourse, double lengthOfAxisAcrossCourse, double course) {
         if (lengthOfAxisAlongCourse <= 0)
