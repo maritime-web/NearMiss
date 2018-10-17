@@ -32,19 +32,20 @@ public class Ellipse {
      *
      * @param centreLatitude Latitude of the ellipse's centre in degrees
      * @param centreLongitude Longitude of the ellipse's center in degrees
-     * @param verticalSemiAxisBeforeRotationInMeters Length of the ellipse's vertical semi axis before rotation in meters
-     * @param horizontalSemiAxisBeforeRotationInMeters Length of the ellipse's horizontal semi axis before rotation in meters. The values supplied for this parameters are only valid in meters around latitude 55 degrees North or South.
-     * @param rotateDegreesCounterClockwise Counter-clockwise rotation angle of the ellipse in degrees
+     * @param lengthOfAxisAlongCourse Length of the ellipse's vertical semi axis before rotation in meters
+     * @param lengthOfAxisAcrossCourse Length of the ellipse's horizontal semi axis before rotation in meters. The values supplied for this parameters are only valid in meters around latitude 55 degrees North or South.
+     * @param course Counter-clockwise rotation angle of the ellipse in degrees
      */
-    public Ellipse(double centreLatitude, double centreLongitude, double verticalSemiAxisBeforeRotationInMeters, double horizontalSemiAxisBeforeRotationInMeters, double rotateDegreesCounterClockwise) {
-        if (verticalSemiAxisBeforeRotationInMeters <= 0)
-            throw new IllegalArgumentException("verticalSemiAxisBeforeRotationInMeters must be a positive number");
-        if (horizontalSemiAxisBeforeRotationInMeters <= 0)
-            throw new IllegalArgumentException("horizontalSemiAxisBeforeRotationInMeters must be a positive number");
+    public Ellipse(double centreLatitude, double centreLongitude, double lengthOfAxisAlongCourse, double lengthOfAxisAcrossCourse, double course) {
+        if (lengthOfAxisAlongCourse <= 0)
+            throw new IllegalArgumentException("lengthOfAxisAlongCourse must be a positive number");
+        if (lengthOfAxisAcrossCourse <= 0)
+            throw new IllegalArgumentException("lengthOfAxisAcrossCourse must be a positive number");
 
-        double vAxis = verticalSemiAxisBeforeRotationInMeters / METERS_PER_DEGREE_LATITUDE;
-        double hAxis = horizontalSemiAxisBeforeRotationInMeters / METERS_PER_DEGREE_LONGITUDE;
-        double orientRad = rotateDegreesCounterClockwise * (PI/180.0);
+        final double vAxis = lengthOfAxisAlongCourse / METERS_PER_DEGREE_LATITUDE;
+        final double hAxis = lengthOfAxisAcrossCourse / METERS_PER_DEGREE_LONGITUDE;
+        final double orientDeg = (360 - course) % 360.0;
+        final double orientRad = orientDeg * (PI/180.0);
 
         Coordinate centre = new Coordinate(centreLongitude, centreLatitude);
         GeometricShapeFactory gsf = new GeometricShapeFactory();
@@ -53,6 +54,7 @@ public class Ellipse {
         gsf.setHeight(vAxis);
         gsf.setNumPoints(100);
         Polygon ellipse = gsf.createEllipse();
+
         AffineTransformation trans = AffineTransformation.rotationInstance(orientRad, centre.x, centre.y);
         ellipse.apply(trans);
 
