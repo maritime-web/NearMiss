@@ -15,6 +15,7 @@ import static java.lang.Math.PI;
  * at the surface where the Earth can the surface can safely be assumed to a linear, flat plane.
  *
  */
+@SuppressWarnings("WeakerAccess")
 public class Ellipse {
 
     private final Polygon _internalRepresentation;
