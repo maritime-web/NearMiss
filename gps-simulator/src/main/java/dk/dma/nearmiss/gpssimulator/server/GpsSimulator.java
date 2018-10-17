@@ -1,6 +1,9 @@
 package dk.dma.nearmiss.gpssimulator.server;
 
-import dk.dma.nearmiss.gpssimulator.location.*;
+import dk.dma.nearmiss.gpssimulator.location.GeoHelper;
+import dk.dma.nearmiss.gpssimulator.location.Location;
+import dk.dma.nearmiss.gpssimulator.location.Route;
+import dk.dma.nearmiss.gpssimulator.location.RouteSimulator;
 import dk.dma.nearmiss.gpssimulator.nmea.Gpgll;
 import dk.dma.nearmiss.gpssimulator.observer.AbstractSubject;
 import org.slf4j.Logger;
@@ -9,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static java.lang.Thread.sleep;
 
@@ -23,10 +24,6 @@ import static java.lang.Thread.sleep;
 public class GpsSimulator extends AbstractSubject implements Runnable {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private String message;
-
-    private String getTime() {
-        return new SimpleDateFormat("HHmmss").format(new Date());
-    }
 
     private String getRemainingDistance(Location currentLocation, Location lastWaypoint) {
         DecimalFormat df = new DecimalFormat("#.###");
