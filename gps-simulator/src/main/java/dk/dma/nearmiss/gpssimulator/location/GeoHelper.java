@@ -10,22 +10,21 @@ public class GeoHelper {
 
     public static final double EARTH_RADIUS_IN_KM = 6.371;
 
-
     /**
      * Calculate distance between two points in latitude and longitude taking
      * into account height difference. If you are not interested in height
      * difference pass 0.0. Uses Haversine method as its base.
-     *
+     * <p>
      * lat1, lon1 Start point lat2, lon2 End point el1 Start altitude in meters
      * el2 End altitude in meters
-     *
+     * <p>
      * From stackoverflow since the original method from Mobility Services Lab failed to calculate correct distance.
      * See <a href="https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude-what-am-i-doi">https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude-what-am-i-doi</a>
      *
-     * @returns Distance in Km
+     * @return Distance in Km
      */
     public static double calcGeoDistanceInKm(double lat1, double lat2, double lon1,
-                                  double lon2, double el1, double el2) {
+                                             double lon2, double el1, double el2) {
 
 
         double latDistance = Math.toRadians(lat2 - lat1);
@@ -43,14 +42,14 @@ public class GeoHelper {
         return Math.sqrt(distance);
     }
 
-    public static double calcGeoDistanceInKm(Location location1, Location location2){
+    public static double calcGeoDistanceInKm(Location location1, Location location2) {
         return calcGeoDistanceInKm(location1.getLatitude(), location2.getLatitude(), location1.getLongitude(), location2.getLongitude(), 0, 0);
     }
 
     public static double calcAngleBetweenGeoLocationsInRadians(double lat1, double lat2, double lon1, double lon2) {
-        double dlat = lat2-lat1;
-        double dlon = lon2-lon1;
-        double angle = (Math.atan2(dlat,dlon) * 180) / Math.PI;
+        double dlat = lat2 - lat1;
+        double dlon = lon2 - lon1;
+        double angle = (Math.atan2(dlat, dlon) * 180) / Math.PI;
         return Math.toRadians(angle);
     }
 
@@ -66,6 +65,5 @@ public class GeoHelper {
         System.out.println(String.format("Distance %s km", distanceKm));
         //System.out.println(String.format("Distance %s km", distanceM));
     }
-
 
 }
