@@ -12,19 +12,22 @@ import java.net.Socket;
 public class GpsSimulatorServer implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final GpsSimulator gps;
+    private final TcpServerConfiguration configuration;
     private ServerSocket serverSocketListener;
     private int clientNumber = 0;
 
-    GpsSimulatorServer(GpsSimulator gps) {
+    GpsSimulatorServer(GpsSimulator gps, TcpServerConfiguration configuration) {
         this.gps = gps;
+        this.configuration = configuration;
         init();
     }
 
     private void init() {
         try {
-            serverSocketListener = new ServerSocket(9898);
+            logger.info(String.format("Using %s as localPort.", configuration.getLocalPort()));
+            serverSocketListener = new ServerSocket(configuration.getLocalPort());
         } catch (IOException e) {
-            logger.error("Could not create new server socket on port 9898");
+            logger.error(String.format("Could not create new server socket on port %s", configuration.getLocalPort()));
         }
     }
 
