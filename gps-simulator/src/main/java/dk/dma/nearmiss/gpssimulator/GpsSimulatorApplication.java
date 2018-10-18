@@ -17,9 +17,9 @@ public class GpsSimulatorApplication implements CommandLineRunner {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private TcpServer gpsSimulatorServer;
+    private GpsSimulatorServer gpsSimulatorServer;
 
-    public GpsSimulatorApplication(TcpServer gpsSimulatorServer) {
+    public GpsSimulatorApplication(GpsSimulatorServer gpsSimulatorServer) {
         this.gpsSimulatorServer = gpsSimulatorServer;
     }
 

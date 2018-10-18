@@ -37,8 +37,7 @@ public class TcpServerConnection implements Observer {
 
     @Override
     public void update() {
-        String time = simulator.getMessage();
-        print(String.format("%s : Message from GpsSimulatorSocketConnection to client# %s", time, clientNumber));
+        print(simulator.getMessage());
     }
 
 }

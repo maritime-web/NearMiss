@@ -39,7 +39,7 @@ public class RouteSimulator {
             }
             nextWaypoint = simulatedRoute.getWaypoints()[waypointCounter];
         }
-        logger.debug("Moving to " + nextWaypoint.getName() + ". Distance = " + GeoHelper.calcGeoDistanceInKm(currentLocation, nextWaypoint) * 1000 + "m");
+        logger.trace("Moving to " + nextWaypoint.getName() + ". Distance = " + GeoHelper.calcGeoDistanceInKm(currentLocation, nextWaypoint) * 1000 + "m");
         double angle = GeoHelper.calcAngleBetweenGeoLocationsInRadians(currentLocation, nextWaypoint);
         double newLat = currentLocation.getLatitude() + Math.sin(angle) * SIMULATOR_MOVEMENT_SPEED;
         double newLon = currentLocation.getLongitude() + Math.cos(angle) * SIMULATOR_MOVEMENT_SPEED;
