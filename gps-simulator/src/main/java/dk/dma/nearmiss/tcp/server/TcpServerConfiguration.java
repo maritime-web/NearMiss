@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.gpssimulator.server;
+package dk.dma.nearmiss.tcp.server;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"dk.dma.nearmiss.gpssimulator.observer", "dk.dma.nearmiss.gpssimulator.client", "dk.dma.nearmiss.aissimulator"})
+@ComponentScan(basePackages = {"dk.dma.nearmiss.observer", "dk.dma.nearmiss.tcp.client", "dk.dma.nearmiss.aissimulator"})
 public class AisSimulatorApplication implements CommandLineRunner {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -28,7 +28,7 @@ public class AisSimulatorApplication implements CommandLineRunner {
         logger.info("Starting AisSimulatorApplication...");
 
         // Start GPS TCP client
-		new Thread(aisSimulator.getGpsSimulatorClient()).start();
+		new Thread(aisSimulator.getTcpClient()).start();
 	}
 
 }

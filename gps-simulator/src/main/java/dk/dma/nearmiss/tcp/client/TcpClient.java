@@ -1,6 +1,7 @@
-package dk.dma.nearmiss.gpssimulator.client;
+package dk.dma.nearmiss.tcp.client;
 
-import dk.dma.nearmiss.gpssimulator.observer.AbstractSubject;
+import dk.dma.nearmiss.observer.AbstractSubject;
+import dk.dma.nearmiss.simulator.MessageProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 @Component
-public class GpsSimulatorClient extends AbstractSubject implements Runnable {
+public class TcpClient extends AbstractSubject implements MessageProvider, Runnable {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -19,7 +20,7 @@ public class GpsSimulatorClient extends AbstractSubject implements Runnable {
     private BufferedReader input;
     private String answer;
 
-    GpsSimulatorClient() {
+    TcpClient() {
         init();
     }
 
@@ -50,7 +51,6 @@ public class GpsSimulatorClient extends AbstractSubject implements Runnable {
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
     public String getMessage() {
         return answer;
     }

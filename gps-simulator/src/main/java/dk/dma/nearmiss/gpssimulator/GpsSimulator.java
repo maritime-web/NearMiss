@@ -1,11 +1,11 @@
-package dk.dma.nearmiss.gpssimulator.server;
+package dk.dma.nearmiss.gpssimulator;
 
 import dk.dma.nearmiss.gpssimulator.location.GeoHelper;
 import dk.dma.nearmiss.gpssimulator.location.Location;
 import dk.dma.nearmiss.gpssimulator.location.Route;
 import dk.dma.nearmiss.gpssimulator.location.RouteSimulator;
 import dk.dma.nearmiss.gpssimulator.nmea.Gpgll;
-import dk.dma.nearmiss.gpssimulator.observer.AbstractSubject;
+import dk.dma.nearmiss.simulator.Simulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ import static java.lang.Thread.sleep;
  * Listeners are able to ask the GPS simulator of the current position.
  */
 @Component
-public class GpsSimulator extends AbstractSubject implements Runnable {
+public class GpsSimulator extends Simulator {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private String message;
 
@@ -68,7 +68,7 @@ public class GpsSimulator extends AbstractSubject implements Runnable {
         }
     }
 
-    String getMessage() {
+    public String getMessage() {
         return message;
     }
 }

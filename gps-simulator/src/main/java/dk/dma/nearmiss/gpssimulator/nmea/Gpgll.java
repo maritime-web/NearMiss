@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class Gpgll {
+    @SuppressWarnings("WeakerAccess")
     public static final String MESSAGE_TYPE = "GPGLL";
     private final Location location;
     private final Instant instant;

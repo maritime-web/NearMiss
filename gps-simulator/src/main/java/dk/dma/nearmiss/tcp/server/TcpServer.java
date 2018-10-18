@@ -1,23 +1,23 @@
-package dk.dma.nearmiss.gpssimulator.server;
+package dk.dma.nearmiss.tcp.server;
 
+import dk.dma.nearmiss.simulator.Simulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-@Component
-public class GpsSimulatorServer implements Runnable {
+public abstract class TcpServer implements Runnable {
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final GpsSimulator gps;
+    private final Simulator simulator;
     private final TcpServerConfiguration configuration;
     private ServerSocket serverSocketListener;
     private int clientNumber = 0;
 
-    GpsSimulatorServer(GpsSimulator gps, TcpServerConfiguration configuration) {
-        this.gps = gps;
+    public TcpServer(Simulator simulator, TcpServerConfiguration configuration) {
+        this.simulator = simulator;
         this.configuration = configuration;
         init();
     }
@@ -36,7 +36,7 @@ public class GpsSimulatorServer implements Runnable {
             //noinspection InfiniteLoopStatement
             while (true) {
                 Socket socket = serverSocketListener.accept();
-                gps.addListener(new GpsSimulatorSocketConnection(socket, clientNumber++, gps));
+                simulator.addListener(new TcpServerConnection(socket, clientNumber++, simulator));
             }
         } catch (IOException e) {
             logger.error(String.format("Error communicating with server socket: %s", e.getMessage()));
@@ -55,7 +55,8 @@ public class GpsSimulatorServer implements Runnable {
         }
     }
 
-    public GpsSimulator getGpsSimulator() {
-        return gps;
+    public Simulator getSimulator() {
+        return simulator;
     }
+
 }

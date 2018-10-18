@@ -1,7 +1,7 @@
 package dk.dma.nearmiss.aissimulator;
 
-import dk.dma.nearmiss.gpssimulator.client.GpsSimulatorClient;
-import dk.dma.nearmiss.gpssimulator.observer.Observer;
+import dk.dma.nearmiss.tcp.client.TcpClient;
+import dk.dma.nearmiss.observer.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -9,19 +9,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class AisSimulator implements Observer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final GpsSimulatorClient gpsSimulatorClient;
+    private final TcpClient tcpClient;
 
-    public AisSimulator(GpsSimulatorClient gpsSimulatorClient) {
-        this.gpsSimulatorClient = gpsSimulatorClient;
-        gpsSimulatorClient.addListener(this);
+    public AisSimulator(TcpClient tcpClient) {
+        this.tcpClient = tcpClient;
+        tcpClient.addListener(this);
     }
 
     @Override
     public void update() {
-        logger.info(String.format("AisSimulator has received: %s", gpsSimulatorClient.getMessage()));
+        logger.info(String.format("AisSimulator has received: %s", tcpClient.getMessage()));
     }
 
-    GpsSimulatorClient getGpsSimulatorClient() {
-        return gpsSimulatorClient;
+    TcpClient getTcpClient() {
+        return tcpClient;
     }
 }

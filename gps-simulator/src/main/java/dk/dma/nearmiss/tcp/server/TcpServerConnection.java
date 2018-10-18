@@ -1,6 +1,7 @@
-package dk.dma.nearmiss.gpssimulator.server;
+package dk.dma.nearmiss.tcp.server;
 
-import dk.dma.nearmiss.gpssimulator.observer.Observer;
+import dk.dma.nearmiss.simulator.MessageProvider;
+import dk.dma.nearmiss.observer.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,18 +9,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class GpsSimulatorSocketConnection implements Observer {
+public class TcpServerConnection implements Observer {
     private final Socket socket;
     private final int clientNumber;
-    private final GpsSimulator gps;
+    private final MessageProvider simulator;
 
     private PrintWriter out;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    GpsSimulatorSocketConnection(Socket socket, int clientNumber, GpsSimulator gps) {
+    TcpServerConnection(Socket socket, int clientNumber, MessageProvider simulator) {
         this.socket = socket;
         this.clientNumber = clientNumber;
-        this.gps = gps;
+        this.simulator = simulator;
         logger.info("New connection with client# " + clientNumber + " at " + socket);
     }
 
@@ -36,7 +37,7 @@ public class GpsSimulatorSocketConnection implements Observer {
 
     @Override
     public void update() {
-        String time = gps.getMessage();
+        String time = simulator.getMessage();
         print(String.format("%s : Message from GpsSimulatorSocketConnection to client# %s", time, clientNumber));
     }
 

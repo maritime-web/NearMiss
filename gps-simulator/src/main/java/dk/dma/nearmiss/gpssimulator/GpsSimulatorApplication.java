@@ -1,32 +1,25 @@
 package dk.dma.nearmiss.gpssimulator;
 
-import dk.dma.nearmiss.gpssimulator.client.GpsSimulatorClient;
-import dk.dma.nearmiss.gpssimulator.server.GpsSimulatorServer;
+import dk.dma.nearmiss.tcp.client.TcpClient;
+import dk.dma.nearmiss.tcp.server.TcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 
-
-
-@ComponentScan(excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = GpsSimulatorClient.class) })
 @SpringBootApplication
+@ComponentScan(basePackages = {"dk.dma.nearmiss"},
+        excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = TcpClient.class) })
 public class GpsSimulatorApplication implements CommandLineRunner {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private GpsSimulatorServer gpsSimulatorServer;
+    private TcpServer gpsSimulatorServer;
 
-
-    public GpsSimulatorApplication(GpsSimulatorServer gpsSimulatorServer) {
+    public GpsSimulatorApplication(TcpServer gpsSimulatorServer) {
         this.gpsSimulatorServer = gpsSimulatorServer;
     }
 
@@ -39,7 +32,7 @@ public class GpsSimulatorApplication implements CommandLineRunner {
         logger.info("Starting GpsSimulatorApplication...");
 
         // Start GPS simulator
-        new Thread(gpsSimulatorServer.getGpsSimulator()).start();
+        new Thread(gpsSimulatorServer.getSimulator()).start();
 
         // Start TCP server
         new Thread(gpsSimulatorServer).start();

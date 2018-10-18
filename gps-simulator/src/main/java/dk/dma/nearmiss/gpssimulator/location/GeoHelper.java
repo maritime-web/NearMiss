@@ -57,13 +57,4 @@ public class GeoHelper {
         return calcAngleBetweenGeoLocationsInRadians(location1.getLatitude(), location2.getLatitude(), location1.getLongitude(), location2.getLongitude());
     }
 
-    public static void main(String[] args) {
-        Location tripStart = new Location("Trip Start", 56.02250000, 11.73222222);
-        Location tripEnd = new Location("Trip End", 57.67500000, 11.73222222);
-        double distanceKm = calcGeoDistanceInKm(tripStart, tripEnd);
-        //double distanceM = distance(tripStart.getLatitude(),tripEnd.getLatitude(), tripStart.getLongitude(), tripEnd.getLongitude(), 0, 0);
-        System.out.println(String.format("Distance %s km", distanceKm));
-        //System.out.println(String.format("Distance %s km", distanceM));
-    }
-
 }
