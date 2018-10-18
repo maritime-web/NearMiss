@@ -23,7 +23,7 @@ public class AisSimulator extends Simulator implements Observer {
     @Override
     public void update() {
         input = tcpClient.getMessage();
-        logger.info(String.format("Received: %s", input));
+        logger.info(String.format("AisSimulator Received: %s", input));
         run(); // run AisServer server part.
     }
 
