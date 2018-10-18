@@ -1,7 +1,6 @@
 package dk.dma.nearmiss.tcp.client;
 
-import dk.dma.nearmiss.observer.AbstractSubject;
-import dk.dma.nearmiss.simulator.MessageProvider;
+import dk.dma.nearmiss.simulator.Simulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -12,21 +11,24 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 @Component
-public class TcpClient extends AbstractSubject implements MessageProvider, Runnable {
+public class TcpClient extends Simulator {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @SuppressWarnings("FieldCanBeLocal")
     private Socket socket;
     private BufferedReader input;
     private String answer;
+    private final TcpClientConfiguration configuration;
 
-    TcpClient() {
+    TcpClient(TcpClientConfiguration configuration) {
+        this.configuration = configuration;
         init();
     }
 
     private void init() {
         try {
-            socket = new Socket("localhost", 9898);
+            logger.debug(String.format("Creating to connection towards %s:%s", configuration.getHost(), configuration.getRemotePort()));
+            socket = new Socket(configuration.getHost(), configuration.getRemotePort());
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
             logger.error("Client: Error creating socket/stream");
