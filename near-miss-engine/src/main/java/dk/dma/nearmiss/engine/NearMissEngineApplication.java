@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"dk.dma.nearmiss.observer", "dk.dma.nearmiss.tcp.client", "dk.dma.nearmiss.engine"})
+@ComponentScan(basePackages = {"dk.dma.nearmiss.observer", "dk.dma.nearmiss.tcp.client", "dk.dma.nearmiss.engine", "dk.dma.nearmiss.db"})
 public class NearMissEngineApplication implements CommandLineRunner {
     private final NearMissEngine engine;
 
