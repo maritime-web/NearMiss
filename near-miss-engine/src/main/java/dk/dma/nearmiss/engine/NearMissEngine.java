@@ -1,5 +1,7 @@
 package dk.dma.nearmiss.engine;
 
+import dk.dma.nearmiss.db.entity.Message;
+import dk.dma.nearmiss.db.repository.MessageRepository;
 import dk.dma.nearmiss.observer.Observer;
 import dk.dma.nearmiss.tcp.client.TcpClient;
 import org.slf4j.Logger;
@@ -10,9 +12,11 @@ import org.springframework.stereotype.Component;
 public class NearMissEngine implements Observer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private final TcpClient tcpClient;
+    private final MessageRepository messageRepository;
 
-    public NearMissEngine(TcpClient tcpClient) {
+    public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository) {
         this.tcpClient = tcpClient;
+        this.messageRepository = messageRepository;
         tcpClient.addListener(this);
     }
 
@@ -22,7 +26,12 @@ public class NearMissEngine implements Observer {
 
     @Override
     public void update() {
-        logger.info(String.format("NearMissEngine Received: %s", tcpClient.getMessage()));
+        String receivedMessage = tcpClient.getMessage();
+
+        logger.info(String.format("NearMissEngine Received: %s", receivedMessage));
+
         // Further handling from received messages to be added here.
+        messageRepository.save(new Message(receivedMessage));
+
     }
 }
