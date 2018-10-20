@@ -1,0 +1,22 @@
+# docker-compose up -d
+# docker-compose down --rmi local
+# docker container logs ais-simulator -f
+# docker container logs gps-simulator -f
+
+version: '2.0'
+services:
+  gps-simulator:
+    build: gps-simulator/.
+    image: gps-simulator
+    container_name: gps-simulator
+    ports:
+    - "9898:9898"
+
+  ais-simulator:
+    build: ais-simulator/.
+    image: ais-simulator
+    container_name: ais-simulator
+    ports:
+    - "9897:9897"
+
+
