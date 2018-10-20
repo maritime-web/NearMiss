@@ -31,7 +31,9 @@ public class NearMissEngine implements Observer {
         logger.info(String.format("NearMissEngine Received: %s", receivedMessage));
 
         // Further handling from received messages to be added here.
-        messageRepository.save(new Message(receivedMessage));
+        Message savedMessage = messageRepository.save(new Message(receivedMessage));
+        logger.debug(String.format("Saved message: %s", savedMessage));
+        logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
 
     }
 }

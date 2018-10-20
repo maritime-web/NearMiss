@@ -13,13 +13,13 @@ To run the full application locally do following:
 Refer to README.adoc in the sub project.
 
 4. Start near-miss-db using the h2tcp profile starting the h2 mem db in tcp mode.
-`java -jar near-miss-db-0.0.1-SNAPSHOT-exec.jar --spring.profiles.active=h2tcp --spring.config.location=../src/main/java/resources`
+`java -jar near-miss-db-0.0.1-SNAPSHOT-exec.jar --spring.profiles.active=h2tcp --spring.config.location=../src/main/resources`
 
 5. Start near-miss-engine using h2tcp profile.
-`java -jar near-miss-engine-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2tcp --spring.config.location=../src/main/java/resources`
+`java -jar near-miss-engine-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2tcp --spring.config.location=../src/main/resources/`
 
 6. Start near-miss-web using h2tcp profile.
-`java -jar near-miss-web-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2tcp --spring.config.location=../src/main/java/resources`
+`java -jar near-miss-web-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2tcp --spring.config.location=../src/main/resources`
 
 
 
