@@ -3,8 +3,38 @@
 # docker container logs ais-simulator -f
 # docker container logs gps-simulator -f
 
-version: '2.0'
+version: '2.1'
 services:
+
+  nearmiss-mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: nearmiss
+      MYSQL_ROOT_PASSWORD: example
+    container_name: nearmiss-mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=example --execute \"SHOW DATABASES;\""
+      interval: 10s
+      timeout: 1s
+      retries: 5
+    volumes:
+      - mysql-db:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.6
+    external_links:
+    - nearmiss-mysql:db
+    ports:
+    - "8081:80"
+    restart: always
+    volumes:
+    - phpmyadmin:/sessions
+    depends_on:
+      nearmiss-mysql:
+        condition: service_started
+
   gps-simulator:
     build: gps-simulator/.
     image: gps-simulator
@@ -30,3 +60,14 @@ services:
     depends_on:
     - "ais-simulator"
 
+  near-miss-engine:
+    build: near-miss-engine/.
+    image: near-miss-engine
+    container_name: near-miss-engine
+    depends_on:
+      nearmiss-mysql:
+          condition: service_healthy
+
+volumes:
+  mysql-db:
+  phpmyadmin:
