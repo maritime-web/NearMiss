@@ -68,6 +68,16 @@ services:
       nearmiss-mysql:
           condition: service_healthy
 
+  near-miss-web:
+    build: near-miss-web/.
+    image: near-miss-web
+    container_name: near-miss-web
+    ports:
+    - "8080:8080"
+    depends_on:
+      nearmiss-mysql:
+          condition: service_healthy
+
 volumes:
   mysql-db:
   phpmyadmin:
