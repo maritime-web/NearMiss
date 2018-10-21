@@ -1,4 +1,4 @@
-# docker-compose up -d
+# docker-compose up --build
 # docker-compose down --rmi local
 # docker container logs ais-simulator -f
 # docker container logs gps-simulator -f
@@ -10,13 +10,23 @@ services:
     image: gps-simulator
     container_name: gps-simulator
     ports:
-    - "9898:9898"
+      - "9898:9898"
 
   ais-simulator:
     build: ais-simulator/.
     image: ais-simulator
     container_name: ais-simulator
     ports:
-    - "9897:9897"
+      - "9897:9897"
+    depends_on:
+      - "gps-simulator"
 
+  pilot-plug-simulator:
+    build: pilot-plug-simulator/.
+    image: pilot-plug-simulator
+    container_name: pilot-plug-simulator
+    ports:
+    - "9000:9000"
+    depends_on:
+    - "ais-simulator"
 
