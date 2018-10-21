@@ -18,7 +18,7 @@ services:
       test: "/usr/bin/mysql --user=root --password=example --execute \"SHOW DATABASES;\""
       interval: 10s
       timeout: 1s
-      retries: 5
+      retries: 10
     volumes:
       - mysql-db:/var/lib/mysql
 
