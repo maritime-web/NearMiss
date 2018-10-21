@@ -5,6 +5,13 @@
 
 version: '2.0'
 services:
+  near-miss-db:
+    build: near-miss-db/.
+    image: near-miss-db
+    container_name: near-miss-db
+    ports:
+      - "8081:8081"
+
   gps-simulator:
     build: gps-simulator/.
     image: gps-simulator
