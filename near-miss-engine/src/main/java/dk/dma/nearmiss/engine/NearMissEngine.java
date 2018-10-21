@@ -28,11 +28,11 @@ public class NearMissEngine implements Observer {
     public void update() {
         String receivedMessage = tcpClient.getMessage();
 
-        logger.info(String.format("NearMissEngine Received: %s", receivedMessage));
+        logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
 
         // Further handling from received messages to be added here.
         Message savedMessage = messageRepository.save(new Message(receivedMessage));
-        logger.debug(String.format("Saved message: %s", savedMessage));
+        logger.debug(String.format("Saved: %s", savedMessage));
         logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
 
     }
