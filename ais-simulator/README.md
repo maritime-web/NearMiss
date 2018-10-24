@@ -1,0 +1,11 @@
+
+
+    https://github.com/dma-ais/AisLib
+
+    <dependency>
+        <groupId>dk.dma.ais.lib</groupId>
+        <artifactId>ais-lib-communication</artifactId>
+        <version>2.4-SNAPSHOT</version>
+    </dependency>
+		
+		

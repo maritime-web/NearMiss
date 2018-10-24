@@ -1,6 +1,9 @@
 package dk.dma.nearmiss.aissimulator;
 
 import com.opencsv.CSVReader;
+import dk.dma.ais.proprietary.GatehouseFactory;
+import dk.dma.ais.proprietary.GatehouseSourceTag;
+import dk.dma.ais.sentence.SentenceLine;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,9 +15,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,7 +67,7 @@ public class AisDataReaderTests {
 
         for (String fileName : fileNames) {
             try {
-                File file = new ClassPathResource(String.format("%s/%s", dir, fileName)).getFile();
+                new ClassPathResource(String.format("%s/%s", dir, fileName)).getFile();
             } catch (IOException e) {
                 allFilesFound = false;
                 logger.error(String.format("File: %s not found in the %s directory.", fileName, dir));
@@ -108,20 +113,17 @@ public class AisDataReaderTests {
 
     @Test
     public void forward() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmss").withZone(ZoneId.of("UTC"));
+
         while (aisDataReader.forward()) {
-            logger.info(aisDataReader.getLine().toString());
+            SentenceLine sentenceLine = new SentenceLine(aisDataReader.getLine().getTime());
+            GatehouseSourceTag tag = (GatehouseSourceTag) GatehouseFactory.parseTag(sentenceLine);
+
+            Instant instant = tag.getTimestamp().toInstant();
+            String timestamp = formatter.format(instant);
+
+            logger.info(String.format("Timestamp: %s Message: %s", timestamp, aisDataReader.getLine().getMessage()));
         }
     }
 
-    @Test
-    @Ignore
-    public void name() throws FileNotFoundException, IOException {
-        File file = new ClassPathResource("csv/1152DK4201152-20181007-7.csv").getFile();
-        CSVReader reader = new CSVReader(new FileReader(file));
-        String[] nextLine;
-        while ((nextLine = reader.readNext()) != null) {
-            // nextLine[] is an array of values from the line
-            System.out.println(nextLine[0] + nextLine[1] + "etc...");
-        }
-    }
-}
+n}
