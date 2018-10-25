@@ -4,7 +4,6 @@ import com.opencsv.CSVReader;
 import dk.dma.ais.proprietary.GatehouseFactory;
 import dk.dma.ais.proprietary.GatehouseSourceTag;
 import dk.dma.ais.sentence.SentenceLine;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -112,11 +111,13 @@ public class AisDataReaderTests {
 
 
     @Test
-    public void forward() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmss").withZone(ZoneId.of("UTC"));
+    public void testForward() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss").withZone(ZoneId.of("UTC"));
 
         while (aisDataReader.forward()) {
-            SentenceLine sentenceLine = new SentenceLine(aisDataReader.getLine().getTime());
+            AisDataLine aisDataLine = aisDataReader.getLine();
+
+            SentenceLine sentenceLine = new SentenceLine(aisDataLine.getTime());
             GatehouseSourceTag tag = (GatehouseSourceTag) GatehouseFactory.parseTag(sentenceLine);
 
             Instant instant = tag.getTimestamp().toInstant();
@@ -126,4 +127,4 @@ public class AisDataReaderTests {
         }
     }
 
-n}
+}
