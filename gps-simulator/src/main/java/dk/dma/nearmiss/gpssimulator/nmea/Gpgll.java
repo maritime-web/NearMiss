@@ -3,7 +3,7 @@ package dk.dma.nearmiss.gpssimulator.nmea;
 import dk.dma.nearmiss.gpssimulator.location.Location;
 import dk.dma.nearmiss.gpssimulator.location.LocationConverter;
 
-import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
@@ -11,16 +11,22 @@ public class Gpgll {
     @SuppressWarnings("WeakerAccess")
     public static final String MESSAGE_TYPE = "GPGLL";
     private final Location location;
-    private final Instant instant;
+    private final LocalTime time;
 
-    public Gpgll(Location location) {
-        this.instant = Instant.now();
+    public Gpgll(Location location, LocalTime time) {
+        this.time = time;
         this.location = location;
     }
 
-    private String getTime() {
+    public String getTime() {
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmss").withZone(ZoneId.of("UTC"));
-        return formatter.format(instant);
+        return formatter.format(time);
+    }
+
+    public String getFormattedTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss VV").withZone(ZoneId.of("UTC"));
+        return formatter.format(time);
     }
 
     private String getGpsLocation() {

@@ -1,5 +1,6 @@
 package dk.dma.nearmiss.gpssimulator;
 
+import dk.dma.nearmiss.GpsSimulatorConfiguration;
 import dk.dma.nearmiss.gpssimulator.location.GeoHelper;
 import dk.dma.nearmiss.gpssimulator.location.Location;
 import dk.dma.nearmiss.gpssimulator.location.Route;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 
 import static java.lang.Thread.sleep;
 
@@ -24,6 +27,11 @@ import static java.lang.Thread.sleep;
 public class GpsSimulator extends Simulator {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private String message;
+    private final GpsSimulatorConfiguration configuration;
+
+    public GpsSimulator(GpsSimulatorConfiguration configuration) {
+        this.configuration = configuration;
+    }
 
     private String getRemainingDistance(Location currentLocation, Location lastWaypoint) {
         DecimalFormat df = new DecimalFormat("#.###");
@@ -36,17 +44,27 @@ public class GpsSimulator extends Simulator {
         //noinspection InfiniteLoopStatement
         while (!sim.hasArrived()) {
 
-            logger.info(String.format("Remaining distance to %s is %s km", trip.lastWaypoint().getName(), getRemainingDistance(sim.currentLocation, trip.lastWaypoint())));
             //OBS. High speed. Loop five times to optain approx. 20 knots.(?)
             for (int i = 0; i < 500; ++i) { // Iterate to create speed. Break if arrived.
                 sim.move();
                 if (sim.hasArrived()) break;
             }
 
-            message = new Gpgll(sim.currentLocation).toString();
+            Gpgll gpgll = new Gpgll(sim.currentLocation, getSimulatedTime());
+            message = gpgll.toString();
+            logger.info(String.format("At %s, remaining distance to %s is %s km",
+                    gpgll.getFormattedTime(), trip.lastWaypoint().getName(), getRemainingDistance(sim.currentLocation, trip.lastWaypoint())));
+            logger.debug(String.format("Broadcasting message: %s", message));
             notifyListeners();
+
             sleep(1000);
         }
+    }
+
+
+    private LocalTime getSimulatedTime() {
+        LocalTime currentTimeUtc = LocalTime.now(ZoneOffset.UTC);
+        return currentTimeUtc.plus(configuration.getStartTimeOffset());
     }
 
     public void run() {
