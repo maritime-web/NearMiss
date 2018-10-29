@@ -13,10 +13,12 @@ public class NearMissEngine implements Observer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private final TcpClient tcpClient;
     private final MessageRepository messageRepository;
+    private final NearMissVesselState state;
 
-    public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository) {
+    public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository, NearMissVesselState state) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
+        this.state = state;
         tcpClient.addListener(this);
     }
 
@@ -24,11 +26,13 @@ public class NearMissEngine implements Observer {
         return tcpClient;
     }
 
+
     @Override
     public void update() {
         String receivedMessage = tcpClient.getMessage();
 
         logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
+        if (isOwnShipUpdate(receivedMessage)) updateOwnShip();
 
         // Further handling from received messages to be added here.
         Message savedMessage = messageRepository.save(new Message(receivedMessage));
@@ -36,4 +40,14 @@ public class NearMissEngine implements Observer {
         logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
 
     }
+
+    private void updateOwnShip() {
+        logger.trace("Updating own ship");
+        //More to come...
+    }
+
+    private boolean isOwnShipUpdate(String message) {
+        return message.startsWith("$GPGLL");
+    }
+
 }
