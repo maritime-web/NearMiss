@@ -1,20 +1,21 @@
-package dk.dma.nearmiss.gpssimulator.location;
+package dk.dma.nearmiss.helper;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
 
+public class PositionHelperTests {
 
-@RunWith(SpringRunner.class)
-public class LocationConverterTests {
-    private static final Location TRIP_START = new Location("Hundested", 56.02250000, 11.73222222);
-    private static final Location TRIP_END = new Location("Göteborg", 57.67500000, 11.73222222);
+    private static final double TRIP_START_LAT = 56.02250000;
+    private static final double TRIP_START_LON = 11.73222222;
+
+    private static final double TRIP_END_LAT = 57.67500000;
+    private static final double TRIP_END_LON = 11.73222222;
+
 
     @Test
     public void pad_2() {
-        LocationConverter conv = new LocationConverter(TRIP_START);
+        PositionHelper conv = new PositionHelper(TRIP_START_LAT, TRIP_START_LON);
 
         assertEquals("Expected correct padding", "01", conv.pad(1, 2));
         assertEquals("Expected correct padding", "02", conv.pad(2, 2));
@@ -23,7 +24,7 @@ public class LocationConverterTests {
 
     @Test
     public void pad_3() {
-        LocationConverter conv = new LocationConverter(TRIP_START);
+        PositionHelper conv = new PositionHelper(TRIP_START_LAT, TRIP_START_LON);
 
         assertEquals("Expected correct padding", "001", conv.pad(1, 3));
         assertEquals("Expected correct padding", "002", conv.pad(2, 3));
@@ -34,14 +35,14 @@ public class LocationConverterTests {
     @Test
     public void toDegreeMinutesSeconds_trip_start() {
         String  expectedResult = "5601.60,N,01143.60,E";
-        LocationConverter conv = new LocationConverter(TRIP_START);
+        PositionHelper conv = new PositionHelper(TRIP_START_LAT, TRIP_START_LON);
         assertEquals("Expected correct NMEA GPS coordinate", expectedResult, conv.toDegreeMinutesSeconds());
     }
 
     @Test
     public void toDegreeMinutesSeconds_trip_end() {
         String  expectedResult = "5740.00,N,01143.60,E";
-        LocationConverter conv = new LocationConverter(TRIP_END);
+        PositionHelper conv = new PositionHelper(TRIP_END_LAT, TRIP_END_LON);
         assertEquals("Expected correct NMEA GPS coordinate", expectedResult, conv.toDegreeMinutesSeconds());
     }
 

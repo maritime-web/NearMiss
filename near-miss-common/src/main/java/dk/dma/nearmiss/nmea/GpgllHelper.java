@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.gpssimulator.nmea;
+package dk.dma.nearmiss.nmea;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,15 +1,11 @@
-package dk.dma.nearmiss.gpssimulator.nmea;
+package dk.dma.nearmiss.nmea;
 
 import org.junit.Test;
-import org.springframework.format.datetime.DateFormatter;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Date;
-import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 

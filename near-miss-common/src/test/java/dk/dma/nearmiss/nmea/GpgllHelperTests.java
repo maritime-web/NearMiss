@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.gpssimulator.nmea;
+package dk.dma.nearmiss.nmea;
 
 import org.junit.Test;
 import org.slf4j.Logger;

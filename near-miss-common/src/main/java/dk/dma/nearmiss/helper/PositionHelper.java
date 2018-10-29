@@ -1,23 +1,15 @@
-package dk.dma.nearmiss.gpssimulator.location;
+package dk.dma.nearmiss.helper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class LocationConverter {
-    private final Location location;
+public class PositionHelper {
+    private final double lat;
+    private final double lon;
 
-    public LocationConverter(Location location) {
-        this.location = location;
-    }
-
-    String pad(int number, int padLength) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < padLength; i++) {
-            sb.append("0");
-        }
-
-        String num = String.valueOf(number);
-        return (sb.toString() + num).substring(num.length());
+    public PositionHelper(double lat, double lon) {
+        this.lat = lat;
+        this.lon = lon;
     }
 
     private String toDegreeMinutesSeconds(double decimalDegrees, boolean isLongtitude) {
@@ -36,19 +28,28 @@ public class LocationConverter {
         return String.format("%s%s.%s", strDegrees, pad(minutes, 2), pad(seconds.intValue(), 2));
     }
 
+    String pad(int number, int padLength) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < padLength; i++) {
+            sb.append("0");
+        }
+
+        String num = String.valueOf(number);
+        return (sb.toString() + num).substring(num.length());
+    }
+
     private String latitudeLetter() {
-        return (location.getLatitude() < 0) ? "S" : "N";
+        return (lat < 0) ? "S" : "N";
     }
 
     private String longtitudeLetter() {
-        return (location.getLongitude() < 0) ? "W" : "E";
+        return (lon < 0) ? "W" : "E";
     }
 
     public String toDegreeMinutesSeconds() {
-        // $GPGLL,4916.45,N,12311.12,W,225444,A,*1D
-
-        String latitude = toDegreeMinutesSeconds(location.getLatitude(), false);
-        String longtitude = toDegreeMinutesSeconds(location.getLongitude(), true);
+        String latitude = toDegreeMinutesSeconds(lat, false);
+        String longtitude = toDegreeMinutesSeconds(lon, true);
         return String.format("%s,%s,%s,%s", latitude, latitudeLetter(), longtitude, longtitudeLetter());
     }
 }
+

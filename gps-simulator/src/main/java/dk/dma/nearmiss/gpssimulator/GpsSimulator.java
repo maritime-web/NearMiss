@@ -5,7 +5,7 @@ import dk.dma.nearmiss.gpssimulator.location.GeoHelper;
 import dk.dma.nearmiss.gpssimulator.location.Location;
 import dk.dma.nearmiss.gpssimulator.location.Route;
 import dk.dma.nearmiss.gpssimulator.location.RouteSimulator;
-import dk.dma.nearmiss.gpssimulator.nmea.Gpgll;
+import dk.dma.nearmiss.nmea.Gpgll;
 import dk.dma.nearmiss.simulator.Simulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class GpsSimulator extends Simulator {
                 if (sim.hasArrived()) break;
             }
 
-            Gpgll gpgll = new Gpgll(sim.currentLocation, getSimulatedTime());
+            Gpgll gpgll = new Gpgll(sim.currentLocation.getLatitude(), sim.currentLocation.getLongitude(), getSimulatedTime());
             message = gpgll.toString();
             logger.info(String.format("At %s, remaining distance to %s is %s km",
                     gpgll.getFormattedTime(), trip.lastWaypoint().getName(), getRemainingDistance(sim.currentLocation, trip.lastWaypoint())));
