@@ -57,6 +57,7 @@
 	</parent>
 
 	<modules>
+		<module>near-miss-common</module>
 		<module>gps-simulator</module>
 		<module>ais-simulator</module>
 		<module>pilot-plug-simulator</module>
