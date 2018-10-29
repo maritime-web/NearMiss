@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 @Component
@@ -20,7 +18,6 @@ public final class AisDataReader {
     private CSVReader csvReader;
     private AisDataLine currentLine;
     private boolean noMoreMessages = false;
-
 
     public AisDataReader(AisDataReaderConfiguration configuration) {
         this.configuration = configuration;
@@ -90,8 +87,8 @@ public final class AisDataReader {
         }
 
         String fileName = configuration.getFiles().get(currentFileIndex);
-        File file = new ClassPathResource(String.format("%s/%s", configuration.getDirectory(), fileName)).getFile();
-        csvReader = new CSVReader(new FileReader(file));
+        InputStream isr = new ClassPathResource(String.format("%s/%s", configuration.getDirectory(), fileName)).getInputStream();
+        csvReader = new CSVReader(new InputStreamReader(isr));
 
         String[] headerLine = csvReader.readNext();
         if (headerLine != null) {
