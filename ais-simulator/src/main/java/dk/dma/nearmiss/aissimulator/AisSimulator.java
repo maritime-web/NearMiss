@@ -3,7 +3,7 @@ package dk.dma.nearmiss.aissimulator;
 import dk.dma.ais.proprietary.GatehouseFactory;
 import dk.dma.ais.proprietary.GatehouseSourceTag;
 import dk.dma.ais.sentence.SentenceLine;
-import dk.dma.nearmiss.gpssimulator.nmea.GpgllHelper;
+import dk.dma.nearmiss.nmea.GpgllHelper;
 import dk.dma.nearmiss.observer.Observer;
 import dk.dma.nearmiss.simulator.Simulator;
 import dk.dma.nearmiss.tcp.client.TcpClient;
