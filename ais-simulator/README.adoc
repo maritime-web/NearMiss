@@ -1,6 +1,12 @@
 = AIS Simulator
 
+== Running locally
+When running the ais-simmulator locally use profile `local`
+
 == ToDO
+
+=== Default Profile
+Should be configured with no AIS data files. And the application should allow for this.
 
 === Document dependency to AisLib
 
