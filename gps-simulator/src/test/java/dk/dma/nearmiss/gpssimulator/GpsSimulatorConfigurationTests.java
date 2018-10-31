@@ -16,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class GpsSimulatorConfigurationTests {
