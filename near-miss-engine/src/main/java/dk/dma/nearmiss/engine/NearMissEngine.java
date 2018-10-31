@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class    NearMissEngine implements Observer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -33,27 +35,35 @@ public class    NearMissEngine implements Observer {
 
         logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
         if (isOwnShipUpdate(receivedMessage))
-            updateOwnShip();
+            handleGpsUpdate();
         else if (isOtherShipUpdate(receivedMessage))
             updateOtherShip();
         else
             logger.error("Unsupported message received");
-        
+
         Message savedMessage = messageRepository.save(new Message(receivedMessage));
         logger.debug(String.format("Saved: %s", savedMessage));
         //logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
 
     }
 
-    private void updateOwnShip() {
+    private void handleGpsUpdate() {
         logger.trace("Updating own ship");
         // Further handling from received messages to be added here.
+        // Run screening
+        Map<String, NearMissVessel> vessels = new NearMissScreener(state.getOwnVessel(), state.getOtherVessels()).screen();
+        // Kick-start near-miss calculations on screening result.
+        logger.debug(String.format("%s ships has been screened for near-miss calculation", vessels.size()));
     }
 
     private void updateOtherShip() {
         logger.trace("Updating other ship");
+        // Run screening to obtain map of all relevant other ships.
+
         // Further handling from received messages to be added here.
     }
+
+
 
     private boolean isOwnShipUpdate(String message) {
         return message.startsWith("$GPGLL");

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.Hashtable;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 @Component
 public class NearMissVesselState {
     private final NearMissVessel ownVessel;

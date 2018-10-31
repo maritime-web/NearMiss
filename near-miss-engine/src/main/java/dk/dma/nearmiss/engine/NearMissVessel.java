@@ -17,6 +17,7 @@ public class NearMissVessel {
     private Double width; // beam
 
     private LocalDateTime lastReport; // Updated time in UTC
+    private LocalDateTime latestNearMissDetect;
 
     public NearMissVessel() {
         super();
@@ -110,6 +111,14 @@ public class NearMissVessel {
         this.lastReport = lastReport;
     }
 
+    public LocalDateTime getLatestNearMissDetect() {
+        return latestNearMissDetect;
+    }
+
+    public void setLatestNearMissDetect(LocalDateTime latestNearMissDetect) {
+        this.latestNearMissDetect = latestNearMissDetect;
+    }
+
     @Override
     public String toString() {
         return "NearMissVessel{" +
@@ -122,6 +131,7 @@ public class NearMissVessel {
                 ", length=" + length +
                 ", width=" + width +
                 ", lastReport=" + lastReport +
+                ", latestNearMissDetect=" + latestNearMissDetect +
                 '}';
     }
 }
