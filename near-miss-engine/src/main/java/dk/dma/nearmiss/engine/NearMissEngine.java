@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NearMissEngine implements Observer {
+public class    NearMissEngine implements Observer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private final TcpClient tcpClient;
     private final MessageRepository messageRepository;
@@ -32,22 +32,34 @@ public class NearMissEngine implements Observer {
         String receivedMessage = tcpClient.getMessage();
 
         logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
-        if (isOwnShipUpdate(receivedMessage)) updateOwnShip();
-
-        // Further handling from received messages to be added here.
+        if (isOwnShipUpdate(receivedMessage))
+            updateOwnShip();
+        else if (isOtherShipUpdate(receivedMessage))
+            updateOtherShip();
+        else
+            logger.error("Unsupported message received");
+        
         Message savedMessage = messageRepository.save(new Message(receivedMessage));
         logger.debug(String.format("Saved: %s", savedMessage));
-        logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
+        //logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
 
     }
 
     private void updateOwnShip() {
         logger.trace("Updating own ship");
-        //More to come...
+        // Further handling from received messages to be added here.
+    }
+
+    private void updateOtherShip() {
+        logger.trace("Updating other ship");
+        // Further handling from received messages to be added here.
     }
 
     private boolean isOwnShipUpdate(String message) {
         return message.startsWith("$GPGLL");
     }
 
+    private boolean isOtherShipUpdate(String message) {
+        return message.startsWith("!AI") || message.startsWith("!BS");
+    }
 }
