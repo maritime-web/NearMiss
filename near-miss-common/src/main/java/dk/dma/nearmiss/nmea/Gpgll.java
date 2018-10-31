@@ -1,6 +1,6 @@
 package dk.dma.nearmiss.nmea;
 
-import dk.dma.nearmiss.helper.PositionHelper;
+import dk.dma.nearmiss.helper.PositionDmsConverter;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -30,7 +30,7 @@ public class Gpgll {
     }
 
     private String getGpsLocation() {
-        return new PositionHelper(lat, lon).toDegreeMinutesSeconds();
+        return new PositionDmsConverter(lat, lon).convert();
     }
 
     private String calculateChecksum() {
