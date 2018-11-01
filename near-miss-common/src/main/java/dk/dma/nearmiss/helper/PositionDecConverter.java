@@ -17,7 +17,7 @@ public final class PositionDecConverter {
 
     public Position convert() {
         if (dmsLat == null || dmsLon == null) {
-            return null;
+            return new Position(0, 0);
         }
         return new Position(positionDecimal(dmsLat, true), positionDecimal(dmsLon, false));
     }
@@ -40,7 +40,7 @@ public final class PositionDecConverter {
     }
 
     double letter(String degreesMinutesSeconds) {
-        String letter = degreesMinutesSeconds.substring(degreesMinutesSeconds.length() -1);
+        String letter = degreesMinutesSeconds.substring(degreesMinutesSeconds.length() - 1);
         return ("N".equals(letter) || "E".equals(letter)) ? 1D : -1D;
     }
 

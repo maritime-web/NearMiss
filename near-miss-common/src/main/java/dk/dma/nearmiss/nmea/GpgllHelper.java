@@ -21,6 +21,16 @@ public final class GpgllHelper {
         return LocalTime.parse(timeString, formatter);
     }
 
+    public String getDmsLat() {
+        String[] separated = gpgllString.split(",");
+        return String.format("%s,%s", separated[1], separated[2]);
+    }
+
+    public String getDmsLon() {
+        String[] separated = gpgllString.split(",");
+        return String.format("%s,%s", separated[3], separated[4]);
+    }
+
     public LocalDateTime getLocalDateTime(LocalDate localDate) {
         return LocalDateTime.of(localDate, getLocalTime());
     }

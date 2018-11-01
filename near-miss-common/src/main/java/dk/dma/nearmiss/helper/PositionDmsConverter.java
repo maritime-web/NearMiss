@@ -15,6 +15,7 @@ public final class PositionDmsConverter {
         this.lon = lon;
     }
 
+    @SuppressWarnings("unused")
     public PositionDmsConverter(Position position) {
         this.lat = position.getLat();
         this.lon = position.getLon();
