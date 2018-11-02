@@ -22,6 +22,9 @@ public class NearMissEngineConfiguration {
     private String stringDate;
     private LocalDate date;
 
+    @Value("${near.miss.own.ship.mmsi:0}")
+    private Integer ownShipMmsi;
+
     public Integer getInterval() {
         return interval == null ? 0 : interval;
     }
@@ -55,5 +58,13 @@ public class NearMissEngineConfiguration {
 
     public void setSaveAllPositions(boolean saveAllPositions) {
         this.saveAllPositions = saveAllPositions;
+    }
+
+    public Integer getOwnShipMmsi() {
+        return ownShipMmsi;
+    }
+
+    public void setOwnShipMmsi(Integer ownShipMmsi) {
+        this.ownShipMmsi = ownShipMmsi;
     }
 }

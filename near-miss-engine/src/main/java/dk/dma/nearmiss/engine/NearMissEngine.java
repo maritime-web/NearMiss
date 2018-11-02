@@ -72,7 +72,7 @@ public class NearMissEngine implements Observer {
             PositionDecConverter toDec = new PositionDecConverter(dmsLat, dmsLon);
             Position pos = toDec.convert();
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
-            vesselPositionRepository.save(new VesselPosition("own", pos.getLat(), pos.getLon(), timestamp));
+            vesselPositionRepository.save(new VesselPosition(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
         }
 
         // Run screening
