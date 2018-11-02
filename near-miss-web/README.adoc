@@ -1,0 +1,24 @@
+== NearMiss Web
+
+== Purpose
+
+This near-miss-engine is developed in context of the DMA near-miss project.
+
+The Purpose of the component is to expose a REST interface into the generated near-miss event data of the system.
+
+== Build
+
+The software is built as part of the parent maven build. To build this maven module separately just run `mvn package`
+or similar.
+
+When running the build use the SpringBoot default profile (application.properties) for standalone execution of the
+tests.
+
+== Usage
+
+The component has been designed to run in development mode (locally or within development environment). Or in a Docker
+packaged mode.
+
+Running development mode use the profile `dev`
+
+Running in Docker use the profile `docker`

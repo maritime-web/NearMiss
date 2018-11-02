@@ -1,0 +1,21 @@
+= NearMissDB
+
+== Purpose
+
+This near-miss-db is developed in context of the DMA near-miss project.
+
+The Purpose of the component is to define persistence layer and to an TCP H2 databse for developmed.
+
+== Build
+
+The software is built as part of the parent maven build. To build this maven module separately just run `mvn package`
+or similar.
+
+When running the build use the SpringBoot default profile (application.properties) for standalone execution of the
+tests.
+
+== Usage
+
+The compoent has been designed to run in development mode (locally or within development environment.
+
+Running development mode use the profile `dev`
