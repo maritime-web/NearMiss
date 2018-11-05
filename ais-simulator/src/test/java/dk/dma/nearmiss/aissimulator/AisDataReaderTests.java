@@ -40,7 +40,6 @@ public class AisDataReaderTests {
         assertEquals("Expected right directory name", "csv", conf.getDirectory());
     }
 
-
     @Test
     public void testColumnsConfiguration() {
         AisDataReaderConfiguration conf = aisDataReader.getConfiguration();

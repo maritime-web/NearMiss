@@ -58,14 +58,14 @@ public class AisSimulator extends Simulator implements Observer {
             return;
         }
 
-        logger.trace(String.format("Next message is: %s", aisDataLine));
+        logger.trace(String.format("Next message is: %s\r\n", aisDataLine.getTimedMessage()));
         LocalDateTime messageDateTime = getMessageDateTime(aisDataLine.getTime());
         logger.trace(String.format("Message DateTime is: %s", messageDateTime));
         LocalDateTime gpsDateTime = new GpgllHelper(input).getLocalDateTime(currentLocalDate);
         logger.trace(String.format("GPS DateTime is: %s", gpsDateTime));
 
         while (aisDataLine != null && gpsDateTime.isAfter(messageDateTime)) {
-            output = aisDataLine.getMessage();
+            output = aisDataLine.getTimedMessage();
             logger.debug(String.format("Brodcasting message: %s", output));
             notifyListeners();
             aisDataLine = nextAisDataLine();

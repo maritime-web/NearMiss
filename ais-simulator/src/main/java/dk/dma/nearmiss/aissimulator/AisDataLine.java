@@ -10,14 +10,16 @@ public final class AisDataLine {
         this.time = time;
     }
 
-    @SuppressWarnings("unused")
-    public String getMessage() {
+    String getMessage() {
         return message;
     }
 
-    @SuppressWarnings("unused")
-    public String getTime() {
+    String getTime() {
         return time;
+    }
+
+    String getTimedMessage() {
+        return String.format("%s\r\n%s", getTime(), getMessage());
     }
 
     @Override
