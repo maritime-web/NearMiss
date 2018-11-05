@@ -12,18 +12,20 @@ public class VesselPosition {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    private String mmsi;
+    private int mmsi;
     private double latitude;
     private double longitude;
+    private int heading;
     private LocalDateTime positionTime;
 
     public VesselPosition() {
     }
 
-    public VesselPosition(String mmsi, double latitude, double longitude, LocalDateTime positionTime) {
+    public VesselPosition(int mmsi, double latitude, double longitude, int heading, LocalDateTime positionTime) {
         this.mmsi = mmsi;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.heading = heading;
         this.positionTime = positionTime;
     }
 
@@ -35,11 +37,11 @@ public class VesselPosition {
         this.id = id;
     }
 
-    public String getMmsi() {
+    public int getMmsi() {
         return mmsi;
     }
 
-    public void setMmsi(String mmsi) {
+    public void setMmsi(int mmsi) {
         this.mmsi = mmsi;
     }
 
@@ -59,12 +61,32 @@ public class VesselPosition {
         this.longitude = longitude;
     }
 
+    public int getHeading() {
+        return heading;
+    }
+
+    public void setHeading(int heading) {
+        this.heading = heading;
+    }
+
     public LocalDateTime getPositionTime() {
         return positionTime;
     }
 
     public void setPositionTime(LocalDateTime positionTime) {
         this.positionTime = positionTime;
+    }
+
+    @Override
+    public String toString() {
+        return "VesselPosition{" +
+                "id=" + id +
+                ", mmsi=" + mmsi +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", heading=" + heading +
+                ", positionTime=" + positionTime +
+                '}';
     }
 }
 
