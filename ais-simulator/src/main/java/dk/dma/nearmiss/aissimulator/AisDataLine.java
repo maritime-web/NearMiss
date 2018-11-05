@@ -19,8 +19,14 @@ public final class AisDataLine {
     }
 
     String getTimedMessage() {
-        return String.format("%s\r\n%s", getTime(), getMessage());
+        String crLfString = getMessage();
+        crLfString = crLfString.replace("!BS", "__r__n!BS");
+        crLfString = crLfString.replace("!AI", "__r__n!AI");
+        return String.format("%s%s", getTime(), crLfString);
     }
+    //String getTimedMessage() {
+    //    return String.format("%s\r\n%s", getTime(), getMessage());
+    //}
 
     @Override
     public String toString() {
