@@ -1,5 +1,9 @@
 package dk.dma.nearmiss.engine;
 
+import dk.dma.ais.binary.SixbitException;
+import dk.dma.ais.message.AisMessage;
+import dk.dma.ais.message.AisMessageException;
+import dk.dma.ais.message.AisStaticCommon;
 import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.Target;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
@@ -18,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,7 +102,7 @@ public class NearMissEngine implements Observer {
 
     /** Determine whether a vessel updated recently enough to be considered for near-miss analysis */
     private boolean isRecentlyUpdated(Vessel v) {
-        return Duration.between(v.getLastReport(), LocalDateTime.now()).get(ChronoUnit.MINUTES) > 15;
+        return Duration.between(v.getLastReport(), LocalDateTime.now()).toMinutes() > 15;
     }
 
     /** Determine whether a vessel is of a type relevant for near-miss analysis */
@@ -113,7 +117,46 @@ public class NearMissEngine implements Observer {
 
     /** Convert TargetInfo to Vessel */
     private Vessel toVessel(TargetInfo t) {
-        return new Vessel(t.getMmsi(), "UNKNOWN", 0, 0);
+        String name = null;
+        int loa = -1;
+        int beam = -1;
+
+        if (t.hasStaticInfo()) {
+            AisPacket staticAisPacket = t.getStaticAisPacket1();
+            try {
+                AisMessage aisMessage = staticAisPacket.getAisMessage();
+
+                if (aisMessage instanceof AisStaticCommon) {
+                    AisStaticCommon staticData = (AisStaticCommon) aisMessage;
+
+                    name = staticData.getName();
+                    loa = staticData.getDimBow() + staticData.getDimStern();
+                    beam = staticData.getDimPort() + staticData.getDimStarboard();
+                }
+            } catch (AisMessageException | SixbitException e) {
+                logger.error(e.getMessage());
+            }
+        }
+
+        Vessel v = new Vessel(t.getMmsi(), name, loa, beam);
+
+        v.setLastReport(toLocalDateTime(t.getAisTarget().getLastReport()));
+        v.setSog(t.getSog());
+        v.setCog(t.getCog() / 10);
+        v.setHdg(t.getHeading() == 511 ? NaN : t.getHeading());
+
+        if (t.hasPositionInfo()) {
+            v.setLat(t.getPosition().getLatitude());
+            v.setLon(t.getPosition().getLongitude());
+        }
+
+        return v;
+    }
+
+    private static LocalDateTime toLocalDateTime(Date date) {
+        return Instant.ofEpochMilli(date.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
     }
 
     private void updateOwnVessel(String message) {
