@@ -2,8 +2,8 @@ package dk.dma.nearmiss.engine;
 
 import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.Target;
-import dk.dma.ais.tracker.Tracker;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
+import dk.dma.ais.tracker.targetTracker.TargetTracker;
 import dk.dma.nearmiss.db.entity.Message;
 import dk.dma.nearmiss.db.entity.VesselPosition;
 import dk.dma.nearmiss.db.repository.MessageRepository;
@@ -20,27 +20,38 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 public class NearMissEngine implements Observer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final TcpClient tcpClient;
     private final MessageRepository messageRepository;
     private final VesselPositionRepository vesselPositionRepository;
-    private final NearMissVesselState state;
     private final NearMissEngineConfiguration conf;
-    private final Tracker tracker;
+    private final TargetTracker tracker;
+    private final NearMissDetector nearMissDetector;
+    private final DistanceBasedScreener nearMissScreener;
+
+    private final Vessel ownVessel;
 
     public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository,
-                          VesselPositionRepository vesselPositionRepository, NearMissVesselState state,
-                          Tracker tracker, NearMissEngineConfiguration conf) {
+                          VesselPositionRepository vesselPositionRepository,
+                          TargetTracker tracker, NearMissEngineConfiguration conf, NearMissDetector nearMissDetector,
+                          DistanceBasedScreener nearMissScreener) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
         this.vesselPositionRepository = vesselPositionRepository;
-        this.state = state;
         this.tracker = tracker;
         this.conf = conf;
+        this.nearMissDetector = nearMissDetector;
+        this.nearMissScreener = nearMissScreener;
+        this.ownVessel = new Vessel(0, "UNKNOWN", 0, 0);
+
         tcpClient.addListener(this);
     }
 
@@ -48,28 +59,62 @@ public class NearMissEngine implements Observer {
         return tcpClient;
     }
 
-
     @Override
     public void update() {
         String receivedMessage = tcpClient.getMessage();
 
-        logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
-        if (isOwnShipUpdate(receivedMessage)) {
-            updateOwnShip(receivedMessage);
+        if (isNotBlank(receivedMessage)) {
+            logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
+            if (isOwnShipUpdate(receivedMessage)) {
+                updateOwnVessel(receivedMessage);
+                detectNearMisses();
+            } else if (isOtherShipUpdate(receivedMessage))
+                updateOtherShip(receivedMessage);
+            else
+                logger.error("Unsupported message received");
+
+            Message savedMessage = messageRepository.save(new Message(receivedMessage));
+            logger.debug(String.format("Saved: %s", savedMessage));
+            //logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
         }
-        else if (isOtherShipUpdate(receivedMessage))
-            updateOtherShip(receivedMessage);
-        else
-            logger.error("Unsupported message received");
-
-        Message savedMessage = messageRepository.save(new Message(receivedMessage));
-        logger.debug(String.format("Saved: %s", savedMessage));
-        //logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
-
     }
 
-    private void updateOwnShip(String message) {
-        logger.trace("Updating own ship");
+    /** Iterate through all known other vessels and identify near misses */
+    private void detectNearMisses() {
+        Set<Vessel> nearMisses = tracker.stream()
+                .map(this::toVessel)
+                .filter(v -> isRecentlyUpdated(v))
+                .filter(v -> isRelevantType(v))
+                .map(v -> projectForward(v) )
+                .filter(v -> nearMissScreener.isCandidate(ownVessel, v))
+                .filter(v -> nearMissDetector.nearMiss(ownVessel, v))
+                .collect(Collectors.toSet());
+
+        logger.info("{} near misses detected.", nearMisses.size());
+    }
+
+    /** Determine whether a vessel is of a type relevant for near-miss analysis */
+    private boolean isRelevantType(Vessel v) {
+        return true;
+    }
+
+    /** Determine whether a vessel updated recently enough to be considered for near-miss analysis */
+    private boolean isRecentlyUpdated(Vessel v) {
+        return true;
+    }
+
+    /** Project vessel's position forward in time */
+    private Vessel projectForward(Vessel v) {
+        return v;
+    }
+
+    /** Convert TargetInfo to Vessel */
+    private Vessel toVessel(TargetInfo t) {
+        return new Vessel(t.getMmsi(), "UNKNOWN", 0, 0);
+    }
+
+    private void updateOwnVessel(String message) {
+        logger.trace("Updating own vessel");
         // Further handling from received messages to be added here.
         // Update own ship
         // Save position for own ship.
@@ -82,13 +127,14 @@ public class NearMissEngine implements Observer {
             Position pos = toDec.convert();
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
             vesselPositionRepository.save(new VesselPosition(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
-        }
 
-        // Run screening
-        Map<String, NearMissVessel> vessels = new NearMissScreener(state.getOwnVessel(), state.getOtherVessels()).screen();
-        // Kick-start save position for screened ships.
-        // Kick-start near-miss calculations on screening result.
-        logger.debug(String.format("%s ships has been screened for near-miss calculation", vessels.size()));
+            this.ownVessel.setLat(pos.getLat());
+            this.ownVessel.setLon(pos.getLon());
+            this.ownVessel.setCog(0);
+            this.ownVessel.setSog(0);
+            this.ownVessel.setHdg(0);
+            this.ownVessel.setLastReport(LocalDateTime.now());
+        }
     }
 
     private void updateOtherShip(String message) {
@@ -119,9 +165,7 @@ public class NearMissEngine implements Observer {
             logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
         }
 
-        // Run screening to obtain map of all relevant other ships.
-
-        // Further handling from received messages to be added here.
+        logger.info("Tracking {} other vessels", tracker.size());
     }
 
     private boolean isOwnShipUpdate(String message) {
