@@ -1,8 +1,9 @@
 package dk.dma.nearmiss.engine;
 
 import dk.dma.ais.packet.AisPacket;
+import dk.dma.ais.tracker.Target;
+import dk.dma.ais.tracker.Tracker;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
-import dk.dma.ais.tracker.targetTracker.TargetTracker;
 import dk.dma.nearmiss.db.entity.Message;
 import dk.dma.nearmiss.db.entity.VesselPosition;
 import dk.dma.nearmiss.db.repository.MessageRepository;
@@ -29,15 +30,16 @@ public class NearMissEngine implements Observer {
     private final VesselPositionRepository vesselPositionRepository;
     private final NearMissVesselState state;
     private final NearMissEngineConfiguration conf;
-    private final TargetTracker tracker = new TargetTracker();
+    private final Tracker tracker;
 
     public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository,
                           VesselPositionRepository vesselPositionRepository, NearMissVesselState state,
-                          NearMissEngineConfiguration conf) {
+                          Tracker tracker, NearMissEngineConfiguration conf) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
         this.vesselPositionRepository = vesselPositionRepository;
         this.state = state;
+        this.tracker = tracker;
         this.conf = conf;
         tcpClient.addListener(this);
     }
@@ -52,8 +54,9 @@ public class NearMissEngine implements Observer {
         String receivedMessage = tcpClient.getMessage();
 
         logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
-        if (isOwnShipUpdate(receivedMessage))
-            handleGpsUpdate(receivedMessage);
+        if (isOwnShipUpdate(receivedMessage)) {
+            updateOwnShip(receivedMessage);
+        }
         else if (isOtherShipUpdate(receivedMessage))
             updateOtherShip(receivedMessage);
         else
@@ -65,7 +68,7 @@ public class NearMissEngine implements Observer {
 
     }
 
-    private void handleGpsUpdate(String message) {
+    private void updateOwnShip(String message) {
         logger.trace("Updating own ship");
         // Further handling from received messages to be added here.
         // Update own ship
@@ -93,23 +96,28 @@ public class NearMissEngine implements Observer {
         // Update state
         String multiLineMessage = message.replace("__r__n", "\r\n");
         AisPacket packet = AisPacket.from(multiLineMessage);
-        TargetInfo info = null;
+        Target target = null;
         try {
             int mmsi = packet.getAisMessage().getUserId();
             tracker.update(packet);
-            info = tracker.get(mmsi);
+            target = tracker.get(mmsi);
         } catch (Exception e) {
             logger.error("Error adding AIS message to tracker.");
             e.printStackTrace();
         }
 
-        if (conf.isSaveAllPositions() && info != null && info.getPosition() != null) {
-            Position pos = new Position(info.getPosition().getLatitude(), info.getPosition().getLongitude());
-            Date positionTimestamp = new Date(info.getPositionTimestamp());
-            LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            vesselPositionRepository.save(new VesselPosition(info.getMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
-        }
+        if (target instanceof TargetInfo) {
+            TargetInfo info = (TargetInfo) target;
 
+            if (conf.isSaveAllPositions() && info != null && info.getPosition() != null) {
+                Position pos = new Position(info.getPosition().getLatitude(), info.getPosition().getLongitude());
+                Date positionTimestamp = new Date(info.getPositionTimestamp());
+                LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                vesselPositionRepository.save(new VesselPosition(info.getMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
+            }
+        } else {
+            logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
+        }
 
         // Run screening to obtain map of all relevant other ships.
 
