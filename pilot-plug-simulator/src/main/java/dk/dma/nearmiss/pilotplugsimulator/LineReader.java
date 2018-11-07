@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class LineReader implements Runnable {
 
@@ -27,22 +29,56 @@ public class LineReader implements Runnable {
         logger.info("FileReader for {}:{} running.", remoteHost, remotePort);
 
         try {
-            Socket client = new Socket(remoteHost, remotePort);
+            Socket client = connectForRead(remoteHost, remotePort);
             Scanner scanner = new Scanner(client.getInputStream());
 
             //noinspection InfiniteLoopStatement
             while (true) {
-                String line = scanner.nextLine();
-                messageQueue.add(line);
+                try {
+                    String line = scanner.nextLine();
+                    logger.info("From {}:{}: {}", remoteHost, remotePort, line);
+                    messageQueue.add(line);
 
-                final int n = messageQueue.size();
-                if (n > 100 && n % 100 == 0)
-                    logger.warn("Message queue size is {}", n);
+                    final int n = messageQueue.size();
+                    if (n > 100 && n % 100 == 0)
+                        logger.warn("Message queue size is {}", n);
+                } catch (NoSuchElementException e) {
+                    logger.warn(e.getMessage());
+
+                    client.close();
+                    logger.info("Connection to {}:{} closed.", remoteHost, remotePort);
+
+                    client = connectForRead(remoteHost, remotePort);
+                    scanner = new Scanner(client.getInputStream());
+                }
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
 
         logger.info("FileReader for {}:{} finishing.", remoteHost, remotePort);
+    }
+
+    private Socket connectForRead(String remoteHost, int remotePort) {
+        Socket client = null;
+
+        do {
+            try {
+                client = new Socket(remoteHost, remotePort);
+                logger.info("Connected to {}:{} for read.", remoteHost, remotePort);
+            } catch (IOException e) {
+                logger.error("Connection to {}:{}: {}", remoteHost, remotePort, e.getMessage());
+            }
+
+            if (client == null) {
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    logger.warn(e.getMessage());
+                }
+            }
+        } while (client == null);
+
+        return client;
     }
 }
