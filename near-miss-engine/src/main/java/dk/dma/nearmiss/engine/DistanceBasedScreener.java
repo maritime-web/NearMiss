@@ -21,7 +21,7 @@ class DistanceBasedScreener implements Screener {
     }
 
     @Override
-    public boolean isCandidate(Vessel ownVessel, Vessel otherVessel) {
+    public boolean nearMissCandidate(Vessel ownVessel, Vessel otherVessel) {
         //distance
         //interval
         //ignore list

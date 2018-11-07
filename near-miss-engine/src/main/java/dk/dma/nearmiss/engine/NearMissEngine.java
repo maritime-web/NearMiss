@@ -35,21 +35,21 @@ public class NearMissEngine implements Observer {
     private final VesselPositionRepository vesselPositionRepository;
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
-    private final NearMissDetector nearMissDetector;
+    private final Detector detector;
     private final DistanceBasedScreener nearMissScreener;
 
     private final Vessel ownVessel;
 
     public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository,
                           VesselPositionRepository vesselPositionRepository,
-                          TargetTracker tracker, NearMissEngineConfiguration conf, NearMissDetector nearMissDetector,
+                          TargetTracker tracker, NearMissEngineConfiguration conf, Detector detector,
                           DistanceBasedScreener nearMissScreener) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
         this.vesselPositionRepository = vesselPositionRepository;
         this.tracker = tracker;
         this.conf = conf;
-        this.nearMissDetector = nearMissDetector;
+        this.detector = detector;
         this.nearMissScreener = nearMissScreener;
         this.ownVessel = new Vessel(0, "UNKNOWN", 0, 0);
 
@@ -87,8 +87,8 @@ public class NearMissEngine implements Observer {
                 .filter(v -> isRecentlyUpdated(v))
                 .filter(v -> isRelevantType(v))
                 .map(v -> projectForward(v) )
-                .filter(v -> nearMissScreener.isCandidate(ownVessel, v))
-                .filter(v -> nearMissDetector.nearMiss(ownVessel, v))
+                .filter(v -> nearMissScreener.nearMissCandidate(ownVessel, v))
+                .filter(v -> detector.nearMissDetected(ownVessel, v))
                 .collect(Collectors.toSet());
 
         logger.info("{} near misses detected.", nearMisses.size());
