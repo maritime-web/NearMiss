@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.Double.NaN;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
@@ -124,9 +125,13 @@ public class NearMissEngine implements Observer {
         dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getLat(), ownVessel.getLon());
         double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(v.getLat(), v.getLon())) / 1852;
 
-        logger.debug(String.format("Distance to %d is %f nautical miles", v.getMmsi(), distance));
+        logger.debug(String.format("Distance to %s (in position [%f %f]) is %f nautical miles", nameOrMmsi(v), v.getLat(), v.getLon(), distance));
 
         return distance < 3.0; // nautical miles
+    }
+
+    private String nameOrMmsi(Vessel v) {
+        return isBlank(v.getName()) ? String.valueOf(v.getMmsi()) : v. getName();
     }
 
     /** Project vessel's position forward in time */
