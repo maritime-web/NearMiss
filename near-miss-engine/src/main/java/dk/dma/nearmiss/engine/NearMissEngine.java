@@ -42,21 +42,18 @@ public class NearMissEngine implements Observer {
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
     private final Detector detector;
-    private final DistanceBasedScreener nearMissScreener;
 
     private final Vessel ownVessel;
 
     public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository,
                           VesselPositionRepository vesselPositionRepository,
-                          TargetTracker tracker, NearMissEngineConfiguration conf, Detector detector,
-                          DistanceBasedScreener nearMissScreener) {
+                          TargetTracker tracker, NearMissEngineConfiguration conf, Detector detector) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
         this.vesselPositionRepository = vesselPositionRepository;
         this.tracker = tracker;
         this.conf = conf;
         this.detector = detector;
-        this.nearMissScreener = nearMissScreener;
         this.ownVessel = new Vessel(0, "UNKNOWN", 0, 0);
 
         tcpClient.addListener(this);
@@ -89,12 +86,13 @@ public class NearMissEngine implements Observer {
     /** Iterate through all known other vessels and identify near misses */
     private void detectNearMisses() {
         Set<Vessel> nearMisses = tracker.stream()
+                .filter(t -> ! isBlackListed(t.getMmsi()))
                 .filter(t -> t.hasPositionInfo())
                 .map(this::toVessel)
                 .filter(v -> isRecentlyUpdated(v))
                 .filter(v -> isRelevantType(v))
                 .map(v -> projectForward(v) )
-                .filter(v -> nearMissScreener.nearMissCandidate(ownVessel, v))
+                .filter(v -> isInVicinity(v))
                 .filter(v -> detector.nearMissDetected(ownVessel, v))
                 .collect(Collectors.toSet());
 
@@ -108,6 +106,10 @@ public class NearMissEngine implements Observer {
         });
     }
 
+    private boolean isBlackListed(int mmsi) {
+        return false;
+    }
+
     /** Determine whether a vessel updated recently enough to be considered for near-miss analysis */
     private boolean isRecentlyUpdated(Vessel v) {
         return Duration.between(v.getLastReport(), LocalDateTime.now()).toMinutes() > 15;
@@ -116,6 +118,15 @@ public class NearMissEngine implements Observer {
     /** Determine whether a vessel is of a type relevant for near-miss analysis */
     private boolean isRelevantType(Vessel v) {
         return true;
+    }
+
+    private boolean isInVicinity(Vessel v) {
+        dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getLat(), ownVessel.getLon());
+        double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(v.getLat(), v.getLon())) / 1852;
+
+        logger.debug(String.format("Distance to %d is %f nautical miles", v.getMmsi(), distance));
+
+        return distance < 3.0; // nautical miles
     }
 
     /** Project vessel's position forward in time */
