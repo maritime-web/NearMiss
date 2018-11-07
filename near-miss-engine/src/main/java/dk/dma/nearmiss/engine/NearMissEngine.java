@@ -89,6 +89,7 @@ public class NearMissEngine implements Observer {
     /** Iterate through all known other vessels and identify near misses */
     private void detectNearMisses() {
         Set<Vessel> nearMisses = tracker.stream()
+                .filter(t -> t.hasPositionInfo())
                 .map(this::toVessel)
                 .filter(v -> isRecentlyUpdated(v))
                 .filter(v -> isRelevantType(v))
@@ -98,6 +99,13 @@ public class NearMissEngine implements Observer {
                 .collect(Collectors.toSet());
 
         logger.info("{} near misses detected.", nearMisses.size());
+
+        dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getLat(), ownVessel.getLon());
+
+        nearMisses.forEach(nm -> {
+            double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(nm.getLat(), nm.getLon())) / 1852;
+            logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", nm.getName(), nm.getLat(), nm.getLon(), ownVessel.getLat(), ownVessel.getLon(), distance));
+        });
     }
 
     /** Determine whether a vessel updated recently enough to be considered for near-miss analysis */
@@ -129,7 +137,7 @@ public class NearMissEngine implements Observer {
                 if (aisMessage instanceof AisStaticCommon) {
                     AisStaticCommon staticData = (AisStaticCommon) aisMessage;
 
-                    name = staticData.getName();
+                    name = staticData.getName().trim();
                     loa = staticData.getDimBow() + staticData.getDimStern();
                     beam = staticData.getDimPort() + staticData.getDimStarboard();
                 }
