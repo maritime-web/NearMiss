@@ -55,7 +55,7 @@ public class NearMissEngine implements Observer {
         this.tracker = tracker;
         this.conf = conf;
         this.detector = detector;
-        this.ownVessel = new Vessel(0, "UNKNOWN", 0, 0);
+        this.ownVessel = new Vessel(0);
 
         tcpClient.addListener(this);
     }
@@ -89,6 +89,7 @@ public class NearMissEngine implements Observer {
         Set<Vessel> nearMisses = tracker.stream()
                 .filter(t -> ! isBlackListed(t.getMmsi()))
                 .filter(t -> t.hasPositionInfo())
+                .filter(t -> t.getSog() > 5f)
                 .map(this::toVessel)
                 .filter(v -> isRecentlyUpdated(v))
                 .filter(v -> isRelevantType(v))
@@ -99,11 +100,11 @@ public class NearMissEngine implements Observer {
 
         logger.info("{} near misses detected.", nearMisses.size());
 
-        dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getLat(), ownVessel.getLon());
+        dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon());
 
         nearMisses.forEach(nm -> {
-            double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(nm.getLat(), nm.getLon())) / 1852;
-            logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", nm.getName(), nm.getLat(), nm.getLon(), ownVessel.getLat(), ownVessel.getLon(), distance));
+            double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(nm.getCenterPosition().getLat(), nm.getCenterPosition().getLon())) / 1852;
+            logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", nm.getName(), nm.getCenterPosition().getLat(), nm.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
         });
     }
 
@@ -122,10 +123,10 @@ public class NearMissEngine implements Observer {
     }
 
     private boolean isInVicinity(Vessel v) {
-        dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getLat(), ownVessel.getLon());
-        double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(v.getLat(), v.getLon())) / 1852;
+        dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon());
+        double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(v.getCenterPosition().getLat(), v.getCenterPosition().getLon())) / 1852;
 
-        logger.debug(String.format("Distance to %s (in position [%f %f]) is %f nautical miles", nameOrMmsi(v), v.getLat(), v.getLon(), distance));
+        logger.debug(String.format("Distance to %s (in position [%f %f]) is %f nautical miles", nameOrMmsi(v), v.getCenterPosition().getLat(), v.getCenterPosition().getLon(), distance));
 
         return distance < 3.0; // nautical miles
     }
@@ -142,8 +143,10 @@ public class NearMissEngine implements Observer {
     /** Convert TargetInfo to Vessel */
     private Vessel toVessel(TargetInfo t) {
         String name = null;
-        int loa = -1;
-        int beam = -1;
+        int dimPort = 0;
+        int dimStarboard = 0;
+        int dimBow = 0;
+        int dimStern = 0;
 
         if (t.hasStaticInfo()) {
             AisPacket staticAisPacket = t.getStaticAisPacket1();
@@ -152,29 +155,39 @@ public class NearMissEngine implements Observer {
 
                 if (aisMessage instanceof AisStaticCommon) {
                     AisStaticCommon staticData = (AisStaticCommon) aisMessage;
-
                     name = staticData.getName().trim();
-                    loa = staticData.getDimBow() + staticData.getDimStern();
-                    beam = staticData.getDimPort() + staticData.getDimStarboard();
+                    dimPort = staticData.getDimPort();
+                    dimStarboard = staticData.getDimStarboard();
+                    dimBow = staticData.getDimBow();
+                    dimStern = staticData.getDimStern();
                 }
             } catch (AisMessageException | SixbitException e) {
                 logger.error(e.getMessage());
             }
         }
 
-        Vessel v = new Vessel(t.getMmsi(), name, loa, beam);
-
+        Vessel v = new Vessel(t.getMmsi());
+        v.setName(name);
+        v.setLoa(dimStern + dimBow);
+        v.setBeam(dimPort + dimStarboard);
         v.setLastReport(toLocalDateTime(t.getAisTarget().getLastReport()));
-        v.setSog(t.getSog());
-        v.setCog(t.getCog() / 10);
-        v.setHdg(t.getHeading() == 511 ? NaN : t.getHeading());
 
         if (t.hasPositionInfo()) {
-            v.setLat(t.getPosition().getLatitude());
-            v.setLon(t.getPosition().getLongitude());
+            v.setSog(t.getSog());
+            v.setCog(t.getCog() / 10);
+            v.setHdg(t.getHeading() == 511 ? NaN : t.getHeading());
+
+            Position gpsReceiverPosition = new Position(t.getPosition().getLatitude(), t.getPosition().getLongitude());
+            Position geometricCenterPosition = calulateGeometricCenter(gpsReceiverPosition, t.getCog() / 10, dimPort, dimStern);
+
+            v.setCenterPosition(geometricCenterPosition);
         }
 
         return v;
+    }
+
+    private Position calulateGeometricCenter(Position gpsReceiverPosition, double cog, int dimPort, int dimStern) {
+        return gpsReceiverPosition; // TODO
     }
 
     private static LocalDateTime toLocalDateTime(Date date) {
@@ -198,8 +211,9 @@ public class NearMissEngine implements Observer {
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
             vesselPositionRepository.save(new VesselPosition(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
 
-            this.ownVessel.setLat(pos.getLat());
-            this.ownVessel.setLon(pos.getLon());
+            Position geometricCenter = calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
+
+            this.ownVessel.setCenterPosition(geometricCenter);
             this.ownVessel.setCog(NaN);
             this.ownVessel.setSog(NaN);
             this.ownVessel.setHdg(NaN);
