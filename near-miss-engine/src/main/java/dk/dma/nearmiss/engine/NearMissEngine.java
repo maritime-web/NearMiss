@@ -17,8 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,13 +96,13 @@ public class NearMissEngine implements Observer {
         logger.info("{} near misses detected.", nearMisses.size());
     }
 
-    /** Determine whether a vessel is of a type relevant for near-miss analysis */
-    private boolean isRelevantType(Vessel v) {
-        return true;
-    }
-
     /** Determine whether a vessel updated recently enough to be considered for near-miss analysis */
     private boolean isRecentlyUpdated(Vessel v) {
+        return Duration.between(v.getLastReport(), LocalDateTime.now()).get(ChronoUnit.MINUTES) > 15;
+    }
+
+    /** Determine whether a vessel is of a type relevant for near-miss analysis */
+    private boolean isRelevantType(Vessel v) {
         return true;
     }
 
