@@ -14,7 +14,6 @@ import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,12 +44,6 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
         createAndStartLineReaders(connectTo);
         createAndStartListener(port);
         createAndStartLineDistributor();
-
-        //noinspection InfiniteLoopStatement
-        while (true) {
-            TimeUnit.HOURS.sleep(1);
-            logger.info("Heartbeat");
-        }
     }
 
     private static void fail(String message) {
@@ -111,7 +104,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
 
     private void createAndStartLineDistributor() {
         Thread lineDistributor = new Thread(new LineDistributor(messageQueue, outboundPrintWriters));
-        lineDistributor.setDaemon(true);
+        lineDistributor.setDaemon(false);
         lineDistributor.start();
     }
 
@@ -136,7 +129,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
                 logger.error(e.getMessage(), e);
             }
         });
-        t.setDaemon(true);
+        t.setDaemon(false);
         t.start();
     }
 
@@ -145,7 +138,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
             HostnamePortnumber hp = parseRemoteAddresses(remote);
             if (hp != null) {
                 Thread lineReader = new Thread(new LineReader(messageQueue, hp.hostname, hp.port));
-                lineReader.setDaemon(true);
+                lineReader.setDaemon(false);
                 lineReader.start();
             }
         });
