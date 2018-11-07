@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.Double.NaN;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
@@ -130,9 +131,9 @@ public class NearMissEngine implements Observer {
 
             this.ownVessel.setLat(pos.getLat());
             this.ownVessel.setLon(pos.getLon());
-            this.ownVessel.setCog(0);
-            this.ownVessel.setSog(0);
-            this.ownVessel.setHdg(0);
+            this.ownVessel.setCog(NaN);
+            this.ownVessel.setSog(NaN);
+            this.ownVessel.setHdg(NaN);
             this.ownVessel.setLastReport(LocalDateTime.now());
         }
     }
