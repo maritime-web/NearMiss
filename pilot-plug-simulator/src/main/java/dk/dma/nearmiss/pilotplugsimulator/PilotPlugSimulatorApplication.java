@@ -24,7 +24,7 @@ public class PilotPlugSimulatorApplication implements ApplicationRunner {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final static String USAGE = "--port==localPort [--connectTo==remoteHost:remotePort]...";
+    private final static String USAGE = "--port=localPort [--connect=remoteHost:remotePort]...";
     private final static Pattern HOSTNAME_PORT_PATTERN = Pattern.compile("^\\s*(.*?):(\\d+)\\s*$");
 
     private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
