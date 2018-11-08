@@ -118,9 +118,11 @@ public class NearMissEngine implements Observer {
 
         dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon());
 
-        nearMisses.forEach(nm -> {
-            double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(nm.getCenterPosition().getLat(), nm.getCenterPosition().getLon())) / 1852;
-            logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", nm.getName(), nm.getCenterPosition().getLat(), nm.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
+        nearMisses.forEach(otherVessel -> {
+            vesselPositionRepository.save(new VesselPosition(otherVessel.getMmsi(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), (int) otherVessel.getHdg(), ownVessel.getLastReport()));
+
+            double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon())) / 1852;
+            logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", otherVessel.getName(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
         });
     }
 
