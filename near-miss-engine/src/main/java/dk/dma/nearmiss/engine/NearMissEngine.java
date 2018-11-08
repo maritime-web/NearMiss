@@ -89,11 +89,11 @@ public class NearMissEngine implements Observer {
 
         if (isNotBlank(receivedMessage)) {
             logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
-            if (isOwnShipUpdate(receivedMessage)) {
+            if (isOwnVesselUpdate(receivedMessage)) {
                 updateOwnVessel(receivedMessage);
                 detectNearMisses();
-            } else if (isOtherShipUpdate(receivedMessage))
-                updateOtherShip(receivedMessage);
+            } else if (isOtherVesselUpdate(receivedMessage))
+                updateOtherVessel(receivedMessage);
             else
                 logger.error("Unsupported message received");
 
@@ -142,14 +142,14 @@ public class NearMissEngine implements Observer {
             Position geometricCenter = geometryService.calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
 
             this.ownVessel.setCenterPosition(geometricCenter);
-            this.ownVessel.setCog(NaN);
-            this.ownVessel.setSog(NaN);
-            this.ownVessel.setHdg(NaN);
+            this.ownVessel.setCog(NaN); // TODO calculate or get own cog
+            this.ownVessel.setSog(NaN); // TODO calculate or get own sog
+            this.ownVessel.setHdg(NaN); // TODO calculate or get own hdg
             this.ownVessel.setLastReport(LocalDateTime.now());
         }
     }
 
-    private void updateOtherShip(String message) {
+    private void updateOtherVessel(String message) {
         logger.trace("Updating other ship");
         // Update state
         String multiLineMessage = message.replace("__r__n", "\r\n");
@@ -180,11 +180,11 @@ public class NearMissEngine implements Observer {
         logger.info("Tracking {} other vessels", tracker.size());
     }
 
-    private boolean isOwnShipUpdate(String message) {
+    private boolean isOwnVesselUpdate(String message) {
         return message.startsWith("$GPGLL");
     }
 
-    private boolean isOtherShipUpdate(String message) {
+    private boolean isOtherVesselUpdate(String message) {
         return message.startsWith("$PGHP");
     }
 }
