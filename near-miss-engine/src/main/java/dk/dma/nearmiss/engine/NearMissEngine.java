@@ -91,7 +91,8 @@ public class NearMissEngine implements Observer {
             logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
             if (isOwnVesselUpdate(receivedMessage)) {
                 updateOwnVessel(receivedMessage);
-                detectNearMisses();
+                Set<Vessel> detectedNearMisses = detectNearMisses();
+                storeNearMisses(detectedNearMisses);
             } else if (isOtherVesselUpdate(receivedMessage))
                 updateOtherVessel(receivedMessage);
             else
@@ -99,11 +100,10 @@ public class NearMissEngine implements Observer {
 
             Message savedMessage = messageRepository.save(new Message(receivedMessage));
             logger.debug(String.format("Saved: %s", savedMessage));
-            //logger.trace(String.format("Newest: {%s}", messageRepository.listNewest()));
         }
     }
 
-    private void detectNearMisses() {
+    private Set<Vessel> detectNearMisses() {
         // Iterate through all known other vessels and identify near misses
         Set<Vessel> nearMisses = tracker.stream()
                 .filter(targetPropertyScreener)
@@ -113,13 +113,18 @@ public class NearMissEngine implements Observer {
                 .filter(detector::nearMissDetected)
                 .collect(Collectors.toSet());
 
-        // Act on detected near misses
         logger.info("{} near misses detected.", nearMisses.size());
 
+        return nearMisses;
+    }
+
+    private void storeNearMisses(Set<Vessel> nearMisses) {
         dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon());
 
         nearMisses.forEach(otherVessel -> {
-            vesselPositionRepository.save(new VesselPosition(otherVessel.getMmsi(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), (int) otherVessel.getHdg(), ownVessel.getLastReport()));
+            // TODO save more details about near-miss situation
+            VesselPosition savedVesselPosition = vesselPositionRepository.save(new VesselPosition(otherVessel.getMmsi(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), (int) otherVessel.getHdg(), ownVessel.getLastReport()));
+            logger.debug(String.format("Saved: %s", savedVesselPosition));
 
             double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon())) / 1852;
             logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", otherVessel.getName(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
