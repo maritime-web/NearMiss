@@ -4,6 +4,8 @@ import dk.dma.nearmiss.engine.Vessel;
 import dk.dma.nearmiss.helper.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.util.function.Predicate;
 
@@ -12,16 +14,17 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 /**
  * Determine whether or not a vessel is in vicinity of a given position.
  */
+@Component
 public class VesselVicinityScreener implements Predicate<Vessel> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final Position position;
+    private final Vessel ownVessel;
 
     /**
-     * @param position The position to consider vicinity of.
+     * @param ownVessel The vessel with position to consider vicinity of.
      */
-    public VesselVicinityScreener(Position position) {
-        this.position = position;
+    public VesselVicinityScreener(@Qualifier("ownVessel") Vessel ownVessel) {
+        this.ownVessel = ownVessel;
     }
 
     /**
@@ -32,6 +35,7 @@ public class VesselVicinityScreener implements Predicate<Vessel> {
      */
     @Override
     public boolean test(Vessel vessel) {
+        Position position = ownVessel.getCenterPosition();
         dk.dma.enav.model.geometry.Position vesselPosition = dk.dma.enav.model.geometry.Position.create(vessel.getCenterPosition().getLat(), vessel.getCenterPosition().getLon());
         double distance = vesselPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(position.getLat(), position.getLon())) / 1852;
 

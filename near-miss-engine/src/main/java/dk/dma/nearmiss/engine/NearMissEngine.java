@@ -17,13 +17,13 @@ import dk.dma.nearmiss.observer.Observer;
 import dk.dma.nearmiss.tcp.client.TcpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.lang.Double.NaN;
@@ -33,6 +33,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class NearMissEngine implements Observer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    // Components
     private final TcpClient tcpClient;
     private final MessageRepository messageRepository;
     private final VesselPositionRepository vesselPositionRepository;
@@ -44,15 +45,24 @@ public class NearMissEngine implements Observer {
     private final TargetToVesselConverter targetToVesselConverter;
     private final TargetPropertyScreener targetPropertyScreener;
     private final PositionPredicter positionPredicter;
+    private final VesselVicinityScreener vicinityScreener;
+    private final NearMissDetector detector;
 
+    // Own vessel state
     private final Vessel ownVessel;
 
-    public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository,
+    public NearMissEngine(TcpClient tcpClient,
+                          MessageRepository messageRepository,
                           VesselPositionRepository vesselPositionRepository,
-                          TargetTracker tracker, NearMissEngineConfiguration conf,
+                          TargetTracker tracker,
+                          NearMissEngineConfiguration conf,
                           VesselGeometryService geometryService,
                           TargetToVesselConverter targetToVesselConverter,
-                          TargetPropertyScreener targetPropertyScreener, PositionPredicter positionPredicter) {
+                          TargetPropertyScreener targetPropertyScreener,
+                          PositionPredicter positionPredicter,
+                          VesselVicinityScreener vicinityScreener,
+                          NearMissDetector detector,
+                          @Qualifier("ownVessel") Vessel ownVessel) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
         this.vesselPositionRepository = vesselPositionRepository;
@@ -62,7 +72,9 @@ public class NearMissEngine implements Observer {
         this.targetToVesselConverter = targetToVesselConverter;
         this.targetPropertyScreener = targetPropertyScreener;
         this.positionPredicter = positionPredicter;
-        this.ownVessel = new Vessel(0);
+        this.vicinityScreener = vicinityScreener;
+        this.detector = detector;
+        this.ownVessel = ownVessel;
 
         tcpClient.addListener(this);
     }
@@ -92,10 +104,6 @@ public class NearMissEngine implements Observer {
     }
 
     private void detectNearMisses() {
-        // Setup engine parts
-        Predicate<Vessel> vicinityScreener = new VesselVicinityScreener(ownVessel.getCenterPosition());
-        NearMissDetector detector = new EllipseShapedSafetyZoneDetector(ownVessel);
-
         // Iterate through all known other vessels and identify near misses
         Set<Vessel> nearMisses = tracker.stream()
                 .filter(targetPropertyScreener)
