@@ -1,0 +1,143 @@
+swagger: '2.0'
+info:
+  version: '0.1'
+  title: Near miss api
+paths:
+  /near-miss:
+    get:
+      tags:
+      - events
+      summary: Get near miss events for own vessel in the specified time interval
+      operationId: events
+      consumes: []
+      produces:
+      - application/json
+      parameters:
+      - name: from
+        in: query
+        description: Start time of the interval in UTC
+        required: true
+        type: string
+        format: date-time
+      - name: to
+        in: query
+        description: End time of the interval in UTC
+        required: true
+        type: string
+        format: date-time
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/near-miss-response'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+        '501':
+          description: Server Error
+definitions:
+  near-miss-response:
+    type: object
+    properties:
+      own:
+        type: object
+        properties:
+          mmsi:
+            type: integer
+            format: int64
+            description: identification of a vessel
+          name:
+            type: string
+          imo-number:
+            type: string
+          type:
+            type: integer
+            format: int32
+          dimensions:
+            $ref: '#/definitions/dimensions'
+        description: Data for own vessel
+      objects:
+        type: array
+        items:
+          $ref: '#/definitions/near-miss-object'
+        description: Static data for the near miss objects encountered in the requested time interval
+      position-reports:
+        type: array
+        items:
+          $ref: '#/definitions/position-report'
+        description: All position reports regarding the vessels involved in near miss encounters
+  safety-zone:
+    type: object
+    properties:
+      a:
+        type: number
+        format: double
+        description: Half the length of the ellipse major axis
+      b:
+        type: number
+        format: double
+        description: Half the length of the ellipse minor axis
+  near-miss-object:
+    type: object
+    properties:
+      object-type:
+        type: string
+        enum:
+        - vessel
+        description: Indicates the type of near miss object
+      vessel:
+        $ref: '#/definitions/dimensions'
+  dimensions:
+    type: object
+    properties:
+      beam:
+        type: integer
+        format: int32
+        description: Width of vessel in meters
+      loa:
+        type: integer
+        format: int32
+        description: Length OverAll in meters
+  position-report:
+    type: object
+    properties:
+      mmsi:
+        type: integer
+        format: int64
+        description: Identification of the vessel for which this report pertains
+      lat:
+        type: number
+        format: double
+        description: Latitude in decimal degrees
+      lon:
+        type: number
+        format: double
+        description: Longitude in decimal degrees
+      time:
+        type: string
+        format: date-time
+      sog:
+        type: number
+        format: double
+        description: Velocity in meters per second
+      cog:
+        type: number
+        format: double
+        description: Course over ground
+      hdg:
+        type: number
+        format: double
+        description: Heading
+      near-miss-flag:
+        type: boolean
+        description: Indicate whether a near miss is detected at this point in time or not
+      safety-zone:
+        $ref: '#/definitions/safety-zone'
+        description: The vessels safety zone. Only present if the report pertains to own vessel

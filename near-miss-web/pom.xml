@@ -11,7 +11,7 @@
 	<name>near-miss-web</name>
 	<description>Web Component for NearMiss</description>
 
-	<parent>
+    <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.1.0.RELEASE</version>
@@ -22,9 +22,60 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-	</properties>
+        <swagger.version>1.5.21</swagger.version>
+        <springfox-version>2.7.0</springfox-version>
+    </properties>
 
-	<dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>2.3.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${basedir}/src/main/resources/near-miss.yml</inputSpec>
+                            <language>spring</language>
+
+                            <generateApis>true</generateApis>
+                            <generateModels>true</generateModels>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <configOptions>
+                                <sourceFolder>main/java</sourceFolder>
+                                <dateLibrary>java8</dateLibrary>
+                            </configOptions>
+                            <modelPackage>dk.dma.nearmiss.rest.generated.model</modelPackage>
+                            <apiPackage>dk.dma.nearmiss.rest.generated.api</apiPackage>
+                            <invokerPackage>dk.dma.nearmiss.rest.generated.invoke</invokerPackage>
+                            <verbose>false</verbose>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>dk/dma/nearmiss/rest/generated/invoke/Swagger2SpringBoot.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.1.0.RELEASE</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -42,49 +93,40 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-	</dependencies>
+        <!--SpringFox dependencies -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox-version}</version>
+        </dependency>
 
-	<build>
+            <!-- Bean Validation API support -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
 
-		<plugins>
-			<!--
-            <plugin>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>2.3.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${basedir}/src/main/resources/S124v0.4.json</inputSpec>
-                            <language>jaxrs-resteasy</language>
-                            <generateApis>true</generateApis>
-                            <generateModels>true</generateModels>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModelTests>false</generateModelTests>
-                            <generateSupportingFiles>true</generateSupportingFiles>
-                            <configOptions>
-                                <sourceFolder>main/java</sourceFolder>
-                                <dateLibrary>java8</dateLibrary>
-                            </configOptions>
-                            <modelPackage>org.niord.s124.rest.generated.model</modelPackage>
-                            <apiPackage>org.niord.s124.rest.generated.api</apiPackage>
-                            <verbose>false</verbose>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
 
-            <plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.1.0.RELEASE</version>
-			</plugin>
-		</plugins>
-	</build>
-
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
