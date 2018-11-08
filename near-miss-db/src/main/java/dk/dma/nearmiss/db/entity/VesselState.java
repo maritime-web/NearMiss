@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
-public class VesselPosition {
+public class VesselState {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -18,10 +18,10 @@ public class VesselPosition {
     private int heading;
     private LocalDateTime positionTime;
 
-    public VesselPosition() {
+    public VesselState() {
     }
 
-    public VesselPosition(int mmsi, double latitude, double longitude, int heading, LocalDateTime positionTime) {
+    public VesselState(int mmsi, double latitude, double longitude, int heading, LocalDateTime positionTime) {
         this.mmsi = mmsi;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -79,7 +79,7 @@ public class VesselPosition {
 
     @Override
     public String toString() {
-        return "VesselPosition{" +
+        return "VesselState{" +
                 "id=" + id +
                 ", mmsi=" + mmsi +
                 ", latitude=" + latitude +

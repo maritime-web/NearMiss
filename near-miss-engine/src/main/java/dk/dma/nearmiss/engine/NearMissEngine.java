@@ -5,9 +5,9 @@ import dk.dma.ais.tracker.Target;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
 import dk.dma.ais.tracker.targetTracker.TargetTracker;
 import dk.dma.nearmiss.db.entity.Message;
-import dk.dma.nearmiss.db.entity.VesselPosition;
+import dk.dma.nearmiss.db.entity.VesselState;
 import dk.dma.nearmiss.db.repository.MessageRepository;
-import dk.dma.nearmiss.db.repository.VesselPositionRepository;
+import dk.dma.nearmiss.db.repository.VesselStateRepository;
 import dk.dma.nearmiss.engine.engineParts.*;
 import dk.dma.nearmiss.engine.geometry.VesselGeometryService;
 import dk.dma.nearmiss.helper.Position;
@@ -36,7 +36,7 @@ public class NearMissEngine implements Observer {
     // Components
     private final TcpClient tcpClient;
     private final MessageRepository messageRepository;
-    private final VesselPositionRepository vesselPositionRepository;
+    private final VesselStateRepository vesselStateRepository;
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
 
@@ -53,7 +53,7 @@ public class NearMissEngine implements Observer {
 
     public NearMissEngine(TcpClient tcpClient,
                           MessageRepository messageRepository,
-                          VesselPositionRepository vesselPositionRepository,
+                          VesselStateRepository vesselStateRepository,
                           TargetTracker tracker,
                           NearMissEngineConfiguration conf,
                           VesselGeometryService geometryService,
@@ -65,7 +65,7 @@ public class NearMissEngine implements Observer {
                           @Qualifier("ownVessel") Vessel ownVessel) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
-        this.vesselPositionRepository = vesselPositionRepository;
+        this.vesselStateRepository = vesselStateRepository;
         this.tracker = tracker;
         this.conf = conf;
         this.geometryService = geometryService;
@@ -123,8 +123,8 @@ public class NearMissEngine implements Observer {
 
         nearMisses.forEach(otherVessel -> {
             // TODO save more details about near-miss situation
-            VesselPosition savedVesselPosition = vesselPositionRepository.save(new VesselPosition(otherVessel.getMmsi(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), (int) otherVessel.getHdg(), ownVessel.getLastReport()));
-            logger.debug(String.format("Saved: %s", savedVesselPosition));
+            VesselState savedVesselState = vesselStateRepository.save(new VesselState(otherVessel.getMmsi(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), (int) otherVessel.getHdg(), ownVessel.getLastReport()));
+            logger.debug(String.format("Saved: %s", savedVesselState));
 
             double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon())) / 1852;
             logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", otherVessel.getName(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
@@ -144,7 +144,7 @@ public class NearMissEngine implements Observer {
             PositionDecConverter toDec = new PositionDecConverter(dmsLat, dmsLon);
             Position pos = toDec.convert();
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
-            vesselPositionRepository.save(new VesselPosition(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
+            vesselStateRepository.save(new VesselState(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
 
             Position geometricCenter = geometryService.calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
 
@@ -178,7 +178,7 @@ public class NearMissEngine implements Observer {
                 Position pos = new Position(info.getPosition().getLatitude(), info.getPosition().getLongitude());
                 Date positionTimestamp = new Date(info.getPositionTimestamp());
                 LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                vesselPositionRepository.save(new VesselPosition(info.getMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
+                vesselStateRepository.save(new VesselState(info.getMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
             }
         } else {
             logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
