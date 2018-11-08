@@ -1,9 +1,5 @@
 package dk.dma.nearmiss.engine;
 
-import dk.dma.ais.binary.SixbitException;
-import dk.dma.ais.message.AisMessage;
-import dk.dma.ais.message.AisMessageException;
-import dk.dma.ais.message.AisStaticCommon;
 import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.Target;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
@@ -12,6 +8,8 @@ import dk.dma.nearmiss.db.entity.Message;
 import dk.dma.nearmiss.db.entity.VesselPosition;
 import dk.dma.nearmiss.db.repository.MessageRepository;
 import dk.dma.nearmiss.db.repository.VesselPositionRepository;
+import dk.dma.nearmiss.engine.engineParts.*;
+import dk.dma.nearmiss.engine.geometry.VesselGeometryService;
 import dk.dma.nearmiss.helper.Position;
 import dk.dma.nearmiss.helper.PositionDecConverter;
 import dk.dma.nearmiss.nmea.GpgllHelper;
@@ -21,16 +19,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.lang.Double.NaN;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
@@ -42,19 +39,17 @@ public class NearMissEngine implements Observer {
     private final VesselPositionRepository vesselPositionRepository;
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
-    private final Detector detector;
 
     private final Vessel ownVessel;
 
     public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository,
                           VesselPositionRepository vesselPositionRepository,
-                          TargetTracker tracker, NearMissEngineConfiguration conf, Detector detector) {
+                          TargetTracker tracker, NearMissEngineConfiguration conf) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
         this.vesselPositionRepository = vesselPositionRepository;
         this.tracker = tracker;
         this.conf = conf;
-        this.detector = detector;
         this.ownVessel = new Vessel(0);
 
         tcpClient.addListener(this);
@@ -84,20 +79,26 @@ public class NearMissEngine implements Observer {
         }
     }
 
-    /** Iterate through all known other vessels and identify near misses */
     private void detectNearMisses() {
+        // Setup engine parts
+        TargetPropertyScreener targetPropertyScreener = new TargetPropertyScreener();
+        Function<TargetInfo, Vessel> targetToVesselConverter = new TargetToVesselConverter();
+        VesselPropertyScreener vesselPropertyScreener = new VesselPropertyScreener();
+        Function<Vessel, Vessel> positionPredicter = new PositionPredicter();
+        Predicate<Vessel> vicinityScreener = new VesselVicinityScreener(ownVessel.getCenterPosition());
+        NearMissDetector detector = new EllipseShapedSafetyZoneDetector(ownVessel);
+
+        // Iterate through all known other vessels and identify near misses
         Set<Vessel> nearMisses = tracker.stream()
-                .filter(t -> ! isBlackListed(t.getMmsi()))
-                .filter(t -> t.hasPositionInfo())
-                .filter(t -> t.getSog() > 5f)
-                .map(this::toVessel)
-                .filter(v -> isRecentlyUpdated(v))
-                .filter(v -> isRelevantType(v))
-                .map(v -> projectForward(v) )
-                .filter(v -> isInVicinity(v))
-                .filter(v -> detector.nearMissDetected(ownVessel, v))
+                .filter(targetPropertyScreener)
+                .map(targetToVesselConverter)
+                .filter(vesselPropertyScreener)
+                .map(positionPredicter)
+                .filter(vicinityScreener)
+                .filter(detector::nearMissDetected)
                 .collect(Collectors.toSet());
 
+        // Act on detected near misses
         logger.info("{} near misses detected.", nearMisses.size());
 
         dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon());
@@ -106,94 +107,6 @@ public class NearMissEngine implements Observer {
             double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(nm.getCenterPosition().getLat(), nm.getCenterPosition().getLon())) / 1852;
             logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", nm.getName(), nm.getCenterPosition().getLat(), nm.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
         });
-    }
-
-    private boolean isBlackListed(int mmsi) {
-        return false;
-    }
-
-    /** Determine whether a vessel updated recently enough to be considered for near-miss analysis */
-    private boolean isRecentlyUpdated(Vessel v) {
-        return Duration.between(v.getLastReport(), LocalDateTime.now()).toMinutes() > 15;
-    }
-
-    /** Determine whether a vessel is of a type relevant for near-miss analysis */
-    private boolean isRelevantType(Vessel v) {
-        return true;
-    }
-
-    private boolean isInVicinity(Vessel v) {
-        dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon());
-        double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(v.getCenterPosition().getLat(), v.getCenterPosition().getLon())) / 1852;
-
-        logger.debug(String.format("Distance to %s (in position [%f %f]) is %f nautical miles", nameOrMmsi(v), v.getCenterPosition().getLat(), v.getCenterPosition().getLon(), distance));
-
-        return distance < 3.0; // nautical miles
-    }
-
-    private String nameOrMmsi(Vessel v) {
-        return isBlank(v.getName()) ? String.valueOf(v.getMmsi()) : v. getName();
-    }
-
-    /** Project vessel's position forward in time */
-    private Vessel projectForward(Vessel v) {
-        return v;
-    }
-
-    /** Convert TargetInfo to Vessel */
-    private Vessel toVessel(TargetInfo t) {
-        String name = null;
-        int dimPort = 0;
-        int dimStarboard = 0;
-        int dimBow = 0;
-        int dimStern = 0;
-
-        if (t.hasStaticInfo()) {
-            AisPacket staticAisPacket = t.getStaticAisPacket1();
-            try {
-                AisMessage aisMessage = staticAisPacket.getAisMessage();
-
-                if (aisMessage instanceof AisStaticCommon) {
-                    AisStaticCommon staticData = (AisStaticCommon) aisMessage;
-                    name = staticData.getName().trim();
-                    dimPort = staticData.getDimPort();
-                    dimStarboard = staticData.getDimStarboard();
-                    dimBow = staticData.getDimBow();
-                    dimStern = staticData.getDimStern();
-                }
-            } catch (AisMessageException | SixbitException e) {
-                logger.error(e.getMessage());
-            }
-        }
-
-        Vessel v = new Vessel(t.getMmsi());
-        v.setName(name);
-        v.setLoa(dimStern + dimBow);
-        v.setBeam(dimPort + dimStarboard);
-        v.setLastReport(toLocalDateTime(t.getAisTarget().getLastReport()));
-
-        if (t.hasPositionInfo()) {
-            v.setSog(t.getSog());
-            v.setCog(t.getCog() / 10);
-            v.setHdg(t.getHeading() == 511 ? NaN : t.getHeading());
-
-            Position gpsReceiverPosition = new Position(t.getPosition().getLatitude(), t.getPosition().getLongitude());
-            Position geometricCenterPosition = calulateGeometricCenter(gpsReceiverPosition, t.getCog() / 10, dimPort, dimStern);
-
-            v.setCenterPosition(geometricCenterPosition);
-        }
-
-        return v;
-    }
-
-    private Position calulateGeometricCenter(Position gpsReceiverPosition, double cog, int dimPort, int dimStern) {
-        return gpsReceiverPosition; // TODO
-    }
-
-    private static LocalDateTime toLocalDateTime(Date date) {
-        return Instant.ofEpochMilli(date.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
     }
 
     private void updateOwnVessel(String message) {
@@ -211,7 +124,7 @@ public class NearMissEngine implements Observer {
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
             vesselPositionRepository.save(new VesselPosition(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
 
-            Position geometricCenter = calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
+            Position geometricCenter = new VesselGeometryService().calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
 
             this.ownVessel.setCenterPosition(geometricCenter);
             this.ownVessel.setCog(NaN);

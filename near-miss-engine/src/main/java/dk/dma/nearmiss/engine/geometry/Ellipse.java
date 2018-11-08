@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.engine;
+package dk.dma.nearmiss.engine.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;

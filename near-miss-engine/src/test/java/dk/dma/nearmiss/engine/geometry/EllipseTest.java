@@ -1,12 +1,12 @@
-package dk.dma.nearmiss.engine;
+package dk.dma.nearmiss.engine.geometry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static dk.dma.nearmiss.engine.Ellipse.METERS_PER_DEGREE_LATITUDE;
-import static dk.dma.nearmiss.engine.Ellipse.METERS_PER_DEGREE_LONGITUDE;
+import static dk.dma.nearmiss.engine.geometry.Ellipse.METERS_PER_DEGREE_LATITUDE;
+import static dk.dma.nearmiss.engine.geometry.Ellipse.METERS_PER_DEGREE_LONGITUDE;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
