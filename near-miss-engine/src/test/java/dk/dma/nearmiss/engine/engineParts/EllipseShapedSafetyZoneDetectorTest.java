@@ -45,19 +45,18 @@ public class EllipseShapedSafetyZoneDetectorTest {
 
     @Test
     public void detectsNearMissWithSelf() {
-        otherVessel = ownVessel;
-        boolean nearMissDetected = sut.nearMissDetected(otherVessel);
+        assertTrue(sut.nearMissDetected(ownVessel));
+    }
 
-        logger.info("nearMissDetected: {}", nearMissDetected);
-        assertTrue(nearMissDetected);
+    @Test
+    public void detectsNearMissWithOtherVesselCloseBy() {
+        when(otherVessel.getCenterPosition()).thenReturn(new Position(55.0001, 10.0001));
+        assertTrue(sut.nearMissDetected(otherVessel));
     }
 
     @Test
     public void detectsNoNearMissWithOtherVesselFarAway() {
-        boolean nearMissDetected = sut.nearMissDetected(otherVessel);
-
-        logger.info("nearMissDetected: {}", nearMissDetected);
-        assertFalse(nearMissDetected);
+        assertFalse(sut.nearMissDetected(otherVessel));
     }
 
 }
