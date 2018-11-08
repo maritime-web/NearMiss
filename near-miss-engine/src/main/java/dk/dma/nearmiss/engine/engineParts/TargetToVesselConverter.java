@@ -11,6 +11,8 @@ import dk.dma.nearmiss.engine.geometry.VesselGeometryService;
 import dk.dma.nearmiss.helper.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -20,14 +22,16 @@ import java.util.function.Function;
 
 import static java.lang.Double.NaN;
 
+@Component
 public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
     private final VesselGeometryService geometryService;
 
-    public TargetToVesselConverter() {
-        geometryService = new VesselGeometryService();
+    public TargetToVesselConverter(VesselGeometryService geometryService) {
+        this.geometryService = geometryService;
     }
 
     @Override

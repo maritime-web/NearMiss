@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -40,16 +39,29 @@ public class NearMissEngine implements Observer {
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
 
+    // Engine parts
+    private final VesselGeometryService geometryService;
+    private final TargetToVesselConverter targetToVesselConverter;
+    private final TargetPropertyScreener targetPropertyScreener;
+    private final PositionPredicter positionPredicter;
+
     private final Vessel ownVessel;
 
     public NearMissEngine(TcpClient tcpClient, MessageRepository messageRepository,
                           VesselPositionRepository vesselPositionRepository,
-                          TargetTracker tracker, NearMissEngineConfiguration conf) {
+                          TargetTracker tracker, NearMissEngineConfiguration conf,
+                          VesselGeometryService geometryService,
+                          TargetToVesselConverter targetToVesselConverter,
+                          TargetPropertyScreener targetPropertyScreener, PositionPredicter positionPredicter) {
         this.tcpClient = tcpClient;
         this.messageRepository = messageRepository;
         this.vesselPositionRepository = vesselPositionRepository;
         this.tracker = tracker;
         this.conf = conf;
+        this.geometryService = geometryService;
+        this.targetToVesselConverter = targetToVesselConverter;
+        this.targetPropertyScreener = targetPropertyScreener;
+        this.positionPredicter = positionPredicter;
         this.ownVessel = new Vessel(0);
 
         tcpClient.addListener(this);
@@ -81,10 +93,6 @@ public class NearMissEngine implements Observer {
 
     private void detectNearMisses() {
         // Setup engine parts
-        TargetPropertyScreener targetPropertyScreener = new TargetPropertyScreener();
-        Function<TargetInfo, Vessel> targetToVesselConverter = new TargetToVesselConverter();
-        VesselPropertyScreener vesselPropertyScreener = new VesselPropertyScreener();
-        Function<Vessel, Vessel> positionPredicter = new PositionPredicter();
         Predicate<Vessel> vicinityScreener = new VesselVicinityScreener(ownVessel.getCenterPosition());
         NearMissDetector detector = new EllipseShapedSafetyZoneDetector(ownVessel);
 
@@ -92,7 +100,6 @@ public class NearMissEngine implements Observer {
         Set<Vessel> nearMisses = tracker.stream()
                 .filter(targetPropertyScreener)
                 .map(targetToVesselConverter)
-                .filter(vesselPropertyScreener)
                 .map(positionPredicter)
                 .filter(vicinityScreener)
                 .filter(detector::nearMissDetected)
@@ -124,7 +131,7 @@ public class NearMissEngine implements Observer {
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
             vesselPositionRepository.save(new VesselPosition(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
 
-            Position geometricCenter = new VesselGeometryService().calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
+            Position geometricCenter = geometryService.calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
 
             this.ownVessel.setCenterPosition(geometricCenter);
             this.ownVessel.setCog(NaN);
