@@ -1,5 +1,9 @@
 package dk.dma.nearmiss.engine;
 
+import dk.dma.ais.binary.SixbitException;
+import dk.dma.ais.message.AisMessageException;
+import dk.dma.ais.message.AisPositionMessage;
+import dk.dma.ais.message.AisStaticCommon;
 import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.Target;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
@@ -31,7 +35,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 public class NearMissEngine implements Observer {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // Components
     private final TcpClient tcpClient;
@@ -99,7 +103,6 @@ public class NearMissEngine implements Observer {
                 logger.error("Unsupported message received");
 
             Message savedMessage = messageRepository.save(new Message(receivedMessage));
-            logger.debug(String.format("Saved: %s", savedMessage));
         }
     }
 
@@ -122,9 +125,23 @@ public class NearMissEngine implements Observer {
         dk.dma.enav.model.geometry.Position ownPosition = dk.dma.enav.model.geometry.Position.create(ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon());
 
         nearMisses.forEach(otherVessel -> {
-            // TODO save more details about near-miss situation
-            VesselState savedVesselState = vesselStateRepository.save(new VesselState(otherVessel.getMmsi(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), (int) otherVessel.getHdg(), ownVessel.getLastReport()));
-            logger.debug(String.format("Saved: %s", savedVesselState));
+
+            VesselState vesselState = new VesselState(
+                    otherVessel.getMmsi(),
+                    otherVessel.getName(),
+                    otherVessel.getLoa(),
+                    otherVessel.getBeam(),
+                    otherVessel.getCenterPosition().getLat(),
+                    otherVessel.getCenterPosition().getLon(),
+                    (int) otherVessel.getHdg(),
+                    (int) otherVessel.getCog(),
+                    (int) otherVessel.getSog(),
+                    otherVessel.getLastReport(),
+                    true,
+                    true
+            );
+
+            VesselState savedVesselState = vesselStateRepository.save(vesselState);
 
             double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon())) / 1852;
             logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", otherVessel.getName(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
@@ -144,14 +161,30 @@ public class NearMissEngine implements Observer {
             PositionDecConverter toDec = new PositionDecConverter(dmsLat, dmsLon);
             Position pos = toDec.convert();
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
-            vesselStateRepository.save(new VesselState(conf.getOwnShipMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
+
+            VesselState ownVesselState = new VesselState(
+                    conf.getOwnShipMmsi(),
+                    "OWN SHIP", // TODO make configurable
+                    100,          // TODO make configurable
+                    25,         // TODO make configurable
+                    pos.getLat(),
+                    pos.getLon(),
+                    0,           // TODO acquire or calculate
+                    0,           // TODO acquire or calculate
+                    10,          // TODO acquire or calculate
+                    timestamp,
+                    false,
+                    false
+            );
+
+            vesselStateRepository.save(ownVesselState);
 
             Position geometricCenter = geometryService.calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
 
             this.ownVessel.setCenterPosition(geometricCenter);
-            this.ownVessel.setCog(NaN); // TODO calculate or get own cog
-            this.ownVessel.setSog(NaN); // TODO calculate or get own sog
-            this.ownVessel.setHdg(NaN); // TODO calculate or get own hdg
+            this.ownVessel.setCog(ownVesselState.getCog());
+            this.ownVessel.setSog(ownVesselState.getSog());
+            this.ownVessel.setHdg(ownVesselState.getHdg());
             this.ownVessel.setLastReport(LocalDateTime.now());
         }
     }
@@ -174,11 +207,39 @@ public class NearMissEngine implements Observer {
         if (target instanceof TargetInfo) {
             TargetInfo info = (TargetInfo) target;
 
-            if (conf.isSaveAllPositions() && info != null && info.getPosition() != null) {
+            if (conf.isSaveAllPositions() && info != null) {
+                AisStaticCommon aisStatic = null;
+                AisPositionMessage aisDynamic = null;
+                try {
+                    if (info.hasStaticInfo())
+                        aisStatic = (AisStaticCommon) info.getStaticAisPacket1().getAisMessage();
+
+                    if (info.hasPositionInfo())
+                        aisDynamic = (AisPositionMessage) info.getPositionPacket().getAisMessage();
+                } catch (AisMessageException|SixbitException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+
+                final int mmsi = info.getMmsi();
+                final double lat = aisDynamic != null ? info.getPosition().getLatitude() : NaN;
+                final double lon = aisDynamic != null ? info.getPosition().getLongitude() : NaN;
+                final int hdg = aisDynamic != null ? info.getHeading() : 0;
+                final float cog = aisDynamic != null ? info.getCog() : 0;
+                final int sog = aisDynamic != null ? info.getHeading() : 0;
+
+                String name = aisStatic != null ? aisStatic.getName() : null;
+                int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimPort() : 0;
+                int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
+
                 Position pos = new Position(info.getPosition().getLatitude(), info.getPosition().getLongitude());
                 Date positionTimestamp = new Date(info.getPositionTimestamp());
                 LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                vesselStateRepository.save(new VesselState(info.getMmsi(), pos.getLat(), pos.getLon(), 0, timestamp));
+
+                VesselState otherVesselState = new VesselState(
+                    mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, false
+                );
+
+                vesselStateRepository.save(otherVesselState);
             }
         } else {
             logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
