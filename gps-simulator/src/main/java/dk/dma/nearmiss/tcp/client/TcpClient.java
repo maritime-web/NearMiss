@@ -42,7 +42,11 @@ public class TcpClient extends Simulator {
             if (input != null) {
                 try {
                     answer = input.readLine();
-                    notifyListeners();
+                    try {
+                        notifyListeners();
+                    } catch (Throwable t) {
+                        logger.error(t.getMessage(), t);
+                    }
                 } catch (IOException e) {
                     logger.error("Client: Error reading from server");
                 }
