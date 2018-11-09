@@ -23,16 +23,16 @@ public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
 
     @Override
     public boolean nearMissDetected(Vessel otherVessel) {
-        VesselContour otherVesselCountour = createContour(otherVessel);
+        VesselContour contourOfOtherVessel = createContour(otherVessel);
         EllipticSafetyZone safetyZoneOfOwnVessel = createSafetyZone(ownVessel);
 
-        if (otherVesselCountour != null && safetyZoneOfOwnVessel != null) {
+        if (contourOfOtherVessel != null && safetyZoneOfOwnVessel != null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("WKT contour of other vessel: {}", otherVesselCountour.toWkt());
+                logger.debug("WKT contour of other vessel: {}", contourOfOtherVessel.toWkt());
                 logger.debug("WKT safety zone of own vessel: {}", safetyZoneOfOwnVessel.toWkt());
             }
 
-            return safetyZoneOfOwnVessel.intersects(otherVesselCountour);
+            return safetyZoneOfOwnVessel.intersects(contourOfOtherVessel);
         } else
             return false;
     }
