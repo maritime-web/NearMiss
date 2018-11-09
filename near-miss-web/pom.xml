@@ -46,6 +46,12 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
+
+                            <supportingFilesToGenerate>
+                                HomeController.java,README.md
+                                <!-- HomeController.java,SwaggerDocumentationConfig.java,README.md -->
+                            </supportingFilesToGenerate>
+
                             <configOptions>
                                 <sourceFolder>main/java</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
@@ -64,6 +70,7 @@
                 <configuration>
                     <excludes>
                         <exclude>dk/dma/nearmiss/rest/generated/invoke/Swagger2SpringBoot.java</exclude>
+                        <exclude>dk/dma/nearmiss/rest/generated/api/NearMissApiController.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
