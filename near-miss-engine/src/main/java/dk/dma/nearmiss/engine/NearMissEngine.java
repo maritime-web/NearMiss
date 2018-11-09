@@ -8,9 +8,7 @@ import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.Target;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
 import dk.dma.ais.tracker.targetTracker.TargetTracker;
-import dk.dma.nearmiss.db.entity.Message;
 import dk.dma.nearmiss.db.entity.VesselState;
-import dk.dma.nearmiss.db.repository.MessageRepository;
 import dk.dma.nearmiss.db.repository.VesselStateRepository;
 import dk.dma.nearmiss.engine.engineParts.*;
 import dk.dma.nearmiss.engine.geometry.VesselGeometryService;
@@ -39,7 +37,6 @@ public class NearMissEngine implements Observer {
 
     // Components
     private final TcpClient tcpClient;
-    private final MessageRepository messageRepository;
     private final VesselStateRepository vesselStateRepository;
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
@@ -56,7 +53,6 @@ public class NearMissEngine implements Observer {
     private final Vessel ownVessel;
 
     public NearMissEngine(TcpClient tcpClient,
-                          MessageRepository messageRepository,
                           VesselStateRepository vesselStateRepository,
                           TargetTracker tracker,
                           NearMissEngineConfiguration conf,
@@ -68,7 +64,6 @@ public class NearMissEngine implements Observer {
                           NearMissDetector detector,
                           @Qualifier("ownVessel") Vessel ownVessel) {
         this.tcpClient = tcpClient;
-        this.messageRepository = messageRepository;
         this.vesselStateRepository = vesselStateRepository;
         this.tracker = tracker;
         this.conf = conf;
@@ -101,8 +96,6 @@ public class NearMissEngine implements Observer {
                 updateOtherVessel(receivedMessage);
             else
                 logger.error("Unsupported message received");
-
-            Message savedMessage = messageRepository.save(new Message(receivedMessage));
         }
     }
 
