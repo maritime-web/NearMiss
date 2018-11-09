@@ -8,6 +8,7 @@ import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.Target;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
 import dk.dma.ais.tracker.targetTracker.TargetTracker;
+import dk.dma.nearmiss.db.entity.EllipticSafetyZone;
 import dk.dma.nearmiss.db.entity.VesselState;
 import dk.dma.nearmiss.db.repository.VesselStateRepository;
 import dk.dma.nearmiss.engine.engineParts.*;
@@ -132,7 +133,8 @@ public class NearMissEngine implements Observer {
                     (int) otherVessel.getCog(),
                     (int) otherVessel.getSog(),
                     otherVessel.getLastReport(),
-                    true
+                    true,
+                    null
             );
 
             VesselState savedVesselState = vesselStateRepository.save(vesselState);
@@ -168,7 +170,8 @@ public class NearMissEngine implements Observer {
                     0,           // TODO acquire or calculate
                     10,          // TODO acquire or calculate
                     timestamp,
-                    false
+                    false,
+                    new EllipticSafetyZone()
             );
 
             vesselStateRepository.save(ownVesselState);
@@ -223,7 +226,7 @@ public class NearMissEngine implements Observer {
                 final int sog = aisDynamic != null ? ((int) info.getSog()) / 10 : 0;
 
                 String name = aisStatic != null ? aisStatic.getName() : null;
-                int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimPort() : 0;
+                int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimStern() : 0;
                 int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
 
                 Position pos = new Position(info.getPosition().getLatitude(), info.getPosition().getLongitude());
@@ -231,7 +234,7 @@ public class NearMissEngine implements Observer {
                 LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
                 VesselState otherVesselState = new VesselState(
-                    AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false
+                    AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null
                 );
 
                 vesselStateRepository.save(otherVesselState);
