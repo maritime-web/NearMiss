@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static dk.dma.nearmiss.db.entity.VesselState.SensorType.*;
 import static java.lang.Double.NaN;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -120,6 +121,7 @@ public class NearMissEngine implements Observer {
         nearMisses.forEach(otherVessel -> {
 
             VesselState vesselState = new VesselState(
+                    PREDICTED,
                     otherVessel.getMmsi(),
                     otherVessel.getName(),
                     otherVessel.getLoa(),
@@ -130,7 +132,6 @@ public class NearMissEngine implements Observer {
                     (int) otherVessel.getCog(),
                     (int) otherVessel.getSog(),
                     otherVessel.getLastReport(),
-                    true,
                     true
             );
 
@@ -156,6 +157,7 @@ public class NearMissEngine implements Observer {
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
 
             VesselState ownVesselState = new VesselState(
+                    GPS,
                     conf.getOwnShipMmsi(),
                     "OWN SHIP", // TODO make configurable
                     100,          // TODO make configurable
@@ -166,7 +168,6 @@ public class NearMissEngine implements Observer {
                     0,           // TODO acquire or calculate
                     10,          // TODO acquire or calculate
                     timestamp,
-                    false,
                     false
             );
 
@@ -218,7 +219,7 @@ public class NearMissEngine implements Observer {
                 final double lat = aisDynamic != null ? info.getPosition().getLatitude() : NaN;
                 final double lon = aisDynamic != null ? info.getPosition().getLongitude() : NaN;
                 final int hdg = aisDynamic != null ? info.getHeading() : 0;
-                final float cog = aisDynamic != null ? info.getCog() : 0;
+                final float cog = aisDynamic != null ? info.getCog() / 10f : 0f;
                 final int sog = aisDynamic != null ? info.getHeading() : 0;
 
                 String name = aisStatic != null ? aisStatic.getName() : null;
@@ -230,7 +231,7 @@ public class NearMissEngine implements Observer {
                 LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
                 VesselState otherVesselState = new VesselState(
-                    mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, false
+                    AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false
                 );
 
                 vesselStateRepository.save(otherVesselState);

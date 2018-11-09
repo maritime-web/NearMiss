@@ -1,9 +1,6 @@
 package dk.dma.nearmiss.db.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -12,6 +9,10 @@ public class VesselState {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private final SensorType sensorType;
 
     @NotNull
     private final int mmsi;
@@ -26,10 +27,10 @@ public class VesselState {
     private final int sog;
     private final LocalDateTime positionTime;
 
-    private final boolean positionPredicted;
     private final boolean isNearMiss;
 
-    public VesselState(int mmsi, String name, int loa, int beam, double latitude, double longitude, int hdg, float cog, int sog, LocalDateTime positionTime, boolean positionPredicted, boolean isNearMiss) {
+    public VesselState(SensorType sensorType, int mmsi, String name, int loa, int beam, double latitude, double longitude, int hdg, float cog, int sog, LocalDateTime positionTime, boolean isNearMiss) {
+        this.sensorType = sensorType;
         this.mmsi = mmsi;
         this.name = name;
         this.loa = loa;
@@ -40,13 +41,17 @@ public class VesselState {
         this.cog = cog;
         this.sog = sog;
         this.positionTime = positionTime;
-        this.positionPredicted = positionPredicted;
         this.isNearMiss = isNearMiss;
     }
 
     /** JPA entity id */
     public Long getId() {
         return id;
+    }
+
+    /** Get sensor type */
+    public SensorType getSensorType() {
+        return sensorType;
     }
 
     /** Get vessel's MMSI number */
@@ -99,11 +104,6 @@ public class VesselState {
         return positionTime;
     }
 
-    /** Is position predicted or reported? */
-    public boolean isPositionPredicted() {
-        return positionPredicted;
-    }
-
     /** Is other vessel in near-miss situation with own vessel? */
     public boolean isNearMiss() {
         return isNearMiss;
@@ -113,17 +113,28 @@ public class VesselState {
     public String toString() {
         return "VesselState{" +
                 "id=" + id +
+                ", sensorType=" + sensorType +
                 ", mmsi=" + mmsi +
                 ", name='" + name + '\'' +
+                ", loa=" + loa +
+                ", beam=" + beam +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", hdg=" + hdg +
                 ", cog=" + cog +
                 ", sog=" + sog +
                 ", positionTime=" + positionTime +
-                ", positionPredicted=" + positionPredicted +
                 ", isNearMiss=" + isNearMiss +
                 '}';
     }
-}
 
+    public enum SensorType {
+        /** Information is predicted or assumed  */
+        PREDICTED,
+        /** Information received from GPS sensor */
+        GPS,
+        /** Information received from AIS sensor */
+        AIS;
+    }
+
+}
