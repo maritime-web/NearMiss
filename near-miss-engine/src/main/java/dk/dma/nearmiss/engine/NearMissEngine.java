@@ -226,7 +226,7 @@ public class NearMissEngine implements Observer {
                 final int sog = aisDynamic != null ? ((int) info.getSog()) / 10 : 0;
 
                 String name = aisStatic != null ? aisStatic.getName() : null;
-                int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimPort() : 0;
+                int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimStern() : 0;
                 int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
 
                 Position pos = new Position(info.getPosition().getLatitude(), info.getPosition().getLongitude());
