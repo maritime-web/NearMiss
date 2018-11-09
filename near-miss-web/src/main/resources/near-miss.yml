@@ -72,33 +72,10 @@ definitions:
   near-miss-response:
     type: object
     properties:
-      own:
-        type: object
-        properties:
-          mmsi:
-            type: integer
-            format: int64
-            description: identification of a vessel
-          name:
-            type: string
-          imo-number:
-            type: string
-          type:
-            type: integer
-            format: int32
-          dimensions:
-            $ref: '#/definitions/dimensions'
-        description: Data for own vessel
-      objects:
+      vessel-states:
         type: array
         items:
-          $ref: '#/definitions/near-miss-object'
-        description: Static data for the near miss objects encountered in the requested time interval
-      position-reports:
-        type: array
-        items:
-          $ref: '#/definitions/position-report'
-        description: All position reports regarding the vessels involved in near miss encounters
+          $ref: '#/definitions/vessel-state'
   safety-zone:
     type: object
     properties:
@@ -110,16 +87,6 @@ definitions:
         type: number
         format: double
         description: Half the length of the ellipse minor axis
-  near-miss-object:
-    type: object
-    properties:
-      object-type:
-        type: string
-        enum:
-        - vessel
-        description: Indicates the type of near miss object
-      vessel:
-        $ref: '#/definitions/dimensions'
   dimensions:
     type: object
     properties:
@@ -131,7 +98,7 @@ definitions:
         type: integer
         format: int32
         description: Length OverAll in meters
-  position-report:
+  vessel-state:
     type: object
     properties:
       mmsi:
@@ -163,10 +130,12 @@ definitions:
         description: Heading
       near-miss-flag:
         type: boolean
-        description: Indicate whether a near miss is detected at this point in time or not
+        description: Indicate whether a near miss is detected at this point in time or not. near-miss is only indicated for other vessels
       safety-zone:
         $ref: '#/definitions/safety-zone'
         description: The vessels safety zone. Only present if the report pertains to own vessel
+      dimensions:
+        $ref: '#/definitions/dimensions'
   configuration-response:
     type: object
     properties:
