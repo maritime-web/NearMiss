@@ -38,7 +38,7 @@ public class EllipseShapedSafetyZoneDetectorTest {
         when(otherVessel.getCenterPosition()).thenReturn(new Position(54.0, 9.0));
         when(otherVessel.getLoa()).thenReturn(50);
         when(otherVessel.getBeam()).thenReturn(15);
-        when(otherVessel.getCog()).thenReturn(90.0);
+        when(otherVessel.getHdg()).thenReturn(90.0);
 
         sut = new EllipseShapedSafetyZoneDetector(ownVessel);
     }
