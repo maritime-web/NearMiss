@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 @Repository
 public class VesselStateRepository {
@@ -27,6 +30,16 @@ public class VesselStateRepository {
         }
         logger.debug(String.format("Saved: %s", vesselState));
         return vesselState;
+    }
+
+    public List<VesselState> list(OffsetDateTime from, OffsetDateTime to) {
+        @SuppressWarnings("JpaQlInspection") TypedQuery<VesselState> query = em.createQuery(
+                "SELECT vs FROM VesselState vs WHERE vs.positionTime BETWEEN :from AND :to ", VesselState.class);
+        query.setParameter("from", from.toLocalDateTime());
+        query.setParameter("to", to.toLocalDateTime());
+        List<VesselState> result = query.getResultList();
+        logger.debug(String.format("Number of VesselState records found: %s", result.size()));
+        return result;
     }
 
 }
