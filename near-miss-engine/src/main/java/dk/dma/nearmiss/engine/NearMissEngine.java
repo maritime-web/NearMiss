@@ -195,10 +195,11 @@ public class NearMissEngine implements Observer {
         String multiLineMessage = message.replace("__r__n", "\r\n");
         AisPacket packet = AisPacket.from(multiLineMessage);
         Target target = null;
+        int targetMmsi = -1;
         try {
-            int mmsi = packet.getAisMessage().getUserId();
+            targetMmsi = packet.getAisMessage().getUserId();
             tracker.update(packet);
-            target = tracker.get(mmsi);
+            target = tracker.get(targetMmsi);
         } catch (Exception e) {
             logger.error("Error adding AIS message to tracker.");
             e.printStackTrace();
@@ -242,7 +243,10 @@ public class NearMissEngine implements Observer {
                 vesselStateRepository.save(otherVesselState);
             }
         } else {
-            logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
+            if (target != null)
+                logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
+            else
+                logger.warn("Mmsi {} not found in tracker.", targetMmsi);
         }
 
         logger.info("Tracking {} other vessels", tracker.size());
