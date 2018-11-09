@@ -12,25 +12,25 @@ public class VesselState {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private final SensorType sensorType;
+    private SensorType sensorType;
 
     @NotNull
-    private final int mmsi;
-    private final String name;
-    private final int loa;
-    private final int beam;
+    private int mmsi;
+    private String name;
+    private int loa;
+    private int beam;
 
-    private final double latitude;
-    private final double longitude;
-    private final int hdg;
-    private final int cog;
-    private final int sog;
-    private final LocalDateTime positionTime;
+    private double latitude;
+    private double longitude;
+    private int hdg;
+    private int cog;
+    private int sog;
+    private LocalDateTime positionTime;
 
-    private final boolean isNearMiss;
+    private boolean isNearMiss;
 
     @Embedded
-    private final EllipticSafetyZone safetyZone;
+    private EllipticSafetyZone safetyZone;
 
     public VesselState(SensorType sensorType, int mmsi, String name, int loa, int beam, double latitude, double longitude, int hdg, int cog, int sog, LocalDateTime positionTime, boolean isNearMiss, EllipticSafetyZone safetyZone) {
         this.sensorType = sensorType;
@@ -46,6 +46,9 @@ public class VesselState {
         this.positionTime = positionTime;
         this.isNearMiss = isNearMiss;
         this.safetyZone = safetyZone;
+    }
+
+    public VesselState() {
     }
 
     /** JPA entity id */

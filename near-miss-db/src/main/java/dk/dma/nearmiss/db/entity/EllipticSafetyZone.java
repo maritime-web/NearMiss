@@ -10,27 +10,27 @@ public class EllipticSafetyZone {
     /** Latitude of center */
     @NotNull
     @Column(name = "ESZ_CENTER_LATITUDE")
-    private final Double latitude;
+    private Double latitude;
 
     /** Longitude of center */
     @NotNull
     @Column(name = "ESZ_CENTER_LONGITUDE")
-    private final Double longitude;
+    private Double longitude;
 
     /** Orientation of major axis (in true degrees; 0 = north) */
     @NotNull
     @Column(name = "ESZ_ORIENT_MAJOR")
-    private final Integer orientationOfMajor;
+    private Integer orientationOfMajor;
 
     /** Length of semi major axis (in meters) */
     @NotNull
     @Column(name = "ESZ_A")
-    private final Double semiMajor;
+    private Double semiMajor;
 
     /** Length of semi minor axis (in meters) */
     @NotNull
     @Column(name = "ESZ_B")
-    private final Double semiMinor;
+    private Double semiMinor;
 
     public EllipticSafetyZone() {
         this.latitude = null;
