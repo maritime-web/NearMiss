@@ -1,7 +1,8 @@
 package dk.dma.nearmiss.engine.engineParts;
 
 import dk.dma.nearmiss.engine.Vessel;
-import dk.dma.nearmiss.engine.geometry.Ellipse;
+import dk.dma.nearmiss.engine.geometry.EllipticSafetyZone;
+import dk.dma.nearmiss.engine.geometry.VesselContour;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,44 +23,42 @@ public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
 
     @Override
     public boolean nearMissDetected(Vessel otherVessel) {
-        Ellipse ellipticContourOfOtherVessel = createContour(otherVessel);
-        Ellipse safetyZoneOfOwnVessel = createSafetyZone(ownVessel);
+        VesselContour otherVesselCountour = createContour(otherVessel);
+        EllipticSafetyZone safetyZoneOfOwnVessel = createSafetyZone(ownVessel);
 
-        if (ellipticContourOfOtherVessel != null && safetyZoneOfOwnVessel != null) {
+        if (otherVesselCountour != null && safetyZoneOfOwnVessel != null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("WKT contour of other vessel: {}", ellipticContourOfOtherVessel.toWkt());
+                logger.debug("WKT contour of other vessel: {}", otherVesselCountour.toWkt());
                 logger.debug("WKT safety zone of own vessel: {}", safetyZoneOfOwnVessel.toWkt());
             }
 
-            return safetyZoneOfOwnVessel.intersects(ellipticContourOfOtherVessel);
+            return safetyZoneOfOwnVessel.intersects(otherVesselCountour);
         } else
             return false;
     }
 
-    private Ellipse createContour(Vessel vessel) {
-        Ellipse contour = null;
+    private VesselContour createContour(Vessel vessel) {
+        VesselContour contour = null;
 
         double centreLatitude = vessel.getCenterPosition().getLat();
         double centreLongitude = vessel.getCenterPosition().getLon();
         int loa = vessel.getLoa();
         int beam = vessel.getBeam();
-        double cog = vessel.getCog();
+        int hdg = (int) vessel.getHdg();
 
         if (loa == 0) {
-            logger.debug("LOA of vessel {} is unknown. Cannot calculate safety zone.", vessel.getMmsi());
+            logger.debug("LOA of vessel {} is unknown. Cannot calculate vessel contour.", vessel.getMmsi());
         } else if (beam == 0) {
-            logger.debug("Beam of vessel {} is unknown. Cannot calculate safety zone.", vessel.getMmsi());
-        } else if (Double.isNaN(cog)) {
-            logger.debug("COG of vessel {} is unknown. Cannot calculate safety zone.", vessel.getMmsi());
+            logger.debug("Beam of vessel {} is unknown. Cannot calculate vessel contour.", vessel.getMmsi());
         } else {
-            contour = new Ellipse(centreLatitude, centreLongitude, loa, beam, cog);
+            contour = new VesselContour(centreLatitude, centreLongitude, loa, beam, hdg);
         }
 
         return contour;
     }
 
-    private Ellipse createSafetyZone(Vessel vessel) {
-        Ellipse safetyZone = null;
+    private EllipticSafetyZone createSafetyZone(Vessel vessel) {
+        EllipticSafetyZone safetyZone = null;
 
         double sog = vessel.getSog();
         double cog = vessel.getCog();
@@ -80,7 +79,7 @@ public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
             int lengthOfAxisAlongCourse = loa + ((int) sog * 10);         // TODO make factor configurable; linear relation to sog? loa?
             int lengthOfAxisAcrossCourse = beam * 4;                      // TODO make factor configurable;
 
-            safetyZone = new Ellipse(centreLatitude, centreLongitude, lengthOfAxisAlongCourse, lengthOfAxisAcrossCourse, cog);
+            safetyZone = new EllipticSafetyZone(centreLatitude, centreLongitude, lengthOfAxisAlongCourse, lengthOfAxisAcrossCourse, cog);
         }
 
         return safetyZone;

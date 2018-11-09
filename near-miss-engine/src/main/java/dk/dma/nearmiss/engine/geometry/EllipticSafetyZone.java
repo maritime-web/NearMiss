@@ -9,16 +9,16 @@ import org.locationtech.jts.util.GeometricShapeFactory;
 import static java.lang.Math.PI;
 
 /**
- * This class represents an Ellipse.
+ * This class represents an EllipticSafetyZone.
  *
  * The ellipse is intended to support geometric calculations of the surface of the Earth; but limited to distances
  * at the surface where the Earth can the surface can safely be assumed to a linear, flat plane.
  *
  */
 @SuppressWarnings("WeakerAccess")
-public class Ellipse {
+public class EllipticSafetyZone {
 
-    private final Polygon _internalRepresentation;
+    final Polygon _internalRepresentation;
 
     final static int METERS_PER_MINUTE_LATITUDE = 1852;
     final static int MINUTES_PER_DEGREE_LATITUDE = 60;
@@ -29,7 +29,7 @@ public class Ellipse {
     final static int METERS_PER_DEGREE_LONGITUDE = METERS_PER_MINUTE_LONGITUDE * MINUTES_PER_DEGREE_LONGITUDE;
 
     /**
-     * Create an Ellipse
+     * Create an EllipticSafetyZone
      *
      * @param centreLatitude Latitude of the ellipse's centre in degrees.
      * @param centreLongitude Longitude of the ellipse's center in degrees.
@@ -37,7 +37,7 @@ public class Ellipse {
      * @param lengthOfAxisAcrossCourse Length of the ellipse's horizontal axis before rotation in meters. The values supplied for this parameters are only valid in meters around latitude 55 degrees North or South.
      * @param course Counter-clockwise rotation angle of the ellipse in degrees.
      */
-    public Ellipse(double centreLatitude, double centreLongitude, double lengthOfAxisAlongCourse, double lengthOfAxisAcrossCourse, double course) {
+    public EllipticSafetyZone(double centreLatitude, double centreLongitude, double lengthOfAxisAlongCourse, double lengthOfAxisAcrossCourse, double course) {
         if (lengthOfAxisAlongCourse <= 0)
             throw new IllegalArgumentException("lengthOfAxisAlongCourse must be a positive number");
         if (lengthOfAxisAcrossCourse <= 0)
@@ -62,8 +62,12 @@ public class Ellipse {
         this._internalRepresentation = ellipse;
     }
 
-    public boolean intersects(Ellipse otherEllipse) {
+    public boolean intersects(EllipticSafetyZone otherEllipse) {
         return _internalRepresentation.intersects(otherEllipse._internalRepresentation);
+    }
+
+    public boolean intersects(VesselContour vesselContour) {
+        return _internalRepresentation.intersects(vesselContour._internalRepresentation);
     }
 
     public String toWkt() {
