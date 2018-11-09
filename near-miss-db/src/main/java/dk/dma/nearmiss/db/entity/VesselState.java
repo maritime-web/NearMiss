@@ -29,7 +29,10 @@ public class VesselState {
 
     private final boolean isNearMiss;
 
-    public VesselState(SensorType sensorType, int mmsi, String name, int loa, int beam, double latitude, double longitude, int hdg, int cog, int sog, LocalDateTime positionTime, boolean isNearMiss) {
+    @Embedded
+    private final EllipticSafetyZone safetyZone;
+
+    public VesselState(SensorType sensorType, int mmsi, String name, int loa, int beam, double latitude, double longitude, int hdg, int cog, int sog, LocalDateTime positionTime, boolean isNearMiss, EllipticSafetyZone safetyZone) {
         this.sensorType = sensorType;
         this.mmsi = mmsi;
         this.name = name;
@@ -42,6 +45,7 @@ public class VesselState {
         this.sog = sog;
         this.positionTime = positionTime;
         this.isNearMiss = isNearMiss;
+        this.safetyZone = safetyZone;
     }
 
     /** JPA entity id */
@@ -109,6 +113,10 @@ public class VesselState {
         return isNearMiss;
     }
 
+    public EllipticSafetyZone getSafetyZone() {
+        return safetyZone;
+    }
+
     @Override
     public String toString() {
         return "VesselState{" +
@@ -125,6 +133,7 @@ public class VesselState {
                 ", sog=" + sog +
                 ", positionTime=" + positionTime +
                 ", isNearMiss=" + isNearMiss +
+                ", safetyZone=" + safetyZone +
                 '}';
     }
 
