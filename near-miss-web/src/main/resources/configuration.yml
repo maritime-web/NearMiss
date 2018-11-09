@@ -1,0 +1,39 @@
+swagger: '2.0'
+info:
+  version: '0.1'
+  title: near-miss configuration
+paths:
+  /configuration:
+    get:
+      tags:
+      - configuration
+      summary: Get near-miss configurations
+      operationId: configuration
+      consumes: []
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/configuration-response'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+        '501':
+          description: Server Error
+definitions:
+  configuration-response:
+    type: object
+    properties:
+      mmsi:
+        type: integer
+        format: int64
+        description: identification of a own ship

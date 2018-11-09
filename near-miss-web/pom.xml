@@ -71,6 +71,7 @@
                     <excludes>
                         <exclude>dk/dma/nearmiss/rest/generated/invoke/Swagger2SpringBoot.java</exclude>
                         <exclude>dk/dma/nearmiss/rest/generated/api/NearMissApiController.java</exclude>
+                        <exclude>dk/dma/nearmiss/rest/generated/api/ConfigurationApiController.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
