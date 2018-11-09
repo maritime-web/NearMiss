@@ -9,7 +9,12 @@ import org.locationtech.jts.io.WKTWriter;
 import static java.lang.Math.PI;
 
 /**
- * This class represents the contour of a VesselContour.
+ * This class represents the contour of a vessel.
+ *
+ * It is intended to model the contour of "other vessels" when analysing whether they are in the
+ * safety zone of own ship.
+ *
+ * Points are named like this:
  *
  *           D
  *           ^         -
@@ -28,9 +33,7 @@ import static java.lang.Math.PI;
  *       |-------|
  *          beam
  *
- *
- * The ellipse is intended to support geometric calculations of the surface of the Earth; but limited to distances
- * at the surface where the Earth can the surface can safely be assumed to a linear, flat plane.
+ * After constructing the points, the contour is rotated and translated to fit heading and position.
  *
  */
 @SuppressWarnings("WeakerAccess")
