@@ -23,13 +23,13 @@ public class VesselState {
     private final double latitude;
     private final double longitude;
     private final int hdg;
-    private final float cog;
+    private final int cog;
     private final int sog;
     private final LocalDateTime positionTime;
 
     private final boolean isNearMiss;
 
-    public VesselState(SensorType sensorType, int mmsi, String name, int loa, int beam, double latitude, double longitude, int hdg, float cog, int sog, LocalDateTime positionTime, boolean isNearMiss) {
+    public VesselState(SensorType sensorType, int mmsi, String name, int loa, int beam, double latitude, double longitude, int hdg, int cog, int sog, LocalDateTime positionTime, boolean isNearMiss) {
         this.sensorType = sensorType;
         this.mmsi = mmsi;
         this.name = name;
@@ -90,7 +90,7 @@ public class VesselState {
     }
 
     /** Get vessel's true course over ground (degrees) */
-    public float getCog() {
+    public int getCog() {
         return cog;
     }
 
