@@ -104,6 +104,8 @@ public class NearMissEngine implements Observer {
             logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
             if (isOwnVesselUpdate(receivedMessage)) {
                 updateOwnVessel(receivedMessage);
+                EllipticSafetyZone safetyZone = calculateEllipticSafetyZone(this.ownVessel);
+                storeOwnVesselAndSafetyZone(safetyZone);
                 Set<Vessel> detectedNearMisses = detectNearMisses();
                 storeNearMisses(detectedNearMisses);
             } else if (isOtherVesselUpdate(receivedMessage))
@@ -111,6 +113,10 @@ public class NearMissEngine implements Observer {
             else
                 logger.error("Unsupported message received");
         }
+    }
+
+    private EllipticSafetyZone calculateEllipticSafetyZone(Vessel ownVessel) {
+        return new EllipticSafetyZone();
     }
 
     private Set<Vessel> detectNearMisses() {
@@ -156,54 +162,49 @@ public class NearMissEngine implements Observer {
         });
     }
 
+    private void storeOwnVesselAndSafetyZone(EllipticSafetyZone safetyZone) {
+        if (conf.isSaveAllPositions()) {
+            VesselState ownVesselState = new VesselState(
+                    GPS,
+                    this.ownVessel.getMmsi(),
+                    this.ownVessel.getName(),
+                    this.ownVessel.getLoa(),
+                    this.ownVessel.getBeam(),
+                    this.ownVessel.getCenterPosition().getLat(),
+                    this.ownVessel.getCenterPosition().getLon(),
+                    (int) this.ownVessel.getHdg(),
+                    (int) this.ownVessel.getCog(),
+                    (int) this.ownVessel.getSog(),
+                    this.ownVessel.getLastReport(),
+                    false,
+                    safetyZone
+            );
+
+            vesselStateRepository.save(ownVesselState);
+        }
+    }
+
     private void updateOwnVessel(String message) {
         logger.trace("Updating own vessel");
-        // Further handling from received messages to be added here.
-        // Update own ship
-        // Save position for own ship.
 
         courseOverGroundService.update(message);
         speedOverGroundService.update(message);
         headingService.update(message);
 
-        if (conf.isSaveAllPositions()) {
-            GpgllHelper gpgllHelper = new GpgllHelper(message);
-            String dmsLat = gpgllHelper.getDmsLat();
-            String dmsLon = gpgllHelper.getDmsLon();
-            PositionDecConverter toDec = new PositionDecConverter(dmsLat, dmsLon);
-            Position pos = toDec.convert();
-            LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
+        GpgllHelper gpgllHelper = new GpgllHelper(message);
+        String dmsLat = gpgllHelper.getDmsLat();
+        String dmsLon = gpgllHelper.getDmsLon();
+        PositionDecConverter toDec = new PositionDecConverter(dmsLat, dmsLon);
+        Position pos = toDec.convert();
+        LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
 
-            int cog = courseOverGroundService.courseOverGround();
-            int sog = speedOverGroundService.speedOverGround();
-            int hdg = headingService.heading();
+        Position geometricCenter = geometryService.calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
 
-            VesselState ownVesselState = new VesselState(
-                    GPS,
-                    conf.getOwnShipMmsi(),
-                    conf.getOwnShipName(),
-                    conf.getOwnShipLoa(),
-                    conf.getOwnShipBeam(),
-                    pos.getLat(),
-                    pos.getLon(),
-                    hdg,
-                    cog,
-                    sog,
-                    timestamp,
-                    false,
-                    new EllipticSafetyZone()
-            );
-
-            vesselStateRepository.save(ownVesselState);
-
-            Position geometricCenter = geometryService.calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
-
-            this.ownVessel.setCenterPosition(geometricCenter);
-            this.ownVessel.setCog(ownVesselState.getCog());
-            this.ownVessel.setSog(ownVesselState.getSog());
-            this.ownVessel.setHdg(ownVesselState.getHdg());
-            this.ownVessel.setLastReport(LocalDateTime.now());
-        }
+        this.ownVessel.setCenterPosition(geometricCenter);
+        this.ownVessel.setCog(courseOverGroundService.courseOverGround());
+        this.ownVessel.setSog(speedOverGroundService.speedOverGround());
+        this.ownVessel.setHdg(headingService.heading());
+        this.ownVessel.setLastReport(timestamp);
     }
 
     private void updateOtherVessel(String message) {
@@ -234,7 +235,7 @@ public class NearMissEngine implements Observer {
 
                     if (info.hasPositionInfo())
                         aisDynamic = (AisPositionMessage) info.getPositionPacket().getAisMessage();
-                } catch (AisMessageException|SixbitException e) {
+                } catch (AisMessageException | SixbitException e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
 
@@ -254,7 +255,7 @@ public class NearMissEngine implements Observer {
                 LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
                 VesselState otherVesselState = new VesselState(
-                    AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null
+                        AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null
                 );
 
                 vesselStateRepository.save(otherVesselState);
