@@ -1,13 +1,13 @@
-package dk.dma.nearmiss.engine;
+package dk.dma.nearmiss.engine.nmeaBasedServices;
 
 import java.time.LocalTime;
 
-public interface SpeedOverGroundService {
+public interface HeadingService {
     /** Feed service with new NMEA message */
     void update(String message);
 
-    /** Return estimated speed over ground */
-    int speedOverGround();
+    /** Return estimated true heading */
+    int heading();
 
     LocalTime timeOfLastUpdate();
 }

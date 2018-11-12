@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.engine;
+package dk.dma.nearmiss.engine.nmeaBasedServices;
 
 import java.time.LocalTime;
 
