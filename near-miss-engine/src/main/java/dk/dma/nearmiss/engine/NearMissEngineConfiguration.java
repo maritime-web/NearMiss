@@ -22,7 +22,7 @@ public class NearMissEngineConfiguration {
     private String stringDate;
     private LocalDate date;
 
-    @Value("${near.miss.own.ship.mmsi:0}")
+    @Value("${near.miss.own.ship.mmsi:219945000}")
     private Integer ownShipMmsi;
 
     public Integer getInterval() {
