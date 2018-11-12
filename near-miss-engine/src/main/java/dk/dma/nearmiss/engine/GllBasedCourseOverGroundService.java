@@ -18,10 +18,11 @@ public class GllBasedCourseOverGroundService implements CourseOverGroundService 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Position lastPosition;
-    private LocalTime timeOfLastPosition;
+    private LocalTime timeOfLastUpdate;
+    private int courseOverGround = -1;
 
     @Override
-    public int courseOverGround(String message) {
+    public void update(String message) {
         GpgllHelper gllHelper = new GpgllHelper(message);
         String currentLat = gllHelper.getDmsLat();
         String currentLon = gllHelper.getDmsLon();
@@ -30,25 +31,35 @@ public class GllBasedCourseOverGroundService implements CourseOverGroundService 
         PositionDecConverter positionDecConverter = new PositionDecConverter(currentLat, currentLon);
         Position currentPosition = positionDecConverter.convert();
 
-        int cog = -1;
+        int tmpCog = -1;
 
         try {
-            if (timeOfLastPosition == null) {
+            if (timeOfLastUpdate == null) {
                 logger.debug("Initializing last position with {}",  currentLat);
-            } else if (timeOfLastPosition.until(timeOfCurrentPosition, ChronoUnit.MINUTES) > 5) {
+            } else if (timeOfLastUpdate.until(timeOfCurrentPosition, ChronoUnit.MINUTES) > 5) {
                 logger.warn("Last position is too old - reinitializing with {}",  currentLat);
             } else {
                 dk.dma.enav.model.geometry.Position p0 = dk.dma.enav.model.geometry.Position.create(lastPosition.getLat(), lastPosition.getLon());
                 dk.dma.enav.model.geometry.Position p1 = dk.dma.enav.model.geometry.Position.create(currentPosition.getLat(), currentPosition.getLon());
-                cog = (int) p0.geodesicInitialBearingTo(p1);
+                tmpCog = (int) p0.geodesicInitialBearingTo(p1);
             }
         } finally {
-            timeOfLastPosition = timeOfCurrentPosition;
+            timeOfLastUpdate = timeOfCurrentPosition;
             lastPosition = currentPosition;
-            logger.debug("cog = {}", cog);
+            logger.debug("cog = {}", tmpCog);
         }
 
-        return cog;
+        courseOverGround = tmpCog;
+    }
+
+    @Override
+    public int courseOverGround() {
+        return courseOverGround;
+    }
+
+    @Override
+    public LocalTime timeOfLastUpdate() {
+        return timeOfLastUpdate;
     }
 
 }

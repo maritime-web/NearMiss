@@ -44,6 +44,7 @@ public class NearMissEngine implements Observer {
     private final TargetTracker tracker;
     private final CourseOverGroundService courseOverGroundService;
     private final SpeedOverGroundService speedOverGroundService;
+    private final HeadingService headingService;
 
     // Engine parts
     private final VesselGeometryService geometryService;
@@ -62,6 +63,7 @@ public class NearMissEngine implements Observer {
                           NearMissEngineConfiguration conf,
                           CourseOverGroundService courseOverGroundService,
                           SpeedOverGroundService speedOverGroundService,
+                          HeadingService headingService,
                           VesselGeometryService geometryService,
                           TargetToVesselConverter targetToVesselConverter,
                           TargetPropertyScreener targetPropertyScreener,
@@ -75,6 +77,7 @@ public class NearMissEngine implements Observer {
         this.conf = conf;
         this.courseOverGroundService = courseOverGroundService;
         this.speedOverGroundService = speedOverGroundService;
+        this.headingService = headingService;
         this.geometryService = geometryService;
         this.targetToVesselConverter = targetToVesselConverter;
         this.targetPropertyScreener = targetPropertyScreener;
@@ -156,6 +159,10 @@ public class NearMissEngine implements Observer {
         // Update own ship
         // Save position for own ship.
 
+        courseOverGroundService.update(message);
+        speedOverGroundService.update(message);
+        headingService.update(message);
+
         if (conf.isSaveAllPositions()) {
             GpgllHelper gpgllHelper = new GpgllHelper(message);
             String dmsLat = gpgllHelper.getDmsLat();
@@ -164,8 +171,9 @@ public class NearMissEngine implements Observer {
             Position pos = toDec.convert();
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
 
-            int cog = courseOverGroundService.courseOverGround(message);
-            int sog = speedOverGroundService.speedOverGround(message);
+            int cog = courseOverGroundService.courseOverGround();
+            int sog = speedOverGroundService.speedOverGround();
+            int hdg = headingService.heading();
 
             VesselState ownVesselState = new VesselState(
                     GPS,
@@ -175,7 +183,7 @@ public class NearMissEngine implements Observer {
                     25,         // TODO make configurable
                     pos.getLat(),
                     pos.getLon(),
-                    0,           // TODO acquire or calculate
+                    hdg,           // TODO acquire or calculate
                     cog,
                     sog,
                     timestamp,

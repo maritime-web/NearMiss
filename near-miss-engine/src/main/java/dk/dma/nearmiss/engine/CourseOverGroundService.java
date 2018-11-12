@@ -1,6 +1,13 @@
 package dk.dma.nearmiss.engine;
 
+import java.time.LocalTime;
+
 public interface CourseOverGroundService {
-    /** Estimate course over ground based on message */
-    int courseOverGround(String message);
+    /** Feed service with new NMEA message */
+    void update(String message);
+
+    /** Return estimated course over ground */
+    int courseOverGround();
+
+    LocalTime timeOfLastUpdate();
 }
