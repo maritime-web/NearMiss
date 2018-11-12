@@ -40,8 +40,12 @@ public class GllBasedSpeedOverGroundService implements SpeedOverGroundService {
             } else {
                 dk.dma.enav.model.geometry.Position p0 = dk.dma.enav.model.geometry.Position.create(lastPosition.getLat(), lastPosition.getLon());
                 dk.dma.enav.model.geometry.Position p1 = dk.dma.enav.model.geometry.Position.create(currentPosition.getLat(), currentPosition.getLon());
-                int dist = (int) p0.geodesicDistanceTo(p1) / 1852;
-                sog = (int) (dist / (timeOfLastPosition.until(timeOfCurrentPosition, ChronoUnit.SECONDS) * 3600));
+                double distanceMeters = p0.geodesicDistanceTo(p1);
+                double distanceNauticalMiles = distanceMeters / 1852;
+                double timeSeconds = timeOfLastPosition.until(timeOfCurrentPosition, ChronoUnit.SECONDS);
+                double speedNauticalMilesPerSecond = distanceNauticalMiles / timeSeconds;
+                double speedNauticalMilesPerHour = speedNauticalMilesPerSecond * 3600;
+                sog = (int) speedNauticalMilesPerHour;
             }
         } finally {
             timeOfLastPosition = timeOfCurrentPosition;
