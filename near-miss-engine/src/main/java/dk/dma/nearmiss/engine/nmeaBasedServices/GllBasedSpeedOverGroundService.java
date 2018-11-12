@@ -3,6 +3,7 @@ package dk.dma.nearmiss.engine.nmeaBasedServices;
 import dk.dma.nearmiss.helper.Position;
 import dk.dma.nearmiss.helper.PositionDecConverter;
 import dk.dma.nearmiss.nmea.GpgllHelper;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
@@ -19,7 +20,12 @@ public class GllBasedSpeedOverGroundService implements SpeedOverGroundService {
 
     private Position lastPosition;
     private LocalTime timeOfLastUpdate;
-    private int speedOverGround = -1;
+    private final DescriptiveStatistics statistics;
+
+    public GllBasedSpeedOverGroundService() {
+        statistics = new DescriptiveStatistics();
+        statistics.setWindowSize(60);
+    }
 
     @Override
     public void update(String message) {
@@ -54,7 +60,7 @@ public class GllBasedSpeedOverGroundService implements SpeedOverGroundService {
             logger.debug("sog = {}", tmpSog);
         }
 
-        speedOverGround = tmpSog;
+        statistics.addValue(tmpSog);
     }
 
     @Override
@@ -64,7 +70,7 @@ public class GllBasedSpeedOverGroundService implements SpeedOverGroundService {
 
     @Override
     public int speedOverGround() {
-        return speedOverGround;
+        return (int) statistics.getMean();
     }
 
 }
