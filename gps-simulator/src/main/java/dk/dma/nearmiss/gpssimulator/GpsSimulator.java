@@ -43,15 +43,11 @@ public class GpsSimulator extends Simulator {
         RouteSimulator sim = new RouteSimulator(trip);
         //noinspection InfiniteLoopStatement
         while (!sim.hasArrived()) {
-
-            //OBS. High speed. Loop five times to optain approx. 20 knots.(?)
-            for (int i = 0; i < 3; ++i) { // Iterate to create speed. Break if arrived.
-                sim.move();
-                if (sim.hasArrived()) break;
-            }
+            sim.move();
 
             Gpgll gpgll = new Gpgll(sim.currentLocation.getLatitude(), sim.currentLocation.getLongitude(), getSimulatedTime());
             message = gpgll.toString();
+            logger.info(String.format(gpgll.toString()));
             logger.info(String.format("At %s, remaining distance to %s is %s km",
                     gpgll.getFormattedTime(), trip.lastWaypoint().getName(), getRemainingDistance(sim.currentLocation, trip.lastWaypoint())));
             logger.debug(String.format("Broadcasting message: %s", message));

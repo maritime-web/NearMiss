@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("WeakerAccess")
 public class RouteSimulator {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    public static final double SIMULATOR_MOVEMENT_SPEED = 0.000015; // ~0.05m - 0.1m per step
+    public static final double SIMULATOR_MOVEMENT_STEP_DISTANCE_METERS = 5;  // 5 m/s=18 km/h=10 knots; 30 m/s=108 km/h=58 knots
     public static final double ARRIVAL_RADIUS_IN_KM = 0.01;  // 10m
 
     public Location currentLocation;
@@ -41,8 +41,8 @@ public class RouteSimulator {
         }
         logger.trace("Moving to " + nextWaypoint.getName() + ". Distance = " + GeoHelper.calcGeoDistanceInKm(currentLocation, nextWaypoint) * 1000 + "m");
         double angle = GeoHelper.calcAngleBetweenGeoLocationsInRadians(currentLocation, nextWaypoint);
-        double newLat = currentLocation.getLatitude() + Math.sin(angle) * SIMULATOR_MOVEMENT_SPEED;
-        double newLon = currentLocation.getLongitude() + Math.cos(angle) * SIMULATOR_MOVEMENT_SPEED;
+        double newLat = currentLocation.getLatitude() + Math.sin(angle) * SIMULATOR_MOVEMENT_STEP_DISTANCE_METERS / (10000000/90);
+        double newLon = currentLocation.getLongitude() + Math.cos(angle) * SIMULATOR_MOVEMENT_STEP_DISTANCE_METERS / (10000000/90);
         currentLocation = new Location("currentLocation", newLat, newLon);
     }
 
