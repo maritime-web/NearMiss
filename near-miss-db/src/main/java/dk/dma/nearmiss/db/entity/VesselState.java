@@ -15,17 +15,16 @@ public class VesselState {
     private SensorType sensorType;
 
     @NotNull
-    private int mmsi;
-    private String name;
-    private int loa;
-    private int beam;
-
-    private double latitude;
-    private double longitude;
-    private int hdg;
-    private int cog;
-    private int sog;
-    private LocalDateTime positionTime;
+    private final int mmsi;
+    private final String name;
+    private final int loa;
+    private final int beam;
+    private final double latitude;
+    private final double longitude;
+    private final int hdg;
+    private final int cog;
+    private final int sog;
+    private final LocalDateTime positionTime;
 
     private boolean isNearMiss;
 
@@ -48,7 +47,10 @@ public class VesselState {
         this.safetyZone = safetyZone;
     }
 
+    @SuppressWarnings("unused")
     public VesselState() {
+        // Dummy values to allow final on fields.
+        this(SensorType.AIS, -1, null, -1, -1, -1.0, -1.0, -1, -1, -1, null, false, null);
     }
 
     /** JPA entity id */
