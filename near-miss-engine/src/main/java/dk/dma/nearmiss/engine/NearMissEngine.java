@@ -116,7 +116,13 @@ public class NearMissEngine implements Observer {
     }
 
     private EllipticSafetyZone calculateEllipticSafetyZone(Vessel ownVessel) {
-        return new EllipticSafetyZone();
+        return new EllipticSafetyZone(
+                ownVessel.getCenterPosition().getLat(),
+                ownVessel.getCenterPosition().getLon(),
+                (int) ownVessel.getCog(),
+                ownVessel.getBeam() * 1.25,
+                ownVessel.getSog() * 4 + ownVessel.getLoa()
+        );
     }
 
     private Set<Vessel> detectNearMisses() {
