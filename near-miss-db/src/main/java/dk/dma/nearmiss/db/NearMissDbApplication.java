@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 @SpringBootApplication
 public class NearMissDbApplication extends SpringBootServletInitializer {
-    static Logger logger = LoggerFactory.getLogger(NearMissDbApplication.class);
+    private static Logger logger = LoggerFactory.getLogger(NearMissDbApplication.class);
 
 
     public static void main(String[] args) {
