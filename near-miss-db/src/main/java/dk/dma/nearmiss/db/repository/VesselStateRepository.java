@@ -11,6 +11,7 @@ import javax.persistence.TypedQuery;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@SuppressWarnings("JpaQlInspection")
 @Repository
 public class VesselStateRepository {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -33,7 +34,7 @@ public class VesselStateRepository {
     }
 
     public List<VesselState> list(OffsetDateTime from, OffsetDateTime to) {
-        @SuppressWarnings("JpaQlInspection") TypedQuery<VesselState> query = em.createQuery(
+        TypedQuery<VesselState> query = em.createQuery(
                 "SELECT vs FROM VesselState vs WHERE vs.positionTime BETWEEN :from AND :to ", VesselState.class);
         query.setParameter("from", from.toLocalDateTime());
         query.setParameter("to", to.toLocalDateTime());
