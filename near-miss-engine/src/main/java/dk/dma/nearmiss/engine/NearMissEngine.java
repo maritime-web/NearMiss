@@ -13,6 +13,9 @@ import dk.dma.nearmiss.db.entity.VesselState;
 import dk.dma.nearmiss.db.repository.VesselStateRepository;
 import dk.dma.nearmiss.engine.engineParts.*;
 import dk.dma.nearmiss.engine.geometry.VesselGeometryService;
+import dk.dma.nearmiss.engine.nmeaBasedServices.CourseOverGroundService;
+import dk.dma.nearmiss.engine.nmeaBasedServices.HeadingService;
+import dk.dma.nearmiss.engine.nmeaBasedServices.SpeedOverGroundService;
 import dk.dma.nearmiss.helper.Position;
 import dk.dma.nearmiss.helper.PositionDecConverter;
 import dk.dma.nearmiss.nmea.GpgllHelper;
@@ -42,6 +45,9 @@ public class NearMissEngine implements Observer {
     private final VesselStateRepository vesselStateRepository;
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
+    private final CourseOverGroundService courseOverGroundService;
+    private final SpeedOverGroundService speedOverGroundService;
+    private final HeadingService headingService;
 
     // Engine parts
     private final VesselGeometryService geometryService;
@@ -58,6 +64,9 @@ public class NearMissEngine implements Observer {
                           VesselStateRepository vesselStateRepository,
                           TargetTracker tracker,
                           NearMissEngineConfiguration conf,
+                          CourseOverGroundService courseOverGroundService,
+                          SpeedOverGroundService speedOverGroundService,
+                          HeadingService headingService,
                           VesselGeometryService geometryService,
                           TargetToVesselConverter targetToVesselConverter,
                           TargetPropertyScreener targetPropertyScreener,
@@ -69,6 +78,9 @@ public class NearMissEngine implements Observer {
         this.vesselStateRepository = vesselStateRepository;
         this.tracker = tracker;
         this.conf = conf;
+        this.courseOverGroundService = courseOverGroundService;
+        this.speedOverGroundService = speedOverGroundService;
+        this.headingService = headingService;
         this.geometryService = geometryService;
         this.targetToVesselConverter = targetToVesselConverter;
         this.targetPropertyScreener = targetPropertyScreener;
@@ -150,6 +162,10 @@ public class NearMissEngine implements Observer {
         // Update own ship
         // Save position for own ship.
 
+        courseOverGroundService.update(message);
+        speedOverGroundService.update(message);
+        headingService.update(message);
+
         if (conf.isSaveAllPositions()) {
             GpgllHelper gpgllHelper = new GpgllHelper(message);
             String dmsLat = gpgllHelper.getDmsLat();
@@ -157,6 +173,10 @@ public class NearMissEngine implements Observer {
             PositionDecConverter toDec = new PositionDecConverter(dmsLat, dmsLon);
             Position pos = toDec.convert();
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
+
+            int cog = courseOverGroundService.courseOverGround();
+            int sog = speedOverGroundService.speedOverGround();
+            int hdg = headingService.heading();
 
             VesselState ownVesselState = new VesselState(
                     GPS,
@@ -166,9 +186,9 @@ public class NearMissEngine implements Observer {
                     25,         // TODO make configurable
                     pos.getLat(),
                     pos.getLon(),
-                    0,           // TODO acquire or calculate
-                    0,           // TODO acquire or calculate
-                    10,          // TODO acquire or calculate
+                    hdg,           // TODO acquire or calculate
+                    cog,
+                    sog,
                     timestamp,
                     false,
                     new EllipticSafetyZone()
