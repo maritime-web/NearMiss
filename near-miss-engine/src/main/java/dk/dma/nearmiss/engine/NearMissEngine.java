@@ -42,6 +42,7 @@ public class NearMissEngine implements Observer {
     private final VesselStateRepository vesselStateRepository;
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
+    private final CourseOverGroundService courseOverGroundService;
 
     // Engine parts
     private final VesselGeometryService geometryService;
@@ -58,6 +59,7 @@ public class NearMissEngine implements Observer {
                           VesselStateRepository vesselStateRepository,
                           TargetTracker tracker,
                           NearMissEngineConfiguration conf,
+                          CourseOverGroundService courseOverGroundService,
                           VesselGeometryService geometryService,
                           TargetToVesselConverter targetToVesselConverter,
                           TargetPropertyScreener targetPropertyScreener,
@@ -69,6 +71,7 @@ public class NearMissEngine implements Observer {
         this.vesselStateRepository = vesselStateRepository;
         this.tracker = tracker;
         this.conf = conf;
+        this.courseOverGroundService = courseOverGroundService;
         this.geometryService = geometryService;
         this.targetToVesselConverter = targetToVesselConverter;
         this.targetPropertyScreener = targetPropertyScreener;
@@ -158,6 +161,8 @@ public class NearMissEngine implements Observer {
             Position pos = toDec.convert();
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
 
+            int cog = courseOverGroundService.courseOverGround(message);
+
             VesselState ownVesselState = new VesselState(
                     GPS,
                     conf.getOwnShipMmsi(),
@@ -167,8 +172,8 @@ public class NearMissEngine implements Observer {
                     pos.getLat(),
                     pos.getLon(),
                     0,           // TODO acquire or calculate
-                    0,           // TODO acquire or calculate
-                    10,          // TODO acquire or calculate
+                    cog,
+                    10,
                     timestamp,
                     false,
                     new EllipticSafetyZone()
