@@ -45,7 +45,7 @@ public class GpsSimulator extends Simulator {
         while (!sim.hasArrived()) {
 
             //OBS. High speed. Loop five times to optain approx. 20 knots.(?)
-            for (int i = 0; i < 500; ++i) { // Iterate to create speed. Break if arrived.
+            for (int i = 0; i < 3; ++i) { // Iterate to create speed. Break if arrived.
                 sim.move();
                 if (sim.hasArrived()) break;
             }
