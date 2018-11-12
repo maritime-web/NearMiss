@@ -68,8 +68,8 @@ public class GpsSimulator extends Simulator {
     }
 
     public void run() {
-        Location tripStart = new Location("Hundested", 56.02250000, 11.73222222);
-        Location tripEnd = new Location("Göteborg", 57.67500000, 11.73222222);
+        Location tripStart = configuration.getTripStart();
+        Location tripEnd = configuration.getTripEnd();
         Route route = new Route(tripStart, tripEnd);
 
         //noinspection InfiniteLoopStatement
