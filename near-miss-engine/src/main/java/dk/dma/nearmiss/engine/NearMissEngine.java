@@ -43,6 +43,7 @@ public class NearMissEngine implements Observer {
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
     private final CourseOverGroundService courseOverGroundService;
+    private final SpeedOverGroundService speedOverGroundService;
 
     // Engine parts
     private final VesselGeometryService geometryService;
@@ -60,6 +61,7 @@ public class NearMissEngine implements Observer {
                           TargetTracker tracker,
                           NearMissEngineConfiguration conf,
                           CourseOverGroundService courseOverGroundService,
+                          SpeedOverGroundService speedOverGroundService,
                           VesselGeometryService geometryService,
                           TargetToVesselConverter targetToVesselConverter,
                           TargetPropertyScreener targetPropertyScreener,
@@ -72,6 +74,7 @@ public class NearMissEngine implements Observer {
         this.tracker = tracker;
         this.conf = conf;
         this.courseOverGroundService = courseOverGroundService;
+        this.speedOverGroundService = speedOverGroundService;
         this.geometryService = geometryService;
         this.targetToVesselConverter = targetToVesselConverter;
         this.targetPropertyScreener = targetPropertyScreener;
@@ -162,6 +165,7 @@ public class NearMissEngine implements Observer {
             LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
 
             int cog = courseOverGroundService.courseOverGround(message);
+            int sog = speedOverGroundService.speedOverGround(message);
 
             VesselState ownVesselState = new VesselState(
                     GPS,
@@ -173,7 +177,7 @@ public class NearMissEngine implements Observer {
                     pos.getLon(),
                     0,           // TODO acquire or calculate
                     cog,
-                    10,
+                    sog,
                     timestamp,
                     false,
                     new EllipticSafetyZone()
