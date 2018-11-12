@@ -5,12 +5,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class OwnVessel extends Vessel {
 
-    {
-        setLoa(100); // TODO make LOA of own vessel configurable
-        setBeam(25); // TODO make beam of own vessel configurable
+    public OwnVessel(NearMissEngineConfiguration conf) {
+        super(conf.getOwnShipMmsi());
+        this.setName(conf.getOwnShipName());
+        this.setLoa(conf.getOwnShipLoa());
+        this.setBeam(conf.getOwnShipBeam());
     }
 
-    public OwnVessel() {
-        super(0); // TODO make own mmsi configurable
-    }
 }
