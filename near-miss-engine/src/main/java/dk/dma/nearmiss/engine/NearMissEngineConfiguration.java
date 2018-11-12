@@ -25,6 +25,15 @@ public class NearMissEngineConfiguration {
     @Value("${near.miss.own.ship.mmsi:219945000}")
     private Integer ownShipMmsi;
 
+    @Value("${near.miss.own.ship.name:OWNSHIP}")
+    private String ownShipName;
+
+    @Value("${near.miss.own.ship.loa:999}")
+    private Integer ownShipLoa;
+
+    @Value("${near.miss.own.ship.beam:99}")
+    private Integer ownShipBeam;
+
     public Integer getInterval() {
         return interval == null ? 0 : interval;
     }
@@ -64,7 +73,16 @@ public class NearMissEngineConfiguration {
         return ownShipMmsi;
     }
 
-    public void setOwnShipMmsi(Integer ownShipMmsi) {
-        this.ownShipMmsi = ownShipMmsi;
+    public String getOwnShipName() {
+        return ownShipName;
     }
+
+    public Integer getOwnShipLoa() {
+        return ownShipLoa;
+    }
+
+    public Integer getOwnShipBeam() {
+        return ownShipBeam;
+    }
+
 }

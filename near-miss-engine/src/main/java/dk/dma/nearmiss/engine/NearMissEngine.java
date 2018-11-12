@@ -181,12 +181,12 @@ public class NearMissEngine implements Observer {
             VesselState ownVesselState = new VesselState(
                     GPS,
                     conf.getOwnShipMmsi(),
-                    "OWN SHIP", // TODO make configurable
-                    100,          // TODO make configurable
-                    25,         // TODO make configurable
+                    conf.getOwnShipName(),
+                    conf.getOwnShipLoa(),
+                    conf.getOwnShipBeam(),
                     pos.getLat(),
                     pos.getLon(),
-                    hdg,           // TODO acquire or calculate
+                    hdg,
                     cog,
                     sog,
                     timestamp,
