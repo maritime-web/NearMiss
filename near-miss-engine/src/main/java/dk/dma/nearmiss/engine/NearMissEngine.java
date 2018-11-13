@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -270,7 +269,7 @@ public class NearMissEngine implements Observer {
             int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
 
             Date positionTimestamp = new Date(target.getPositionTimestamp());
-            LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            LocalDateTime timestamp = LocalDateTimeHelper.toLocalDateTime(positionTimestamp);
 
             VesselState otherVesselState = new VesselState(
                     AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null

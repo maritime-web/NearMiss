@@ -14,12 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.function.Function;
 
+import static dk.dma.nearmiss.engine.engineParts.LocalDateTimeHelper.toLocalDateTime;
 import static java.lang.Double.NaN;
 
 @Component
@@ -69,7 +67,10 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
         v.setName(name);
         v.setLoa(dimStern + dimBow);
         v.setBeam(dimPort + dimStarboard);
-        v.setLastReport(toLocalDateTime(t.getAisTarget().getLastReport()));
+
+        LocalDateTime lastReport = toLocalDateTime(t.getAisTarget().getLastReport());
+        logger.debug("Target {} last report {}", t.getMmsi(), lastReport);
+        v.setLastReport(lastReport);
 
         if (t.hasPositionInfo()) {
             v.setSog(t.getSog());
@@ -85,10 +86,5 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
         return v;
     }
 
-    private static LocalDateTime toLocalDateTime(Date date) {
-        return Instant.ofEpochMilli(date.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-    }
 
 }
