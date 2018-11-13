@@ -31,9 +31,11 @@ public class NearMissApiController implements NearMissApi {
     }
 
     @Override
-    public ResponseEntity<NearMissResponse> events(OffsetDateTime from, OffsetDateTime to) {
-        List<dk.dma.nearmiss.db.entity.VesselState> entities = repository.list(from, to);
-        if (entities.isEmpty()) return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<NearMissResponse> events(OffsetDateTime from, OffsetDateTime to, Boolean onlyNearMissStates) {
+        boolean onlyNearMiss = onlyNearMissStates != null && !Boolean.FALSE.equals(onlyNearMissStates);
+        List<dk.dma.nearmiss.db.entity.VesselState> entities = repository.list(from, to, onlyNearMiss);
+
+        if (entities.isEmpty()) return new ResponseEntity<>(HttpStatus.OK);
 
         List<VesselState> models = entities.stream().map(e -> new VesselStateConverter(e).convert()).collect(Collectors.toList());
 
@@ -41,7 +43,6 @@ public class NearMissApiController implements NearMissApi {
         response.setVesselStates(models);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 
     @Override
     public Optional<ObjectMapper> getObjectMapper() {

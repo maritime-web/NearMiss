@@ -33,9 +33,14 @@ public class VesselStateRepository {
         return vesselState;
     }
 
-    public List<VesselState> list(OffsetDateTime from, OffsetDateTime to) {
-        TypedQuery<VesselState> query = em.createQuery(
-                "SELECT vs FROM VesselState vs WHERE vs.positionTime BETWEEN :from AND :to ", VesselState.class);
+    public List<VesselState> list(OffsetDateTime from, OffsetDateTime to, boolean onlyNearMissStates) {
+        String queryString = "SELECT vs FROM VesselState vs WHERE vs.positionTime BETWEEN :from AND :to ";
+
+        if (Boolean.TRUE.equals(onlyNearMissStates)) {
+            queryString += " AND vs.isNearMiss = TRUE ";
+        }
+
+        TypedQuery<VesselState> query = em.createQuery(queryString, VesselState.class);
         query.setParameter("from", from.toLocalDateTime());
         query.setParameter("to", to.toLocalDateTime());
         List<VesselState> result = query.getResultList();
