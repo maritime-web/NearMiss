@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,7 +106,7 @@ public class NearMissEngine implements Observer {
             logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
             if (isOwnVesselUpdate(receivedMessage)) {
                 updateOwnVessel(receivedMessage);
-                wallclockService.setCurrentDateTime(ownVessel.getLastReport());
+                wallclockService.setCurrentDateTime(ownVessel.getLastPositionReport());
                 EllipticSafetyZone safetyZone = calculateEllipticSafetyZone(ownVessel);
                 storeOwnVesselAndSafetyZone(safetyZone);
                 Set<Vessel> detectedNearMisses = detectNearMisses();
@@ -162,7 +161,7 @@ public class NearMissEngine implements Observer {
                     (int) otherVessel.getHdg(),
                     (int) otherVessel.getCog(),
                     (int) otherVessel.getSog(),
-                    otherVessel.getLastReport(),
+                    otherVessel.getLastPositionReport(),
                     true,
                     null
             );
@@ -187,7 +186,7 @@ public class NearMissEngine implements Observer {
                     (int) this.ownVessel.getHdg(),
                     (int) this.ownVessel.getCog(),
                     (int) this.ownVessel.getSog(),
-                    this.ownVessel.getLastReport(),
+                    this.ownVessel.getLastPositionReport(),
                     false,
                     safetyZone
             );
@@ -216,7 +215,7 @@ public class NearMissEngine implements Observer {
         this.ownVessel.setCog(courseOverGroundService.courseOverGround());
         this.ownVessel.setSog(speedOverGroundService.speedOverGround());
         this.ownVessel.setHdg(headingService.heading());
-        this.ownVessel.setLastReport(timestamp);
+        this.ownVessel.setLastPositionReport(timestamp);
     }
 
     private TargetInfo updateTracker(String message) {
@@ -265,11 +264,12 @@ public class NearMissEngine implements Observer {
             final int sog = aisDynamic != null ? ((int) target.getSog()) / 10 : 0;
 
             String name = aisStatic != null ? aisStatic.getName() : null;
+            name = name != null ? name.replace("@", "").trim() : null;
             int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimStern() : 0;
             int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
 
             Date positionTimestamp = new Date(target.getPositionTimestamp());
-            LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            LocalDateTime timestamp = positionTimestamp.getTime() < 0 ? null : LocalDateTimeHelper.toLocalDateTime(positionTimestamp);
 
             VesselState otherVesselState = new VesselState(
                     AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null

@@ -14,13 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.function.Function;
 
 import static java.lang.Double.NaN;
+import static java.time.ZoneOffset.UTC;
 
 @Component
 public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
@@ -54,7 +52,7 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
 
                 if (aisMessage instanceof AisStaticCommon) {
                     AisStaticCommon staticData = (AisStaticCommon) aisMessage;
-                    name = staticData.getName().trim();
+                    name = staticData.getName().replace("@", "").trim();
                     dimPort = staticData.getDimPort();
                     dimStarboard = staticData.getDimStarboard();
                     dimBow = staticData.getDimBow();
@@ -69,7 +67,10 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
         v.setName(name);
         v.setLoa(dimStern + dimBow);
         v.setBeam(dimPort + dimStarboard);
-        v.setLastReport(toLocalDateTime(t.getAisTarget().getLastReport()));
+
+        LocalDateTime lastPositionReport = LocalDateTime.ofEpochSecond(t.getPositionTimestamp()/1000, (int) ((t.getPositionTimestamp()%1000)*1000000), UTC);
+        logger.debug("Target {} last report {}", t.getMmsi(), lastPositionReport);
+        v.setLastPositionReport(lastPositionReport);
 
         if (t.hasPositionInfo()) {
             v.setSog(t.getSog());
@@ -85,10 +86,5 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
         return v;
     }
 
-    private static LocalDateTime toLocalDateTime(Date date) {
-        return Instant.ofEpochMilli(date.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-    }
 
 }

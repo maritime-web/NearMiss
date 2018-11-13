@@ -20,7 +20,7 @@ public class Vessel {
     private double hdg = NaN; // Assuming heading to be same as cog(?)
     private double sog = NaN; // Speed
 
-    private LocalDateTime lastReport; // Updated time in UTC
+    private LocalDateTime lastPositionReport; // Updated time in UTC
 
     public Vessel(int mmsi) {
         this.mmsi = mmsi;
@@ -86,11 +86,11 @@ public class Vessel {
         this.sog = sog;
     }
 
-    public LocalDateTime getLastReport() {
-        return lastReport;
+    public LocalDateTime getLastPositionReport() {
+        return lastPositionReport;
     }
 
-    public void setLastReport(LocalDateTime lastReport) {
-        this.lastReport = lastReport;
+    public void setLastPositionReport(LocalDateTime lastPositionReport) {
+        this.lastPositionReport = lastPositionReport;
     }
 }
