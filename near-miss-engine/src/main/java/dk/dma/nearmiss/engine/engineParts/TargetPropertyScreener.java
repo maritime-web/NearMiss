@@ -16,6 +16,7 @@ import static dk.dma.nearmiss.engine.engineParts.LocalDateTimeHelper.toLocalDate
 @Component
 public class TargetPropertyScreener implements Predicate<TargetInfo> {
 
+    @SuppressWarnings("Convert2MethodRef")
     public TargetPropertyScreener(NearMissEngineConfiguration configuration, WallclockService wallclock) {
         IS_BLACK_LISTED = t -> false;
         IS_MOVING = t -> t.getSog() / 10f > configuration.getScreenerMinSpeed();

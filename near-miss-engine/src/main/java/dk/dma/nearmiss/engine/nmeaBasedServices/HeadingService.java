@@ -9,5 +9,6 @@ public interface HeadingService {
     /** Return estimated true heading */
     int heading();
 
+    @SuppressWarnings("unused")
     LocalTime timeOfLastUpdate();
 }

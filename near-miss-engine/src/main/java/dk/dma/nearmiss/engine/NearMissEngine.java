@@ -5,7 +5,6 @@ import dk.dma.ais.message.AisMessageException;
 import dk.dma.ais.message.AisPositionMessage;
 import dk.dma.ais.message.AisStaticCommon;
 import dk.dma.ais.packet.AisPacket;
-import dk.dma.ais.tracker.Target;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
 import dk.dma.ais.tracker.targetTracker.TargetTracker;
 import dk.dma.nearmiss.db.entity.EllipticSafetyZone;
@@ -166,7 +165,7 @@ public class NearMissEngine implements Observer {
                     null
             );
 
-            VesselState savedVesselState = vesselStateRepository.save(vesselState);
+            vesselStateRepository.save(vesselState);
 
             double distance = ownPosition.geodesicDistanceTo(dk.dma.enav.model.geometry.Position.create(otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon())) / 1852;
             logger.info(String.format("NEAR MISS detected with %s in position [%f, %f]. Own position is [%f, %f]. Distance is %f nautical miles.", otherVessel.getName(), otherVessel.getCenterPosition().getLat(), otherVessel.getCenterPosition().getLon(), ownVessel.getCenterPosition().getLat(), ownVessel.getCenterPosition().getLon(), distance));
@@ -221,7 +220,7 @@ public class NearMissEngine implements Observer {
     private TargetInfo updateTracker(String message) {
         String multiLineMessage = message.replace("__r__n", "\r\n");
         AisPacket packet = AisPacket.from(multiLineMessage);
-        Target target = null;
+        TargetInfo target = null;
 
         try {
             int targetMmsi = packet.getAisMessage().getUserId();
@@ -232,12 +231,9 @@ public class NearMissEngine implements Observer {
             e.printStackTrace();
         }
 
-        if (!(target instanceof TargetInfo))
-            logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
-
         logger.info("Tracking {} other vessels", tracker.size());
 
-        return target instanceof TargetInfo ? (TargetInfo) target : null;
+        return target;
     }
 
     private void storeOtherVessel(TargetInfo target) {

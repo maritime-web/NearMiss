@@ -9,5 +9,6 @@ public interface SpeedOverGroundService {
     /** Return estimated speed over ground */
     int speedOverGround();
 
+    @SuppressWarnings("unused")
     LocalTime timeOfLastUpdate();
 }

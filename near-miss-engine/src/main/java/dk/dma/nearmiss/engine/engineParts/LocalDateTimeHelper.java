@@ -8,7 +8,7 @@ import static java.time.ZoneOffset.UTC;
 
 public class LocalDateTimeHelper {
 
-    public final static LocalDateTime toLocalDateTime(Date date) {
+    public static LocalDateTime toLocalDateTime(Date date) {
         return Instant.ofEpochMilli(date.getTime())
                 .atZone(UTC)
                 .toLocalDateTime();

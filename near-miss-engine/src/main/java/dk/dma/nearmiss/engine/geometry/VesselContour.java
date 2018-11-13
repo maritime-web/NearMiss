@@ -53,6 +53,7 @@ public class VesselContour {
      * @param beamMeters             VesselContour's beam in meters.
      * @param headingDegrees         VesselContour's heading in degrees true north.
      */
+    @SuppressWarnings({"unused", "UnnecessaryLocalVariable"})
     public VesselContour(double centreLatitudeDegrees, double centreLongitudeDegrees, int loaMeters, int beamMeters, int headingDegrees) {
 
         final double theta = ((360 - headingDegrees) % 360.0) * (PI / 180.0);

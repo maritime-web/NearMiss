@@ -1,7 +1,5 @@
 package dk.dma.nearmiss.engine.nmeaBasedServices;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +8,6 @@ import java.time.LocalTime;
 @Service
 @Primary
 public class GllBasedHeadingService implements HeadingService {
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final CourseOverGroundService courseOverGroundService;
     private int heading;

@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Service to maintain the current time (current wallclock).
  * Use this service instead of direct calls to <built-in-class>#now()
  */
+@SuppressWarnings("WeakerAccess")
 @Service
 public class WallclockService {
 
