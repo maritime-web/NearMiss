@@ -58,7 +58,7 @@ public class GeometryService {
      * @return
      */
     public double metersPerDegreeLatitude() {
-        return 1000*10000/90; // 10.000 km per 90 degrees
+        return METERS_PER_DEGREE_LATITUDE;
     }
 
     /**
@@ -69,7 +69,9 @@ public class GeometryService {
      */
     public double metersPerDegreeLongitude(double latitude) {
         final double theta = latitude * (PI/180.0);
-        return abs(cos(theta) * 1000*10000/90);
+        return abs(cos(theta) * METERS_PER_DEGREE_LATITUDE);
     }
+
+    private static double METERS_PER_DEGREE_LATITUDE = 1000 * 10000 / 90; // 10.000 km per 90 degrees latitude
 
 }
