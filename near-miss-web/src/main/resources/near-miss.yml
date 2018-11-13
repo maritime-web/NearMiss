@@ -53,7 +53,7 @@ paths:
         format: date-time
       responses:
         '200':
-          description: Success
+          description: Success. If there is no Near Miss incidents in a specified time interval the response should be empty i.e. {vessel-states:[]}
           schema:
             $ref: '#/definitions/near-miss-response'
         '400':
@@ -63,7 +63,7 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Not Found
+          description: Not Found.
         '500':
           description: Server Error
         '501':
@@ -87,6 +87,20 @@ definitions:
         type: number
         format: double
         description: Half the length of the ellipse minor axis
+      center-position:
+        $ref: '#/definitions/position'
+        description: Center of the safety zone ellipse
+  position:
+    type: object
+    properties:
+      lat:
+        type: number
+        format: double
+        description: Latitude in decimal degrees
+      lon:
+        type: number
+        format: double
+        description: Longitude in decimal degrees
   dimensions:
     type: object
     properties:
@@ -105,14 +119,8 @@ definitions:
         type: integer
         format: int64
         description: Identification of the vessel for which this report pertains
-      lat:
-        type: number
-        format: double
-        description: Latitude in decimal degrees
-      lon:
-        type: number
-        format: double
-        description: Longitude in decimal degrees
+      position:
+        $ref: '#/definitions/position'
       time:
         type: string
         format: date-time
@@ -136,6 +144,7 @@ definitions:
         description: The vessels safety zone. Only present if the report pertains to own vessel
       dimensions:
         $ref: '#/definitions/dimensions'
+        description: Dimensions of the vessel
   configuration-response:
     type: object
     properties:
@@ -143,3 +152,4 @@ definitions:
         type: integer
         format: int64
         description: identification of a own ship
+
