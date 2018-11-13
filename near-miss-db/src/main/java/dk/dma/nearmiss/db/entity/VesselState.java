@@ -144,7 +144,7 @@ public class VesselState {
 
     public enum SensorType {
         /** Information is predicted or assumed  */
-        PREDICTED,
+        PREDICTOR,
         /** Information received from GPS sensor */
         GPS,
         /** Information received from AIS sensor */

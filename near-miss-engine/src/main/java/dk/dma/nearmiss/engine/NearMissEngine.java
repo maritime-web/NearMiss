@@ -53,7 +53,7 @@ public class NearMissEngine implements Observer {
     private final VesselGeometryService geometryService;
     private final TargetToVesselConverter targetToVesselConverter;
     private final TargetPropertyScreener targetPropertyScreener;
-    private final PositionPredicter positionPredicter;
+    private final PositionPredictor positionPredictor;
     private final VesselVicinityScreener vicinityScreener;
     private final NearMissDetector detector;
 
@@ -71,7 +71,7 @@ public class NearMissEngine implements Observer {
                           VesselGeometryService geometryService,
                           TargetToVesselConverter targetToVesselConverter,
                           TargetPropertyScreener targetPropertyScreener,
-                          PositionPredicter positionPredicter,
+                          PositionPredictor positionPredictor,
                           VesselVicinityScreener vicinityScreener,
                           NearMissDetector detector,
                           @Qualifier("ownVessel") Vessel ownVessel) {
@@ -86,7 +86,7 @@ public class NearMissEngine implements Observer {
         this.geometryService = geometryService;
         this.targetToVesselConverter = targetToVesselConverter;
         this.targetPropertyScreener = targetPropertyScreener;
-        this.positionPredicter = positionPredicter;
+        this.positionPredictor = positionPredictor;
         this.vicinityScreener = vicinityScreener;
         this.detector = detector;
         this.ownVessel = ownVessel;
@@ -135,7 +135,7 @@ public class NearMissEngine implements Observer {
         Set<Vessel> nearMisses = tracker.stream()
                 .filter(targetPropertyScreener)
                 .map(targetToVesselConverter)
-                .map(positionPredicter)
+                .map(positionPredictor)
                 .filter(vicinityScreener)
                 .filter(detector::nearMissDetected)
                 .collect(Collectors.toSet());
@@ -151,7 +151,7 @@ public class NearMissEngine implements Observer {
         nearMisses.forEach(otherVessel -> {
 
             VesselState vesselState = new VesselState(
-                    PREDICTED,
+                    PREDICTOR,
                     otherVessel.getMmsi(),
                     otherVessel.getName(),
                     otherVessel.getLoa(),
@@ -160,7 +160,7 @@ public class NearMissEngine implements Observer {
                     otherVessel.getCenterPosition().getLon(),
                     (int) otherVessel.getHdg(),
                     (int) otherVessel.getCog(),
-                    (int) otherVessel.getSog(),
+                    (int) otherVessel.getSog()  ,
                     otherVessel.getLastPositionReport(),
                     true,
                     null

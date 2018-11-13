@@ -12,11 +12,11 @@ import java.util.function.Function;
 
 /** Project vessel's position forward in time */
 @Component
-public class PositionPredicter implements Function<Vessel, Vessel> {
+public class PositionPredictor implements Function<Vessel, Vessel> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public PositionPredicter(WallclockService wallclock) {
+    public PositionPredictor(WallclockService wallclock) {
         this.wallclock = wallclock;
     }
 
