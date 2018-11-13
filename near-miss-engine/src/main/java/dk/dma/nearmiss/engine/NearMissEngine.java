@@ -269,7 +269,7 @@ public class NearMissEngine implements Observer {
             int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
 
             Date positionTimestamp = new Date(target.getPositionTimestamp());
-            LocalDateTime timestamp = LocalDateTimeHelper.toLocalDateTime(positionTimestamp);
+            LocalDateTime timestamp = positionTimestamp.getTime() < 0 ? null : LocalDateTimeHelper.toLocalDateTime(positionTimestamp);
 
             VesselState otherVesselState = new VesselState(
                     AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null
