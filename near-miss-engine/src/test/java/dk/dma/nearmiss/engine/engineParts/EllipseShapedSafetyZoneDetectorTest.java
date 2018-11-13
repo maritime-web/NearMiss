@@ -1,14 +1,13 @@
 package dk.dma.nearmiss.engine.engineParts;
 
 import dk.dma.nearmiss.engine.Vessel;
+import dk.dma.nearmiss.engine.geometry.GeometryService;
 import dk.dma.nearmiss.helper.Position;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -17,13 +16,13 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class EllipseShapedSafetyZoneDetectorTest {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Mock
     private Vessel ownVessel;
 
     @Mock
     private Vessel otherVessel;
+
+    private GeometryService geometryService = new GeometryService();
 
     private EllipseShapedSafetyZoneDetector sut; // http://xunitpatterns.com/SUT.html
 
@@ -35,12 +34,12 @@ public class EllipseShapedSafetyZoneDetectorTest {
         when(ownVessel.getCog()).thenReturn(90.0);
         when(ownVessel.getSog()).thenReturn(10.0);
 
-        when(otherVessel.getCenterPosition()).thenReturn(new Position(54.0, 9.0));
+        when(otherVessel.getCenterPosition()).thenReturn(new Position(54.0,9.0));
         when(otherVessel.getLoa()).thenReturn(50);
         when(otherVessel.getBeam()).thenReturn(15);
         when(otherVessel.getHdg()).thenReturn(90.0);
 
-        sut = new EllipseShapedSafetyZoneDetector(ownVessel);
+        sut = new EllipseShapedSafetyZoneDetector(geometryService, ownVessel);
     }
 
     @Test

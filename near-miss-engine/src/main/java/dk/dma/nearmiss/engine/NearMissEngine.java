@@ -11,7 +11,7 @@ import dk.dma.nearmiss.db.entity.EllipticSafetyZone;
 import dk.dma.nearmiss.db.entity.VesselState;
 import dk.dma.nearmiss.db.repository.VesselStateRepository;
 import dk.dma.nearmiss.engine.engineParts.*;
-import dk.dma.nearmiss.engine.geometry.VesselGeometryService;
+import dk.dma.nearmiss.engine.geometry.GeometryService;
 import dk.dma.nearmiss.engine.nmeaBasedServices.CourseOverGroundService;
 import dk.dma.nearmiss.engine.nmeaBasedServices.HeadingService;
 import dk.dma.nearmiss.engine.nmeaBasedServices.SpeedOverGroundService;
@@ -49,7 +49,7 @@ public class NearMissEngine implements Observer {
     private final HeadingService headingService;
 
     // Engine parts
-    private final VesselGeometryService geometryService;
+    private final GeometryService geometryService;
     private final TargetToVesselConverter targetToVesselConverter;
     private final TargetPropertyScreener targetPropertyScreener;
     private final PositionPredictor positionPredictor;
@@ -67,7 +67,7 @@ public class NearMissEngine implements Observer {
                           CourseOverGroundService courseOverGroundService,
                           SpeedOverGroundService speedOverGroundService,
                           HeadingService headingService,
-                          VesselGeometryService geometryService,
+                          GeometryService geometryService,
                           TargetToVesselConverter targetToVesselConverter,
                           TargetPropertyScreener targetPropertyScreener,
                           PositionPredictor positionPredictor,
@@ -208,7 +208,7 @@ public class NearMissEngine implements Observer {
         Position pos = toDec.convert();
         LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
 
-        Position geometricCenter = geometryService.calulateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
+        Position geometricCenter = geometryService.calculateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
 
         this.ownVessel.setCenterPosition(geometricCenter);
         this.ownVessel.setCog(courseOverGroundService.courseOverGround());

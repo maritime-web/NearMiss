@@ -7,7 +7,7 @@ import dk.dma.ais.message.AisStaticCommon;
 import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
 import dk.dma.nearmiss.engine.Vessel;
-import dk.dma.nearmiss.engine.geometry.VesselGeometryService;
+import dk.dma.nearmiss.engine.geometry.GeometryService;
 import dk.dma.nearmiss.helper.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,9 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final VesselGeometryService geometryService;
+    private final GeometryService geometryService;
 
-    public TargetToVesselConverter(VesselGeometryService geometryService) {
+    public TargetToVesselConverter(GeometryService geometryService) {
         this.geometryService = geometryService;
     }
 
@@ -76,7 +76,7 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
             v.setHdg(t.getHeading() == 511 ? NaN : t.getHeading());
 
             Position gpsReceiverPosition = new Position(t.getPosition().getLatitude(), t.getPosition().getLongitude());
-            Position geometricCenterPosition = geometryService.calulateGeometricCenter(gpsReceiverPosition, t.getCog() / 10, dimPort, dimStern);
+            Position geometricCenterPosition = geometryService.calculateGeometricCenter(gpsReceiverPosition, t.getCog() / 10, dimPort, dimStern);
 
             v.setCenterPosition(geometricCenterPosition);
         }

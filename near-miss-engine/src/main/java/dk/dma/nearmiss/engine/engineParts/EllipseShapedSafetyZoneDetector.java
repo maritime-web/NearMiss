@@ -1,8 +1,9 @@
 package dk.dma.nearmiss.engine.engineParts;
 
 import dk.dma.nearmiss.engine.Vessel;
-import dk.dma.nearmiss.engine.geometry.EllipticSafetyZone;
-import dk.dma.nearmiss.engine.geometry.VesselContour;
+import dk.dma.nearmiss.engine.geometry.GeometryService;
+import dk.dma.nearmiss.engine.geometry.geometries.EllipticSafetyZone;
+import dk.dma.nearmiss.engine.geometry.geometries.VesselContour;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,10 +15,11 @@ import org.springframework.stereotype.Component;
 public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private final GeometryService geometryService;
     private final Vessel ownVessel;
 
-    public EllipseShapedSafetyZoneDetector(@Qualifier("ownVessel") Vessel ownVessel) {
+    public EllipseShapedSafetyZoneDetector(GeometryService geometryService, @Qualifier("ownVessel") Vessel ownVessel) {
+        this.geometryService = geometryService;
         this.ownVessel = ownVessel;
     }
 
@@ -51,7 +53,7 @@ public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
         } else if (beam == 0) {
             logger.debug("Beam of vessel {} is unknown. Cannot calculate vessel contour.", vessel.getMmsi());
         } else {
-            contour = new VesselContour(centreLatitude, centreLongitude, loa, beam, hdg);
+            contour = geometryService.createVesselContour(centreLatitude, centreLongitude, loa, beam, hdg);
         }
 
         return contour;
@@ -79,7 +81,7 @@ public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
             int lengthOfAxisAlongCourse = loa + ((int) sog * 10);         // TODO make factor configurable; linear relation to sog? loa?
             int lengthOfAxisAcrossCourse = beam * 4;                      // TODO make factor configurable;
 
-            safetyZone = new EllipticSafetyZone(centreLatitude, centreLongitude, lengthOfAxisAlongCourse, lengthOfAxisAcrossCourse, cog);
+            safetyZone = geometryService.createEllipticSafetyZone(centreLatitude, centreLongitude, lengthOfAxisAlongCourse, lengthOfAxisAcrossCourse, cog);
         }
 
         return safetyZone;

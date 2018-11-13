@@ -1,4 +1,4 @@
-package dk.dma.nearmiss.engine.geometry;
+package dk.dma.nearmiss.engine.geometry.geometries;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -41,25 +41,20 @@ public class VesselContour {
 
     final Geometry _internalRepresentation;
 
-    final static int METERS_PER_DEGREE_LATITUDE = 111323;
-    final static int METERS_PER_DEGREE_LONGITUDE = 63994;// not precise - only valid around 55N - http://www.csgnetwork.com/degreelenllavcalc.html
-
     /**
      * Create the contour of a VesselContour
-     *
-     * @param centreLatitudeDegrees  Latitude of vessel's geometric centre in degrees.
-     * @param centreLongitudeDegrees Longitude of vessel's geometric center in degrees.
-     * @param loaMeters              VesselContour's length over all in meters.
-     * @param beamMeters             VesselContour's beam in meters.
-     * @param headingDegrees         VesselContour's heading in degrees true north.
+     *  @param x Longitude of vessel's geometric center in degrees.
+     * @param y Latitude of vessel's geometric centre in degrees.
+     * @param l VesselContour's length over all in meters.
+     * @param b VesselContour's beam in decimal degrees.
+     * @param thetaDeg VesselContour's heading in decimal degrees.
      */
     @SuppressWarnings({"unused", "UnnecessaryLocalVariable"})
-    public VesselContour(double centreLatitudeDegrees, double centreLongitudeDegrees, int loaMeters, int beamMeters, int headingDegrees) {
+    public VesselContour(double x, double y, double l, double b, double thetaDeg) {
+        final double theta = ((360 - thetaDeg) % 360.0) * (PI / 180.0);
 
-        final double theta = ((360 - headingDegrees) % 360.0) * (PI / 180.0);
-
-        final double loa = latitudeMetersToDegrees(loaMeters);
-        final double beam = longitudeMetersToDegrees(beamMeters);
+        final double loa = l;
+        final double beam = b;
 
         final double Mx = 0.0;
         final double My = 0.0;
@@ -98,20 +93,20 @@ public class VesselContour {
 
         // Translate
 
-        final double trAx = rAx + centreLongitudeDegrees;
-        final double trAy = rAy + centreLatitudeDegrees;
+        final double trAx = rAx + x;
+        final double trAy = rAy + y;
 
-        final double trBx = rBx + centreLongitudeDegrees;
-        final double trBy = rBy + centreLatitudeDegrees;
+        final double trBx = rBx + x;
+        final double trBy = rBy + y;
 
-        final double trCx = rCx + centreLongitudeDegrees;
-        final double trCy = rCy + centreLatitudeDegrees;
+        final double trCx = rCx + x;
+        final double trCy = rCy + y;
 
-        final double trDx = rDx + centreLongitudeDegrees;
-        final double trDy = rDy + centreLatitudeDegrees;
+        final double trDx = rDx + x;
+        final double trDy = rDy + y;
 
-        final double trEx = rEx + centreLongitudeDegrees;
-        final double trEy = rEy + centreLatitudeDegrees;
+        final double trEx = rEx + x;
+        final double trEy = rEy + y;
 
         // Create
 
@@ -133,14 +128,6 @@ public class VesselContour {
 
     private double rotateY(double theta, double x, double y) {
         return x * Math.sin(theta) + y * Math.cos(theta);
-    }
-
-    private static double longitudeMetersToDegrees(double meters) {
-        return meters / METERS_PER_DEGREE_LONGITUDE;
-    }
-
-    private static double latitudeMetersToDegrees(double meters) {
-        return meters / METERS_PER_DEGREE_LATITUDE;
     }
 
     public String toWkt() {
