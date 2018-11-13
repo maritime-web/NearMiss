@@ -73,7 +73,7 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
         v.setLastPositionReport(lastPositionReport);
 
         if (t.hasPositionInfo()) {
-            v.setSog(t.getSog());
+            v.setSog(t.getSog() / 10);
             v.setCog(t.getCog() / 10);
             v.setHdg(t.getHeading() == 511 ? NaN : t.getHeading());
 
