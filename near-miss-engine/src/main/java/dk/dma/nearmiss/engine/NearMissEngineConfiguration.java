@@ -1,15 +1,20 @@
 package dk.dma.nearmiss.engine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Component
 @ConfigurationProperties(value = "near.miss")
 public class NearMissEngineConfiguration {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Value("${near.miss.interval:0}")
@@ -33,6 +38,12 @@ public class NearMissEngineConfiguration {
 
     @Value("${near.miss.own.ship.beam:99}")
     private Integer ownShipBeam;
+
+    @Value("${near.miss.screener.target.speed:0}")
+    private Integer screenerMinSpeed;
+
+    @Value("${near.miss.screener.target.recentupdate:10}")
+    private Integer screenerMaxMinutesSinceLastUpdate;
 
     public Integer getInterval() {
         return interval == null ? 0 : interval;
@@ -85,4 +96,32 @@ public class NearMissEngineConfiguration {
         return ownShipBeam;
     }
 
+    public Integer getScreenerMinSpeed() {
+        return screenerMinSpeed;
+    }
+
+    public Integer getScreenerMaxMinutesSinceLastUpdate() {
+        return screenerMaxMinutesSinceLastUpdate;
+    }
+
+    @PostConstruct
+    public void logConfiguration() {
+        logger.info(toString());
+    }
+
+    @Override
+    public String toString() {
+        return "NearMissEngineConfiguration{" +
+                "interval=" + interval +
+                ", saveAllPositions=" + saveAllPositions +
+                ", stringDate='" + stringDate + '\'' +
+                ", date=" + date +
+                ", ownShipMmsi=" + ownShipMmsi +
+                ", ownShipName='" + ownShipName + '\'' +
+                ", ownShipLoa=" + ownShipLoa +
+                ", ownShipBeam=" + ownShipBeam +
+                ", screenerMinSpeed=" + screenerMinSpeed +
+                ", screenerMaxMinutesSinceLastUpdate=" + screenerMaxMinutesSinceLastUpdate +
+                '}';
+    }
 }

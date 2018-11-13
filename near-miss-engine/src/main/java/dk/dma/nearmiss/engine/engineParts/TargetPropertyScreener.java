@@ -1,6 +1,7 @@
 package dk.dma.nearmiss.engine.engineParts;
 
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
+import dk.dma.nearmiss.engine.NearMissEngineConfiguration;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -15,12 +16,12 @@ import static dk.dma.nearmiss.engine.engineParts.LocalDateTimeHelper.toLocalDate
 @Component
 public class TargetPropertyScreener implements Predicate<TargetInfo> {
 
-    public TargetPropertyScreener(WallclockService wallclock) {
+    public TargetPropertyScreener(NearMissEngineConfiguration configuration, WallclockService wallclock) {
         IS_BLACK_LISTED = t -> false;
-        IS_MOVING = t -> t.getSog() > 3f;
+        IS_MOVING = t -> t.getSog() / 10f > configuration.getScreenerMinSpeed();
         HAS_POSITION_INFO = t -> t.hasPositionInfo();
         IS_RELEVANT_TYPE = t -> true;
-        IS_RECENTLY_UPDATED = t -> Duration.between(toLocalDateTime(t.getAisTarget().getLastReport()), wallclock.getCurrentDateTime()).toMinutes() > 15;
+        IS_RECENTLY_UPDATED = t -> Duration.between(toLocalDateTime(t.getAisTarget().getLastReport()), wallclock.getCurrentDateTime()).toMinutes() <= configuration.getScreenerMaxMinutesSinceLastUpdate();
     }
 
     /**
@@ -39,7 +40,6 @@ public class TargetPropertyScreener implements Predicate<TargetInfo> {
     // TODO make black list configurable
     private final Predicate<TargetInfo> IS_BLACK_LISTED;
 
-    // TODO make speed configurable
     private final Predicate<TargetInfo> IS_MOVING;
 
     private final Predicate<TargetInfo> HAS_POSITION_INFO;
@@ -50,7 +50,6 @@ public class TargetPropertyScreener implements Predicate<TargetInfo> {
      */
     private final Predicate<TargetInfo> IS_RELEVANT_TYPE;
 
-    // TODO make duration threshold configurable
     /**
      * Determine whether a vessel updated recently enough to be considered for near-miss analysis
      */
