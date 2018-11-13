@@ -25,16 +25,17 @@ public class PositionPredicter implements Function<Vessel, Vessel> {
         final LocalDateTime lastPositionReport = vessel.getLastPositionReport();
         final LocalDateTime now = wallclock.getCurrentDateTime();
         final Duration t = Duration.between(lastPositionReport, now);
-        final int cog = (int) vessel.getCog();
-        final int sog = (int) vessel.getSog() / 10;
-        final int distanceInNauticalMiles = (int) (sog * (t.getSeconds() / 3600));
-        final int distanceInMeters = distanceInNauticalMiles * 1852;
+        final double cog = vessel.getCog();
+        final double sog = vessel.getSog();
+        final double distanceInNauticalMiles = sog * t.getSeconds() / 3600;
+        final double distanceInMeters = distanceInNauticalMiles * 1852;
         final Position lastKnownPosition = Position.create(vessel.getCenterPosition().getLat(), vessel.getCenterPosition().getLon());
-        final Position predictedPosition = lastKnownPosition.positionAt(vessel.getCog(), distanceInMeters );
+        final Position predictedPosition = lastKnownPosition.positionAt(vessel.getCog(), distanceInMeters);
 
         logger.debug("Vessel {} at {} is predicted {} secs ahead along course {} and speed {} kts to position {}", vessel.getMmsi(), lastKnownPosition, t.getSeconds(), cog, sog, predictedPosition);
 
         vessel.setCenterPosition(new dk.dma.nearmiss.helper.Position(predictedPosition.getLatitude(), predictedPosition.getLongitude()));
+        vessel.setLastPositionReport(now);
 
         return vessel;
     }
