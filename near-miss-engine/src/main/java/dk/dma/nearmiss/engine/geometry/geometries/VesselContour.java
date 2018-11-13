@@ -1,10 +1,8 @@
 package dk.dma.nearmiss.engine.geometry.geometries;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.io.WKTWriter;
 
 import static java.lang.Math.PI;
 
@@ -37,13 +35,11 @@ import static java.lang.Math.PI;
  *
  */
 @SuppressWarnings("WeakerAccess")
-public class VesselContour {
-
-    final Geometry _internalRepresentation;
+public class VesselContour extends dk.dma.nearmiss.engine.geometry.geometries.Geometry {
 
     /**
      * Create the contour of a VesselContour
-     *  @param x Longitude of vessel's geometric center in degrees.
+     * @param x Longitude of vessel's geometric center in degrees.
      * @param y Latitude of vessel's geometric centre in degrees.
      * @param l VesselContour's length over all in meters.
      * @param b VesselContour's beam in decimal degrees.
@@ -128,10 +124,6 @@ public class VesselContour {
 
     private double rotateY(double theta, double x, double y) {
         return x * Math.sin(theta) + y * Math.cos(theta);
-    }
-
-    public String toWkt() {
-        return new WKTWriter().write(_internalRepresentation);
     }
 
 }

@@ -3,10 +3,7 @@ package dk.dma.nearmiss.engine.geometry.geometries;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.util.AffineTransformation;
-import org.locationtech.jts.io.WKTWriter;
 import org.locationtech.jts.util.GeometricShapeFactory;
-
-import java.util.Objects;
 
 import static java.lang.Math.PI;
 
@@ -18,9 +15,7 @@ import static java.lang.Math.PI;
  *
  */
 @SuppressWarnings("WeakerAccess")
-public class EllipticSafetyZone {
-
-    final Polygon _internalRepresentation;
+public class EllipticSafetyZone extends Geometry {
 
     /**
      * Create an EllipticSafetyZone
@@ -51,31 +46,6 @@ public class EllipticSafetyZone {
         ellipse.apply(trans);
 
         this._internalRepresentation = ellipse;
-    }
-
-    public boolean intersects(EllipticSafetyZone otherEllipse) {
-        return _internalRepresentation.intersects(otherEllipse._internalRepresentation);
-    }
-
-    public boolean intersects(VesselContour vesselContour) {
-        return _internalRepresentation.intersects(vesselContour._internalRepresentation);
-    }
-
-    public String toWkt() {
-        return new WKTWriter().write(_internalRepresentation);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        EllipticSafetyZone that = (EllipticSafetyZone) o;
-        return Objects.equals(_internalRepresentation, that._internalRepresentation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(_internalRepresentation);
     }
 
 }
