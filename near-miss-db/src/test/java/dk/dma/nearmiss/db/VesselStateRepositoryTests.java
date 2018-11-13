@@ -26,7 +26,7 @@ public class VesselStateRepositoryTests {
     public void list() {
         OffsetDateTime from = OffsetDateTime.parse("2018-11-09T12:34:12.673Z", FORMATTER);
         OffsetDateTime to = OffsetDateTime.parse("2018-11-09T12:34:12.673Z", FORMATTER);
-        List<VesselState> result = repository.list(from, to);
+        List<VesselState> result = repository.list(from, to, false);
         assertNotNull("Expected to receive result", result);
     }
 

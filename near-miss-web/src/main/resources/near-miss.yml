@@ -51,11 +51,16 @@ paths:
         required: true
         type: string
         format: date-time
+      - name: onlyNearMissStates
+        in: query
+        description: When set to true only vessel states representing a near miss is included in the response
+        required: false
+        type: boolean
       responses:
         '200':
-          description: Success. If there is no Near Miss incidents in a specified time interval the response should be empty i.e. {vessel-states:[]}
+          description: Success. If there is no Near Miss incidents in a specified time interval the response should be empty i.e. {vesselStates:[]}
           schema:
-            $ref: '#/definitions/near-miss-response'
+            $ref: '#/definitions/nearMissResponse'
         '400':
           description: Bad Request
         '401':
@@ -69,14 +74,14 @@ paths:
         '501':
           description: Server Error
 definitions:
-  near-miss-response:
+  nearMissResponse:
     type: object
     properties:
-      vessel-states:
+      vesselStates:
         type: array
         items:
-          $ref: '#/definitions/vessel-state'
-  safety-zone:
+          $ref: '#/definitions/vesselState'
+  safetyZone:
     type: object
     properties:
       a:
@@ -87,7 +92,7 @@ definitions:
         type: number
         format: double
         description: Half the length of the ellipse minor axis
-      center-position:
+      centerPosition:
         $ref: '#/definitions/position'
         description: Center of the safety zone ellipse
   position:
@@ -112,7 +117,7 @@ definitions:
         type: integer
         format: int32
         description: Length OverAll in meters
-  vessel-state:
+  vesselState:
     type: object
     properties:
       mmsi:
@@ -136,11 +141,11 @@ definitions:
         type: number
         format: double
         description: Heading
-      near-miss-flag:
+      nearMissFlag:
         type: boolean
         description: Indicate whether a near miss is detected at this point in time or not. near-miss is only indicated for other vessels
-      safety-zone:
-        $ref: '#/definitions/safety-zone'
+      safetyZone:
+        $ref: '#/definitions/safetyZone'
         description: The vessels safety zone. Only present if the report pertains to own vessel
       dimensions:
         $ref: '#/definitions/dimensions'
