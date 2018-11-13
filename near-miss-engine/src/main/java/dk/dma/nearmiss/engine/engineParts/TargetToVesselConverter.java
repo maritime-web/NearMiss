@@ -54,7 +54,7 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
 
                 if (aisMessage instanceof AisStaticCommon) {
                     AisStaticCommon staticData = (AisStaticCommon) aisMessage;
-                    name = staticData.getName().trim();
+                    name = staticData.getName().replace("@", "").trim();
                     dimPort = staticData.getDimPort();
                     dimStarboard = staticData.getDimStarboard();
                     dimBow = staticData.getDimBow();
