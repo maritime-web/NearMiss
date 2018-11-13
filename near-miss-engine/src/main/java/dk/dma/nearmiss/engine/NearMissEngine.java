@@ -106,7 +106,7 @@ public class NearMissEngine implements Observer {
             logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
             if (isOwnVesselUpdate(receivedMessage)) {
                 updateOwnVessel(receivedMessage);
-                wallclockService.setCurrentDateTime(ownVessel.getLastReport());
+                wallclockService.setCurrentDateTime(ownVessel.getLastPositionReport());
                 EllipticSafetyZone safetyZone = calculateEllipticSafetyZone(ownVessel);
                 storeOwnVesselAndSafetyZone(safetyZone);
                 Set<Vessel> detectedNearMisses = detectNearMisses();
@@ -161,7 +161,7 @@ public class NearMissEngine implements Observer {
                     (int) otherVessel.getHdg(),
                     (int) otherVessel.getCog(),
                     (int) otherVessel.getSog(),
-                    otherVessel.getLastReport(),
+                    otherVessel.getLastPositionReport(),
                     true,
                     null
             );
@@ -186,7 +186,7 @@ public class NearMissEngine implements Observer {
                     (int) this.ownVessel.getHdg(),
                     (int) this.ownVessel.getCog(),
                     (int) this.ownVessel.getSog(),
-                    this.ownVessel.getLastReport(),
+                    this.ownVessel.getLastPositionReport(),
                     false,
                     safetyZone
             );
@@ -215,7 +215,7 @@ public class NearMissEngine implements Observer {
         this.ownVessel.setCog(courseOverGroundService.courseOverGround());
         this.ownVessel.setSog(speedOverGroundService.speedOverGround());
         this.ownVessel.setHdg(headingService.heading());
-        this.ownVessel.setLastReport(timestamp);
+        this.ownVessel.setLastPositionReport(timestamp);
     }
 
     private TargetInfo updateTracker(String message) {

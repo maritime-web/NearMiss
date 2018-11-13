@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.function.Function;
 
-import static dk.dma.nearmiss.engine.engineParts.LocalDateTimeHelper.toLocalDateTime;
 import static java.lang.Double.NaN;
+import static java.time.ZoneOffset.UTC;
 
 @Component
 public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
@@ -68,9 +68,9 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
         v.setLoa(dimStern + dimBow);
         v.setBeam(dimPort + dimStarboard);
 
-        LocalDateTime lastReport = toLocalDateTime(t.getAisTarget().getLastReport());
-        logger.debug("Target {} last report {}", t.getMmsi(), lastReport);
-        v.setLastReport(lastReport);
+        LocalDateTime lastPositionReport = LocalDateTime.ofEpochSecond(t.getPositionTimestamp()/1000, (int) ((t.getPositionTimestamp()%1000)*1000000), UTC);
+        logger.debug("Target {} last report {}", t.getMmsi(), lastPositionReport);
+        v.setLastPositionReport(lastPositionReport);
 
         if (t.hasPositionInfo()) {
             v.setSog(t.getSog());
