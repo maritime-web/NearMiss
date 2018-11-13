@@ -72,6 +72,6 @@ public class GeometryService {
         return abs(cos(theta) * METERS_PER_DEGREE_LATITUDE);
     }
 
-    private static double METERS_PER_DEGREE_LATITUDE = 1000 * 10000 / 90; // 10.000 km per 90 degrees latitude
+    private static double METERS_PER_DEGREE_LATITUDE = 1000d * 10000d / 90d; // 10.000 km per 90 degrees latitude
 
 }
