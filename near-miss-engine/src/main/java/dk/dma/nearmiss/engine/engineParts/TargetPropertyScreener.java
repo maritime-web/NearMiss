@@ -4,11 +4,9 @@ import dk.dma.ais.tracker.targetTracker.TargetInfo;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.function.Predicate;
+
+import static dk.dma.nearmiss.engine.engineParts.LocalDateTimeHelper.toLocalDateTime;
 
 /**
  * Quickly screen the input to determine whether or not a near-miss situation
@@ -16,6 +14,14 @@ import java.util.function.Predicate;
  */
 @Component
 public class TargetPropertyScreener implements Predicate<TargetInfo> {
+
+    public TargetPropertyScreener(WallclockService wallclock) {
+        IS_BLACK_LISTED = t -> false;
+        IS_MOVING = t -> t.getSog() > 3f;
+        HAS_POSITION_INFO = t -> t.hasPositionInfo();
+        IS_RELEVANT_TYPE = t -> true;
+        IS_RECENTLY_UPDATED = t -> Duration.between(toLocalDateTime(t.getAisTarget().getLastReport()), wallclock.getCurrentDateTime()).toMinutes() > 15;
+    }
 
     /**
      * Return true if targetInfo has properties which qualifies it for near-miss analysis.
@@ -31,29 +37,23 @@ public class TargetPropertyScreener implements Predicate<TargetInfo> {
     }
 
     // TODO make black list configurable
-    private final static Predicate<TargetInfo> IS_BLACK_LISTED = t -> false;
+    private final Predicate<TargetInfo> IS_BLACK_LISTED;
 
     // TODO make speed configurable
-    private final static Predicate<TargetInfo> IS_MOVING = t -> t.getSog() > 3f;
+    private final Predicate<TargetInfo> IS_MOVING;
 
-    private final static Predicate<TargetInfo> HAS_POSITION_INFO = t -> t.hasPositionInfo();
+    private final Predicate<TargetInfo> HAS_POSITION_INFO;
 
     // TODO make relevant types configurable
     /**
      * Determine whether a vessel is of a type relevant for near-miss analysis
      */
-    private final static Predicate<TargetInfo> IS_RELEVANT_TYPE = t -> true;
+    private final Predicate<TargetInfo> IS_RELEVANT_TYPE;
 
     // TODO make duration threshold configurable
     /**
      * Determine whether a vessel updated recently enough to be considered for near-miss analysis
      */
-    private final static Predicate<TargetInfo> IS_RECENTLY_UPDATED = t -> Duration.between(toLocalDateTime(t.getAisTarget().getLastReport()), LocalDateTime.now()).toMinutes() > 15;
-
-    private static LocalDateTime toLocalDateTime(Date date) {
-        return Instant.ofEpochMilli(date.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-    }
+    private final Predicate<TargetInfo> IS_RECENTLY_UPDATED;
 
 }

@@ -45,6 +45,7 @@ public class NearMissEngine implements Observer {
     private final VesselStateRepository vesselStateRepository;
     private final NearMissEngineConfiguration conf;
     private final TargetTracker tracker;
+    private final WallclockService wallclockService;
     private final CourseOverGroundService courseOverGroundService;
     private final SpeedOverGroundService speedOverGroundService;
     private final HeadingService headingService;
@@ -64,6 +65,7 @@ public class NearMissEngine implements Observer {
                           VesselStateRepository vesselStateRepository,
                           TargetTracker tracker,
                           NearMissEngineConfiguration conf,
+                          WallclockService wallclockService,
                           CourseOverGroundService courseOverGroundService,
                           SpeedOverGroundService speedOverGroundService,
                           HeadingService headingService,
@@ -78,6 +80,7 @@ public class NearMissEngine implements Observer {
         this.vesselStateRepository = vesselStateRepository;
         this.tracker = tracker;
         this.conf = conf;
+        this.wallclockService = wallclockService;
         this.courseOverGroundService = courseOverGroundService;
         this.speedOverGroundService = speedOverGroundService;
         this.headingService = headingService;
@@ -104,13 +107,16 @@ public class NearMissEngine implements Observer {
             logger.trace(String.format("NearMissEngine Received: %s", receivedMessage));
             if (isOwnVesselUpdate(receivedMessage)) {
                 updateOwnVessel(receivedMessage);
-                EllipticSafetyZone safetyZone = calculateEllipticSafetyZone(this.ownVessel);
+                wallclockService.setCurrentDateTime(ownVessel.getLastReport());
+                EllipticSafetyZone safetyZone = calculateEllipticSafetyZone(ownVessel);
                 storeOwnVesselAndSafetyZone(safetyZone);
                 Set<Vessel> detectedNearMisses = detectNearMisses();
                 storeNearMisses(detectedNearMisses);
-            } else if (isOtherVesselUpdate(receivedMessage))
-                updateOtherVessel(receivedMessage);
-            else
+            } else if (isOtherVesselUpdate(receivedMessage)) {
+                TargetInfo target = updateTracker(receivedMessage);
+                // Time is controlled by GPS alone - wallclockService.setCurrentDateTime(toLocalDateTime(target.getAisTarget().getLastReport()));
+                storeOtherVessel(target);
+            } else
                 logger.error("Unsupported message received");
         }
     }
@@ -213,15 +219,13 @@ public class NearMissEngine implements Observer {
         this.ownVessel.setLastReport(timestamp);
     }
 
-    private void updateOtherVessel(String message) {
-        logger.trace("Updating other ship");
-        // Update state
+    private TargetInfo updateTracker(String message) {
         String multiLineMessage = message.replace("__r__n", "\r\n");
         AisPacket packet = AisPacket.from(multiLineMessage);
         Target target = null;
-        int targetMmsi = -1;
+
         try {
-            targetMmsi = packet.getAisMessage().getUserId();
+            int targetMmsi = packet.getAisMessage().getUserId();
             tracker.update(packet);
             target = tracker.get(targetMmsi);
         } catch (Exception e) {
@@ -229,51 +233,50 @@ public class NearMissEngine implements Observer {
             e.printStackTrace();
         }
 
-        if (target instanceof TargetInfo) {
-            TargetInfo info = (TargetInfo) target;
-
-            if (conf.isSaveAllPositions() && info != null) {
-                AisStaticCommon aisStatic = null;
-                AisPositionMessage aisDynamic = null;
-                try {
-                    if (info.hasStaticInfo())
-                        aisStatic = (AisStaticCommon) info.getStaticAisPacket1().getAisMessage();
-
-                    if (info.hasPositionInfo())
-                        aisDynamic = (AisPositionMessage) info.getPositionPacket().getAisMessage();
-                } catch (AisMessageException | SixbitException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-
-                final int mmsi = info.getMmsi();
-                final double lat = aisDynamic != null ? info.getPosition().getLatitude() : NaN;
-                final double lon = aisDynamic != null ? info.getPosition().getLongitude() : NaN;
-                final int hdg = aisDynamic != null ? info.getHeading() : 0;
-                final int cog = aisDynamic != null ? ((int) info.getCog()) / 10 : 0;
-                final int sog = aisDynamic != null ? ((int) info.getSog()) / 10 : 0;
-
-                String name = aisStatic != null ? aisStatic.getName() : null;
-                int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimStern() : 0;
-                int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
-
-                Position pos = new Position(info.getPosition().getLatitude(), info.getPosition().getLongitude());
-                Date positionTimestamp = new Date(info.getPositionTimestamp());
-                LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-                VesselState otherVesselState = new VesselState(
-                        AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null
-                );
-
-                vesselStateRepository.save(otherVesselState);
-            }
-        } else {
-            if (target != null)
-                logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
-            else
-                logger.warn("Mmsi {} not found in tracker.", targetMmsi);
-        }
+        if (!(target instanceof TargetInfo))
+            logger.warn("Don't know how to handle targets of type {}", target.getClass().getName());
 
         logger.info("Tracking {} other vessels", tracker.size());
+
+        return target instanceof TargetInfo ? (TargetInfo) target : null;
+    }
+
+    private void storeOtherVessel(TargetInfo target) {
+        logger.trace("Updating other ship");
+
+        if (conf.isSaveAllPositions() && target != null) {
+            AisStaticCommon aisStatic = null;
+            AisPositionMessage aisDynamic = null;
+            try {
+                if (target.hasStaticInfo())
+                    aisStatic = (AisStaticCommon) target.getStaticAisPacket1().getAisMessage();
+
+                if (target.hasPositionInfo())
+                    aisDynamic = (AisPositionMessage) target.getPositionPacket().getAisMessage();
+            } catch (AisMessageException | SixbitException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+
+            final int mmsi = target.getMmsi();
+            final double lat = aisDynamic != null ? target.getPosition().getLatitude() : NaN;
+            final double lon = aisDynamic != null ? target.getPosition().getLongitude() : NaN;
+            final int hdg = aisDynamic != null ? target.getHeading() : 0;
+            final int cog = aisDynamic != null ? ((int) target.getCog()) / 10 : 0;
+            final int sog = aisDynamic != null ? ((int) target.getSog()) / 10 : 0;
+
+            String name = aisStatic != null ? aisStatic.getName() : null;
+            int loa = aisStatic != null ? aisStatic.getDimBow() + aisStatic.getDimStern() : 0;
+            int beam = aisStatic != null ? aisStatic.getDimPort() + aisStatic.getDimStarboard() : 0;
+
+            Date positionTimestamp = new Date(target.getPositionTimestamp());
+            LocalDateTime timestamp = positionTimestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+            VesselState otherVesselState = new VesselState(
+                    AIS, mmsi, name, loa, beam, lat, lon, hdg, cog, sog, timestamp, false, null
+            );
+
+            vesselStateRepository.save(otherVesselState);
+        }
     }
 
     private boolean isOwnVesselUpdate(String message) {
