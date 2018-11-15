@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
+public class EllipticSafetyZoneDetector implements NearMissDetector {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final GeometryService geometryService;
     private final Vessel ownVessel;
 
-    public EllipseShapedSafetyZoneDetector(GeometryService geometryService, @Qualifier("ownVessel") Vessel ownVessel) {
+    public EllipticSafetyZoneDetector(GeometryService geometryService, @Qualifier("ownVessel") Vessel ownVessel) {
         this.geometryService = geometryService;
         this.ownVessel = ownVessel;
     }

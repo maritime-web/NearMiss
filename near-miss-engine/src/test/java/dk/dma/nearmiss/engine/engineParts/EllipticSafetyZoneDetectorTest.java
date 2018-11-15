@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EllipseShapedSafetyZoneDetectorTest {
+public class EllipticSafetyZoneDetectorTest {
 
     @Mock
     private Vessel ownVessel;
@@ -24,7 +24,7 @@ public class EllipseShapedSafetyZoneDetectorTest {
 
     private GeometryService geometryService = new GeometryService();
 
-    private EllipseShapedSafetyZoneDetector sut; // http://xunitpatterns.com/SUT.html
+    private EllipticSafetyZoneDetector sut; // http://xunitpatterns.com/SUT.html
 
     @Before
     public void before() {
@@ -39,7 +39,7 @@ public class EllipseShapedSafetyZoneDetectorTest {
         when(otherVessel.getBeam()).thenReturn(15);
         when(otherVessel.getHdg()).thenReturn(90.0);
 
-        sut = new EllipseShapedSafetyZoneDetector(geometryService, ownVessel);
+        sut = new EllipticSafetyZoneDetector(geometryService, ownVessel);
     }
 
     @Test
