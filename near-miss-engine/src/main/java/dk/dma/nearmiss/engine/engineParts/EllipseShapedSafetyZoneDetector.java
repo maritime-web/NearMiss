@@ -82,6 +82,19 @@ public class EllipseShapedSafetyZoneDetector implements NearMissDetector {
             int lengthOfAxisAcrossCourse = beam * 4;                      // TODO make factor configurable;
 
             safetyZone = geometryService.createEllipticSafetyZone(centreLatitude, centreLongitude, lengthOfAxisAlongCourse, lengthOfAxisAcrossCourse, cog);
+
+            if (logger.isDebugEnabled()) {
+                String contourWkt = geometryService.createVesselContour(centreLatitude, centreLongitude, loa, beam, (int) vessel.getHdg()).toWkt();
+                String safetyZoneWkt = safetyZone.toWkt();
+
+                contourWkt = contourWkt.replace("POLYGON", "");
+                safetyZoneWkt = safetyZoneWkt.replace("POLYGON", "");
+
+                String combinedWkt = String.format("MULTIPOLYGON (%s,%s)", contourWkt, safetyZoneWkt);
+
+                logger.debug("Own vessel and safety zone: {}", combinedWkt);
+            }
+
         }
 
         return safetyZone;
