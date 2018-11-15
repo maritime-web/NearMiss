@@ -4,8 +4,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 
-import static java.lang.Math.PI;
-
 /**
  * This class represents the contour of a vessel.
  *
@@ -43,11 +41,11 @@ public class VesselContour extends dk.dma.nearmiss.engine.geometry.geometries.Ge
      * @param y Latitude of vessel's geometric centre in degrees.
      * @param l VesselContour's length over all in meters.
      * @param b VesselContour's beam in decimal degrees.
-     * @param thetaDeg VesselContour's heading in decimal degrees.
+     * @param thetaDeg Counter-clockwise rotation angle of the VesselContour in degrees (0 = bow up).
      */
     @SuppressWarnings({"unused", "UnnecessaryLocalVariable"})
     public VesselContour(double x, double y, double l, double b, double thetaDeg) {
-        final double theta = ((360 - thetaDeg) % 360.0) * (PI / 180.0);
+        final double theta = thetaDegToRad(thetaDeg);
 
         final double loa = l;
         final double beam = b;

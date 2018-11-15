@@ -17,31 +17,31 @@ public class VesselContourTest {
     final double beamDegrees = 35 / new GeometryService().metersPerDegreeLongitude(55);
 
     @Test
-    public void vesselHeadingNorth() {
+    public void contourRotated0Degrees() {
         VesselContour vesselContour = new VesselContour(10, 55, loaDegrees, beamDegrees, 0);
         String wkt = vesselContour.toWkt();
         assertEquals("POLYGON ((9.99972540712969 54.999325, 10.00027459287031 54.999325, 10.00027459287031 55.000405, 10 55.000675, 9.99972540712969 55.000405, 9.99972540712969 54.999325))", wkt);
     }
 
     @Test
-    public void vesselHeadingSouth() {
+    public void contourRotated180Degrees() {
         VesselContour vesselContour = new VesselContour(10, 55, loaDegrees, beamDegrees, 180);
         String wkt = vesselContour.toWkt();
         assertEquals("POLYGON ((10.00027459287031 55.000675, 9.99972540712969 55.000675, 9.99972540712969 54.999595, 10 54.999325, 10.00027459287031 54.999595, 10.00027459287031 55.000675))", wkt);
     }
 
     @Test
-    public void vesselHeadingEast() {
+    public void contourRotated90Degrees() {
         VesselContour vesselContour = new VesselContour(10, 55, loaDegrees, beamDegrees, 90);
         String wkt = vesselContour.toWkt();
-        assertEquals("POLYGON ((9.999325 55.00027459287031, 9.999325 54.99972540712969, 10.000405 54.99972540712969, 10.000675 55, 10.000405 55.00027459287031, 9.999325 55.00027459287031))", wkt);
+        assertEquals("POLYGON ((10.000675 54.99972540712969, 10.000675 55.00027459287031, 9.999595 55.00027459287031, 9.999325 55, 9.999595 54.99972540712969, 10.000675 54.99972540712969))", wkt);
     }
 
     @Test
-    public void vesselHeadingNorthWest() {
+    public void contourRotated315Degrees() {
         VesselContour vesselContour = new VesselContour(10, 55, loaDegrees, beamDegrees, 315);
         String wkt = vesselContour.toWkt();
-        assertEquals("POLYGON ((10.000283130596639 54.999328536442036, 10.000671463557962 54.99971686940336, 9.999907788234282 55.00048054472704, 9.999522702922699 55.0004772970773, 9.999519455272958 55.00009221176572, 10.000283130596639 54.999328536442036))", wkt);
+        assertEquals("POLYGON ((9.999328536442038 54.99971686940336, 9.999716869403361 54.999328536442036, 10.000480544727042 55.00009221176572, 10.000477297077301 55.0004772970773, 10.000092211765718 55.00048054472704, 9.999328536442038 54.99971686940336))", wkt);
     }
 
 }
