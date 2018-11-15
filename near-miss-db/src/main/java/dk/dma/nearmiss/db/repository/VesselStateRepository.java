@@ -34,10 +34,19 @@ public class VesselStateRepository {
     }
 
     public List<VesselState> list(OffsetDateTime from, OffsetDateTime to, boolean onlyNearMissStates) {
-        String queryString = "SELECT vs FROM VesselState vs WHERE vs.positionTime BETWEEN :from AND :to ";
+        String baseSql = "SELECT vs FROM VesselState vs ";
+        String criteria1 = " vs.positionTime BETWEEN :from AND :to ";
+        String criteria2 = " vs.latitude  != 'NaN' ";
+        String criteria3 = " vs.longitude  != 'NaN' ";
+        String nearMissCriteria = " vs.isNearMiss = TRUE ";
+        String queryString;
 
         if (Boolean.TRUE.equals(onlyNearMissStates)) {
-            queryString += " AND vs.isNearMiss = TRUE ";
+            queryString = String.format("%s WHERE %s AND %s AND %s AND %s",
+                    baseSql, criteria1, criteria2, criteria3, nearMissCriteria);
+        } else {
+            queryString = String.format("%s WHERE %s AND %s AND %s",
+                    baseSql, criteria1, criteria2, criteria3);
         }
 
         TypedQuery<VesselState> query = em.createQuery(queryString, VesselState.class);
