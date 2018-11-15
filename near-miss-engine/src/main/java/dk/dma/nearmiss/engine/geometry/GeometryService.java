@@ -18,16 +18,17 @@ public class GeometryService {
      *
      * @param centreLatitude Latitude of the ellipse's center (in decimal degrees)
      * @param centreLongitude Longitude of the ellipse's center (in decimal degrees)
-     * @param lengthOfAxisAlongCourse Length of the ellipse along course (in meters)
-     * @param lengthOfAxisAcrossCourse Length of the ellipse across course (in meters)
-     * @param course Course (in degrees true heading)
+     * @param lengthOfAxisAlongCourse Length of the ellipse along heading (in meters)
+     * @param lengthOfAxisAcrossCourse Length of the ellipse across heading (in meters)
+     * @param headingDegrees Heading of ellipse's major axis (in degrees true heading)
      * @return An elliptic safety zone.
      */
-    public EllipticSafetyZone createEllipticSafetyZone(double centreLatitude, double centreLongitude, double lengthOfAxisAlongCourse, double lengthOfAxisAcrossCourse, double course) {
+    public EllipticSafetyZone createEllipticSafetyZone(double centreLatitude, double centreLongitude, double lengthOfAxisAlongCourse, double lengthOfAxisAcrossCourse, double headingDegrees) {
         final double a = lengthOfAxisAlongCourse / metersPerDegreeLatitude();
         final double b = lengthOfAxisAcrossCourse / metersPerDegreeLongitude(centreLatitude);
+        final double rotationDeg = (360d - headingDegrees) % 360.0;
 
-        return new EllipticSafetyZone(centreLongitude, centreLatitude, a, b, course);
+        return new EllipticSafetyZone(centreLongitude, centreLatitude, a, b, rotationDeg);
     }
 
     /**
@@ -43,8 +44,9 @@ public class GeometryService {
     public VesselContour createVesselContour(double centreLatitudeDegrees, double centreLongitudeDegrees, int loaMeters, int beamMeters, int headingDegrees) {
         final double loaDegrees = loaMeters / metersPerDegreeLatitude();
         final double beamDegrees = beamMeters / metersPerDegreeLongitude(centreLatitudeDegrees);
+        final double rotationDeg = (360d - headingDegrees) % 360.0;
 
-        return new VesselContour(centreLongitudeDegrees, centreLatitudeDegrees, loaDegrees, beamDegrees, headingDegrees);
+        return new VesselContour(centreLongitudeDegrees, centreLatitudeDegrees, loaDegrees, beamDegrees, rotationDeg);
     }
 
     /**
@@ -103,22 +105,49 @@ public class GeometryService {
         final double Cy = Gy - dimSternDeg + (dimBowDeg + dimSternDeg) / 2d;
 
         // Rotate C to heading around G
+        return rotate(new Position(Cy, Cx), new Position(Gy, Gx), -(360 - heading) % 360.0);
+    }
+
+    /**
+     * Compute geodesic position which is the given distance away from the given position in the given direction.
+     * <p>
+     * Calculations are performed in the Cartesian plane and thus only valid for distances < ~30 km.
+     *
+     * @param from      The position to perform the calculation from
+     * @param direction The direction (in true degrees) to move away from position 'from'.
+     * @param distance  The distance (in meters) to move away from position 'from'.
+     * @return The position in the given distance and direction from the reference position.
+     */
+    public Position translate(Position from, double direction, double distance) {
+        dk.dma.enav.model.geometry.Position p = dk.dma.enav.model.geometry.Position.create(from.getLat(), from.getLon()).positionAt(direction, distance);
+        return new Position(p.getLatitude(), p.getLongitude());
+    }
+
+    /**
+     * Compute the position which is location if this position was rotated a given no. of degrees around a given position.
+     * <p>
+     * Calculations are performed in the Cartesian plane and thus only valid for distances < ~30 km.
+     *
+     * @param position The position to rotate.
+     * @param around   The position to rotate around.
+     * @param degrees  The number of degrees to rotate clockwise.
+     * @return
+     */
+    public Position rotate(Position position, Position around, double degrees) {
         // https://academo.org/demos/rotation-about-point/
+        final double theta = -degrees * (PI / 180.0);
 
-        final double thetaRad = ((360 - heading) % 360.0) * (PI / 180.0);
+        final double px = position.getLon();
+        final double py = position.getLat();
+        final double ax = around.getLon();
+        final double ay = around.getLat();
 
-        final double rCx = rotateX(thetaRad, Cx - Gx, Cy - Gy) + Gx;
-        final double rCy = rotateY(thetaRad, Cx - Gx, Cy - Gy) + Gy;
+        final double prx = rotateX(theta, px - ax, py - ay) + ax;
+        final double pry = rotateY(theta, px - ax, py - ay) + ay;
 
-        return new Position(rCy, rCx);
-    }
+        final Position pr = new Position(pry, prx);
 
-    private double rotateX(double theta, double x, double y) {
-        return x * Math.cos(theta) - y * Math.sin(theta);
-    }
-
-    private double rotateY(double theta, double x, double y) {
-        return x * Math.sin(theta) + y * Math.cos(theta);
+        return pr;
     }
 
     /**
@@ -142,5 +171,13 @@ public class GeometryService {
     }
 
     private static double METERS_PER_DEGREE_LATITUDE = 1000d * 10000d / 90d; // 10.000 km per 90 degrees latitude
+
+    private double rotateX(double theta, double x, double y) {
+        return x * cos(theta) - y * sin(theta);
+    }
+
+    private double rotateY(double theta, double x, double y) {
+        return x * sin(theta) + y * cos(theta);
+    }
 
 }

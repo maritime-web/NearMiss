@@ -5,8 +5,6 @@ import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.locationtech.jts.util.GeometricShapeFactory;
 
-import static java.lang.Math.PI;
-
 /**
  * This class represents an EllipticSafetyZone.
  *
@@ -23,7 +21,7 @@ public class EllipticSafetyZone extends Geometry {
      * @param y Cartesian y coordinate of the ellipse's centre.
      * @param a Length of the ellipse's vertical axis before rotation (in cartesian units).
      * @param b Length of the ellipse's horizontal axis before rotation (in cartesian units).
-     * @param thetaDeg Counter-clockwise rotation angle of the ellipse in degrees.
+     * @param thetaDeg Counter-clockwise rotation angle of the ellipse in degrees (0 = major axis pointing up).
      */
     public EllipticSafetyZone(double x, double y, double a, double b, double thetaDeg) {
         if (a <= 0)
@@ -31,8 +29,7 @@ public class EllipticSafetyZone extends Geometry {
         if (b <= 0)
             throw new IllegalArgumentException("b must be a positive number");
 
-        final double orientDeg = -(360 - thetaDeg) % 360.0;
-        final double orientRad = orientDeg * (PI/180.0);
+        final double thetaRad = thetaDegToRad(thetaDeg);
 
         Coordinate centre = new Coordinate(x, y);
         GeometricShapeFactory gsf = new GeometricShapeFactory();
@@ -42,7 +39,7 @@ public class EllipticSafetyZone extends Geometry {
         gsf.setNumPoints(32);
         Polygon ellipse = gsf.createEllipse();
 
-        AffineTransformation trans = AffineTransformation.rotationInstance(orientRad, centre.x, centre.y);
+        AffineTransformation trans = AffineTransformation.rotationInstance(thetaRad, centre.x, centre.y);
         ellipse.apply(trans);
 
         this._internalRepresentation = ellipse;
