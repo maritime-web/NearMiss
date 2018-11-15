@@ -31,7 +31,7 @@ public class EllipticSafetyZone extends Geometry {
         if (b <= 0)
             throw new IllegalArgumentException("b must be a positive number");
 
-        final double orientDeg = (360 - thetaDeg) % 360.0;
+        final double orientDeg = -(360 - thetaDeg) % 360.0;
         final double orientRad = orientDeg * (PI/180.0);
 
         Coordinate centre = new Coordinate(x, y);
@@ -39,7 +39,7 @@ public class EllipticSafetyZone extends Geometry {
         gsf.setCentre(centre);
         gsf.setWidth(b);
         gsf.setHeight(a);
-        gsf.setNumPoints(100);
+        gsf.setNumPoints(32);
         Polygon ellipse = gsf.createEllipse();
 
         AffineTransformation trans = AffineTransformation.rotationInstance(orientRad, centre.x, centre.y);
