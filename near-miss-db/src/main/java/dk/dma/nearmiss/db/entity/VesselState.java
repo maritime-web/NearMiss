@@ -4,7 +4,13 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+@SuppressWarnings({"JpaQlInspection", "unused"})
 @Entity
+@NamedQuery(
+        name = "listVesselStates",
+        query = "select vs from VesselState vs where vs.latitude <> 'NaN' and vs.longitude <> 'NaN' " +
+                " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
+)
 public class VesselState {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -53,67 +59,93 @@ public class VesselState {
         this(SensorType.AIS, -1, null, -1, -1, -1.0, -1.0, -1, -1, -1, null, false, null);
     }
 
-    /** JPA entity id */
+    /**
+     * JPA entity id
+     */
     public Long getId() {
         return id;
     }
 
-    /** Get sensor type */
+    /**
+     * Get sensor type
+     */
     public SensorType getSensorType() {
         return sensorType;
     }
 
-    /** Get vessel's MMSI number */
+    /**
+     * Get vessel's MMSI number
+     */
     public int getMmsi() {
         return mmsi;
     }
 
-    /** Get vessel's name */
+    /**
+     * Get vessel's name
+     */
     public String getName() {
         return name;
     }
 
-    /** Get vessel's length-overall (meters) */
+    /**
+     * Get vessel's length-overall (meters)
+     */
     public int getLoa() {
         return loa;
     }
 
-    /** Get vessel's beam (meters) */
+    /**
+     * Get vessel's beam (meters)
+     */
     public int getBeam() {
         return beam;
     }
 
-    /** Get vessel's latitude (decimal degrees) */
+    /**
+     * Get vessel's latitude (decimal degrees)
+     */
     public double getLatitude() {
         return latitude;
     }
 
-    /** Get vessel's longitude (decimal degrees) */
+    /**
+     * Get vessel's longitude (decimal degrees)
+     */
     public double getLongitude() {
         return longitude;
     }
 
-    /** Get vessel's true heading (degrees) */
+    /**
+     * Get vessel's true heading (degrees)
+     */
     public int getHdg() {
         return hdg;
     }
 
-    /** Get vessel's true course over ground (degrees) */
+    /**
+     * Get vessel's true course over ground (degrees)
+     */
     public int getCog() {
         return cog;
     }
 
-    /** Get vessel's speed over ground (knots) */
+    /**
+     * Get vessel's speed over ground (knots)
+     */
     public int getSog() {
         return sog;
     }
 
-    /** Get time of vessel's position */
+    /**
+     * Get time of vessel's position
+     */
     public LocalDateTime getPositionTime() {
         return positionTime;
     }
 
-    /** Is other vessel in near-miss situation with own vessel? */
+    /**
+     * Is other vessel in near-miss situation with own vessel?
+     */
     public boolean isNearMiss() {
         return isNearMiss;
     }
@@ -143,11 +175,17 @@ public class VesselState {
     }
 
     public enum SensorType {
-        /** Information is predicted or assumed  */
+        /**
+         * Information is predicted or assumed
+         */
         PREDICTOR,
-        /** Information received from GPS sensor */
+        /**
+         * Information received from GPS sensor
+         */
         GPS,
-        /** Information received from AIS sensor */
+        /**
+         * Information received from AIS sensor
+         */
         AIS;
     }
 
