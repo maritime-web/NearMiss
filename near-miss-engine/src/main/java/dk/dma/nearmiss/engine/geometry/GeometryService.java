@@ -47,9 +47,78 @@ public class GeometryService {
         return new VesselContour(centreLongitudeDegrees, centreLatitudeDegrees, loaDegrees, beamDegrees, headingDegrees);
     }
 
-    public Position calculateGeometricCenter(Position gpsReceiverPosition, double cog, int dimPort, int dimStern) {
-        // TODO implement
-        return gpsReceiverPosition;
+    /**
+     * Calculate the geometric center of a vessel given the position of its GPS antenna and the location of this
+     * antenna relative to the vessel.
+     *
+     * @param gpsReceiverPosition Position of the GPS antenne (GPS reference position),
+     * @param heading             Vessel's heading in degrees true north.
+     * @param dimPort             Distance in meters from GPS antenna to vessel's port side.
+     * @param dimStarbord         Distance in meters from GPS antenna to vessel's starboard side.
+     * @param dimBow              Distance in meters from GPS antenna to vessel's bow.
+     * @param dimStern            Distance in meters from GPS antenna to vessel's stern.
+     * @return Geodetic position of vessel's geometric center.
+     */
+    public Position calculateGeometricCenter(Position gpsReceiverPosition, double heading, int dimPort, int dimStarbord, int dimBow, int dimStern) {
+        /*
+         * Points are named like this:
+         *
+         *               (bow)
+         *     D |---------------------| C   -
+         *       |                     |     |
+         *       |                     |     |
+         *       |                     |     |                         heading = 25
+         *       |                     |     |                        -\
+         *       |                     |     |                        /|
+         *       |                     |     | dimBow                /
+         *       |          C          |     |                      /
+         *       |                     |     |                     /
+         *       |                     |     |
+         *       |                     |     |
+         *       |       G             |     -
+         *       |                     |     | dimStern
+         *       |                     |     |
+         *     A |-------|-------------| B   -
+         *        dimPort dimStarboardx
+         *
+         *              (stern)
+         *
+         *     G = position of GPS receiver
+         *     C = geometric center of vessel
+         */
+
+        // Convert dim from meters to degrees
+
+        final double dimPortDeg = dimPort / metersPerDegreeLongitude(gpsReceiverPosition.getLat());
+        final double dimStarboardDeg = dimStarbord / metersPerDegreeLongitude(gpsReceiverPosition.getLat());
+        final double dimBowDeg = dimBow / metersPerDegreeLatitude();
+        final double dimSternDeg = dimStern / metersPerDegreeLatitude();
+
+        // Calculate C facing North
+
+        final double Gx = gpsReceiverPosition.getLon();
+        final double Gy = gpsReceiverPosition.getLat();
+
+        final double Cx = Gx - dimPortDeg + (dimPortDeg + dimStarboardDeg) / 2d;
+        final double Cy = Gy - dimSternDeg + (dimBowDeg + dimSternDeg) / 2d;
+
+        // Rotate C to heading around G
+        // https://academo.org/demos/rotation-about-point/
+
+        final double thetaRad = ((360 - heading) % 360.0) * (PI / 180.0);
+
+        final double rCx = rotateX(thetaRad, Cx - Gx, Cy - Gy) + Gx;
+        final double rCy = rotateY(thetaRad, Cx - Gx, Cy - Gy) + Gy;
+
+        return new Position(rCy, rCx);
+    }
+
+    private double rotateX(double theta, double x, double y) {
+        return x * Math.cos(theta) - y * Math.sin(theta);
+    }
+
+    private double rotateY(double theta, double x, double y) {
+        return x * Math.sin(theta) + y * Math.cos(theta);
     }
 
     /**

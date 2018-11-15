@@ -17,4 +17,22 @@ public class Position {
     public double getLon() {
         return lon;
     }
+
+    @Override
+    public String toString() {
+        return "Position{" +
+                "lat=" + lat +
+                ", lon=" + lon +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Position position = (Position) o;
+        return Double.compare(position.lat, lat) == 0 &&
+                Double.compare(position.lon, lon) == 0;
+    }
+
 }

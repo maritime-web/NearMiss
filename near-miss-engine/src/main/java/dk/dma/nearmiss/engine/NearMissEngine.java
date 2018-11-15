@@ -208,7 +208,7 @@ public class NearMissEngine implements Observer {
         Position pos = toDec.convert();
         LocalDateTime timestamp = gpgllHelper.getLocalDateTime(conf.getDate());
 
-        Position geometricCenter = geometryService.calculateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getCog(), -1, -1);
+        Position geometricCenter = geometryService.calculateGeometricCenter(new Position(pos.getLat(), pos.getLon()), ownVessel.getHdg(), ownVessel.getBeam() / 2, ownVessel.getBeam() / 2, ownVessel.getLoa() / 2, ownVessel.getLoa() / 2);
 
         this.ownVessel.setCenterPosition(geometricCenter);
         this.ownVessel.setCog(courseOverGroundService.courseOverGround());

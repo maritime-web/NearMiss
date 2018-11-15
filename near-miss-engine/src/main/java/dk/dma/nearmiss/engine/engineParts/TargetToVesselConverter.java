@@ -76,7 +76,7 @@ public class TargetToVesselConverter implements Function<TargetInfo, Vessel> {
             v.setHdg(t.getHeading() == 511 ? NaN : t.getHeading());
 
             Position gpsReceiverPosition = new Position(t.getPosition().getLatitude(), t.getPosition().getLongitude());
-            Position geometricCenterPosition = geometryService.calculateGeometricCenter(gpsReceiverPosition, t.getCog() / 10, dimPort, dimStern);
+            Position geometricCenterPosition = geometryService.calculateGeometricCenter(gpsReceiverPosition, v.getHdg(), dimPort, dimStarboard, dimBow, dimStern);
 
             v.setCenterPosition(geometricCenterPosition);
         }
