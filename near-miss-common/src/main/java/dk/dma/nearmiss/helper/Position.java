@@ -31,8 +31,8 @@ public class Position {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Position position = (Position) o;
-        return Double.compare(position.lat, lat) == 0 &&
-                Double.compare(position.lon, lon) == 0;
+        return Math.abs(position.lat - lat) <= 1e-14 &&
+                Math.abs(position.lon - lon) <= 1e-14;
     }
 
 }
