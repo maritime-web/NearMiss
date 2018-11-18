@@ -6,11 +6,20 @@ import java.time.LocalDateTime;
 
 @SuppressWarnings({"JpaQlInspection", "unused"})
 @Entity
-@NamedQuery(
-        name = "listVesselStates",
-        query = "select vs from VesselState vs where vs.latitude <> 'NaN' and vs.longitude <> 'NaN' " +
-                " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
-)
+@NamedQueries(value = {
+    @NamedQuery(
+            name = "listVesselStates",
+            query = "select vs from VesselState vs where vs.latitude <> 'NaN' and vs.longitude <> 'NaN' " +
+                    " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
+    ),
+    @NamedQuery(
+            name = "listVesselStatesByMmsi",
+            query = "select vs from VesselState vs where vs.mmsi = :mmsi " +
+                    " and vs.latitude <> 'NaN' and vs.longitude <> 'NaN' " +
+                    " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
+    )
+
+})
 public class VesselState {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

@@ -135,6 +135,13 @@
             <artifactId>swagger-jaxrs</artifactId>
             <version>${swagger.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.jenetics/jpx -->
+        <dependency>
+            <groupId>io.jenetics</groupId>
+            <artifactId>jpx</artifactId>
+            <version>1.4.0</version>
+        </dependency>
     </dependencies>
 
 </project>

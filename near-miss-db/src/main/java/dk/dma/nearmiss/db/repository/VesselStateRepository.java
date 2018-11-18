@@ -48,4 +48,18 @@ public class VesselStateRepository {
         return result;
     }
 
+    @SuppressWarnings("JpaQueryApiInspection")
+    public List<VesselState> listByMmsi(int mmsi, OffsetDateTime from, OffsetDateTime to, boolean onlyNearMissStates) {
+        Boolean[] nearMissStates = onlyNearMissStates ? new Boolean[]{Boolean.TRUE} : new Boolean[]{Boolean.TRUE, Boolean.FALSE};
+        TypedQuery<VesselState> query = em.createNamedQuery("listVesselStatesByMmsi", VesselState.class);
+        query.setParameter("mmsi", mmsi);
+        query.setParameter("from", from.toLocalDateTime());
+        query.setParameter("to", to.toLocalDateTime());
+        query.setParameter("nearMissStates", Arrays.asList(nearMissStates));
+
+        List<VesselState> result = query.getResultList();
+        logger.debug(String.format("Number of VesselState records found: %s", result.size()));
+        return result;
+    }
+
 }
