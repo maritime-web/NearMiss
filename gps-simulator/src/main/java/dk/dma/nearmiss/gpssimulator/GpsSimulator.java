@@ -41,13 +41,12 @@ public class GpsSimulator extends Simulator {
 
     private void makeTrip(Route trip) throws InterruptedException {
         RouteSimulator sim = new RouteSimulator(trip);
-        //noinspection InfiniteLoopStatement
         while (!sim.hasArrived()) {
             sim.move();
 
             Gpgll gpgll = new Gpgll(sim.currentLocation.getLatitude(), sim.currentLocation.getLongitude(), getSimulatedTime());
             message = gpgll.toString();
-            logger.info(String.format(gpgll.toString()));
+            logger.info(gpgll.toString());
             logger.info(String.format("At %s, remaining distance to %s is %s km",
                     gpgll.getFormattedTime(), trip.lastWaypoint().getName(), getRemainingDistance(sim.currentLocation, trip.lastWaypoint())));
             logger.debug(String.format("Broadcasting message: %s", message));
@@ -66,6 +65,16 @@ public class GpsSimulator extends Simulator {
     public void run() {
         Location tripStart = configuration.getTripStart();
         Location tripEnd = configuration.getTripEnd();
+
+        if (tripEnd.sameLocationAs(tripStart)) {
+            logger.info("Same coordinates for trip start and trip end. Entering Anchor mode");
+            anchorMode(tripStart);
+        } else {
+            routeMode(tripStart, tripEnd);
+        }
+    }
+
+    private void routeMode(Location tripStart, Location tripEnd) {
         Route route = new Route(tripStart, tripEnd);
 
         //noinspection InfiniteLoopStatement
@@ -79,6 +88,24 @@ public class GpsSimulator extends Simulator {
             } catch (InterruptedException e) {
                 logger.info("Sleep Interruption");
             }
+        }
+    }
+
+    private void anchorMode(Location anchorLocation) {
+        try {
+            //noinspection InfiniteLoopStatement
+            for (; ; ) {
+                Gpgll gpgll = new Gpgll(anchorLocation.getLatitude(), anchorLocation.getLongitude(), getSimulatedTime());
+                message = gpgll.toString();
+                logger.info(gpgll.toString());
+                logger.info(String.format("At %s, anchored on location %s is %s km",
+                        gpgll.getFormattedTime(), anchorLocation.getLatitude(), anchorLocation.getLongitude()));
+                logger.debug(String.format("Broadcasting message: %s", message));
+                notifyListeners();
+                sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            logger.info("Sleep Interruption");
         }
     }
 
