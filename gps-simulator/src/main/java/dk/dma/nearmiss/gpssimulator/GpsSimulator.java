@@ -98,7 +98,7 @@ public class GpsSimulator extends Simulator {
                 Gpgll gpgll = new Gpgll(anchorLocation.getLatitude(), anchorLocation.getLongitude(), getSimulatedTime());
                 message = gpgll.toString();
                 logger.info(gpgll.toString());
-                logger.info(String.format("At %s, anchored on location %s is %s km",
+                logger.info(String.format("At %s, anchored on location %s,%s",
                         gpgll.getFormattedTime(), anchorLocation.getLatitude(), anchorLocation.getLongitude()));
                 logger.debug(String.format("Broadcasting message: %s", message));
                 notifyListeners();
