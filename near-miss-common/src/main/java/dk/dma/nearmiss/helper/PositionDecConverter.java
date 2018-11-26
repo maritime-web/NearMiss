@@ -5,6 +5,7 @@ package dk.dma.nearmiss.helper;
  * This class converts a GPS position to Decimal format from Degreees Minutes Seconds.
  * Input Strings to look like "5712.40,N" for latitude or "01143.60,E" for longitude.
  */
+//todo: To be cleaned up! (NMEA minutes/fraction)
 @SuppressWarnings("WeakerAccess")
 public final class PositionDecConverter {
     private final String dmsLat;
@@ -35,7 +36,7 @@ public final class PositionDecConverter {
 
     double seconds(String degreesMinutesSeconds, boolean isLat) {
         int startIndex = isLat ? 5 : 6;
-        int endIndex = isLat ? 7 : 8;
+        int endIndex = isLat ? 9 : 10;
         return Double.valueOf(degreesMinutesSeconds.substring(startIndex, endIndex));
     }
 
@@ -46,10 +47,13 @@ public final class PositionDecConverter {
 
     double fromDms(String degreesMinutesSeconds, boolean isLat) {
         // Decimal Degrees = Degrees + minutes/60 + seconds/3600
-        double minutes = minutes(degreesMinutesSeconds, isLat) / 60;
-        double seconds = seconds(degreesMinutesSeconds, isLat) / 3600;
-        double fraction = minutes + seconds;
-        return letter(degreesMinutesSeconds) * (degrees(degreesMinutesSeconds, isLat) + fraction);
+
+        // Not seconds, but fraction of minutes! NMEA
+        double seconds = seconds(degreesMinutesSeconds, isLat) / 10000; // todo: forkert?
+        double minutes = (minutes(degreesMinutesSeconds, isLat) + seconds) / 60;
+
+        //double fraction = minutes + seconds;
+        return letter(degreesMinutesSeconds) * (degrees(degreesMinutesSeconds, isLat) + minutes);
     }
-    
+
 }

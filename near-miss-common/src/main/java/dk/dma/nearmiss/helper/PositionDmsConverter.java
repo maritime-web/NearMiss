@@ -3,6 +3,7 @@ package dk.dma.nearmiss.helper;
 /**
  * This class converts a GPS position to Degree Minutes Seconds from Decimal format.
  */
+//todo: To be cleaned up! (NMEA minutes/fraction)
 public final class PositionDmsConverter {
     private final double lat;
     private final double lon;
@@ -23,12 +24,18 @@ public final class PositionDmsConverter {
         int degrees = Double.valueOf(absDecimalDegrees).intValue();
 
         double decimal = absDecimalDegrees - degrees;
-        double upscaled = decimal * 3600; // milliseconds
-        double minutes = upscaled / 60; // minutes
-        double seconds = upscaled % 60; //
+        double upscaled = decimal * 3600;
+
+        double minutes = upscaled / 60;
+        int minutesInt = Double.valueOf(minutes).intValue();
+        int minutesFrac = (int) Math.round((minutes - minutesInt) * 10000);
+
+        //double seconds = upscaled % 60;
+        //double secondsInt = Double.valueOf(seconds).intValue();
+        //double secondsFrac = seconds - secondsInt; //
 
         String strDegrees = (isLongtitude) ? pad(degrees, 3) : pad(degrees, 2);
-        return String.format("%s%s.%s", strDegrees, pad(Double.valueOf(minutes).intValue(), 2), pad((int) Math.round(seconds), 2));
+        return String.format("%s%s.%s", strDegrees, pad(minutesInt, 2), pad(minutesFrac, 4));
     }
 
     String pad(int number, int padLength) {

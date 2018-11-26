@@ -10,8 +10,8 @@ public class PositionDecConverterTests {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private PositionDecConverter NULL_CONVERTER = new PositionDecConverter(null, null);
-    private static final String STR_LAT = "5601.60,N";
-    private static final String STR_LON = "01143.60,E";
+    private static final String STR_LAT = "5601.6010,N";
+    private static final String STR_LON = "01143.6010,E";
 
     @Test
     public void playground_lat_1() {
@@ -66,8 +66,8 @@ public class PositionDecConverterTests {
 
     @Test
     public void positionDecimal_toDec_and_back() {
-        String strLat = "5712.40,N";
-        String strLon = "01143.60,E";
+        String strLat = "5712.4000,N";
+        String strLon = "01143.6000,E";
 
         logger.info(String.format("Initial string latitude: %s", strLat));
         logger.info(String.format("Initial string longitude: %s", strLon));
