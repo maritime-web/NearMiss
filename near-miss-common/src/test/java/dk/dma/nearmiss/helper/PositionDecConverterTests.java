@@ -72,10 +72,10 @@ public class PositionDecConverterTests {
         logger.info(String.format("Initial string latitude: %s", strLat));
         logger.info(String.format("Initial string longitude: %s", strLon));
 
-        double decimalLat = NULL_CONVERTER.positionDecimal(strLat, true);
+        double decimalLat = NULL_CONVERTER.fromDms(strLat, true);
         logger.info(String.format("Decimal latitude: %s", decimalLat));
 
-        double decimalLon = NULL_CONVERTER.positionDecimal(strLon, false);
+        double decimalLon = NULL_CONVERTER.fromDms(strLon, false);
         logger.info(String.format("Decimal longitude: %s", decimalLon));
 
         String degreesMinustesSeconds = new PositionDmsConverter(decimalLat, decimalLon).convert();

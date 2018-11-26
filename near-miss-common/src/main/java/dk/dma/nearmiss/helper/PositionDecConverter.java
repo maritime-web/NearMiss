@@ -19,7 +19,7 @@ public final class PositionDecConverter {
         if (dmsLat == null || dmsLon == null) {
             return new Position(0, 0);
         }
-        return new Position(positionDecimal(dmsLat, true), positionDecimal(dmsLon, false));
+        return new Position(fromDms(dmsLat, true), fromDms(dmsLon, false));
     }
 
     double degrees(String degreesMinutesSeconds, boolean isLat) {
@@ -44,12 +44,12 @@ public final class PositionDecConverter {
         return ("N".equals(letter) || "E".equals(letter)) ? 1D : -1D;
     }
 
-    double positionDecimal(String degreesMinutesSeconds, boolean isLat) {
+    double fromDms(String degreesMinutesSeconds, boolean isLat) {
         // Decimal Degrees = Degrees + minutes/60 + seconds/3600
         double minutes = minutes(degreesMinutesSeconds, isLat) / 60;
         double seconds = seconds(degreesMinutesSeconds, isLat) / 3600;
         double fraction = minutes + seconds;
         return letter(degreesMinutesSeconds) * (degrees(degreesMinutesSeconds, isLat) + fraction);
     }
-
+    
 }

@@ -1,10 +1,7 @@
 package dk.dma.nearmiss.helper;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 /**
- * This classe converts a GPS position to Degree Minutes Seconds from Decimal format.
+ * This class converts a GPS position to Degree Minutes Seconds from Decimal format.
  */
 public final class PositionDmsConverter {
     private final double lat;
@@ -22,21 +19,16 @@ public final class PositionDmsConverter {
     }
 
     private String convert(double decimalDegrees, boolean isLongtitude) {
-        BigDecimal absDecimalDegrees = BigDecimal.valueOf(decimalDegrees).abs();
-        int degrees = absDecimalDegrees.intValue();
+        double absDecimalDegrees = Math.abs(decimalDegrees);
+        int degrees = Double.valueOf(absDecimalDegrees).intValue();
 
-        BigDecimal decimal = absDecimalDegrees.subtract(BigDecimal.valueOf(degrees));
-        decimal = decimal.setScale(5, RoundingMode.FLOOR);
-
-        BigDecimal bd60 = BigDecimal.valueOf(60L);
-        BigDecimal minutes = decimal.multiply(bd60);
-
-        BigDecimal upscaled = decimal.multiply(bd60).multiply(bd60);
-        BigDecimal seconds = upscaled.remainder(bd60);
-        seconds = seconds.setScale(0, RoundingMode.HALF_UP);
+        double decimal = absDecimalDegrees - degrees;
+        double upscaled = decimal * 3600; // milliseconds
+        double minutes = upscaled / 60; // minutes
+        double seconds = upscaled % 60; //
 
         String strDegrees = (isLongtitude) ? pad(degrees, 3) : pad(degrees, 2);
-        return String.format("%s%s.%s", strDegrees, pad(minutes.intValue(), 2), pad(seconds.intValue(), 2));
+        return String.format("%s%s.%s", strDegrees, pad(Double.valueOf(minutes).intValue(), 2), pad((int) Math.round(seconds), 2));
     }
 
     String pad(int number, int padLength) {
