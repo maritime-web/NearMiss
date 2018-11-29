@@ -1,14 +1,10 @@
 package dk.dma.nearmiss.engine.nmeaBasedServices;
 
-import java.time.LocalTime;
-
 public interface HeadingService {
-    /** Feed service with new NMEA message */
-    void update(String message);
 
-    /** Return estimated true heading */
-    int heading();
+    /**
+     * Calculate new heading from latest and NMEA message
+     */
+    int update(int heading, int courseOverGround, String message);
 
-    @SuppressWarnings("unused")
-    LocalTime timeOfLastUpdate();
 }

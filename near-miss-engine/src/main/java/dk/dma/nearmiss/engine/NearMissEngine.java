@@ -56,6 +56,8 @@ public class NearMissEngine implements Observer {
     private final VesselVicinityScreener vicinityScreener;
     private final NearMissDetector detector;
 
+
+
     // Own vessel state
     private final Vessel ownVessel;
 
@@ -199,7 +201,6 @@ public class NearMissEngine implements Observer {
 
         courseOverGroundService.update(message);
         speedOverGroundService.update(message);
-        headingService.update(message);
 
         GpgllHelper gpgllHelper = new GpgllHelper(message);
         String dmsLat = gpgllHelper.getDmsLat();
@@ -213,7 +214,7 @@ public class NearMissEngine implements Observer {
         this.ownVessel.setCenterPosition(geometricCenter);
         this.ownVessel.setCog(courseOverGroundService.courseOverGround());
         this.ownVessel.setSog(speedOverGroundService.speedOverGround());
-        this.ownVessel.setHdg(headingService.heading());
+        ownVessel.setHdg(headingService.update((int) ownVessel.getHdg(), (int) ownVessel.getCog(), message));
         this.ownVessel.setLastPositionReport(timestamp);
     }
 
