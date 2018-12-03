@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties("tcp.client")
-
 public class TcpClientConfiguration {
     private String host;
     private int remotePort;

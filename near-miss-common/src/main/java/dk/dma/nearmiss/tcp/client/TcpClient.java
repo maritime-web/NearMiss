@@ -38,8 +38,8 @@ public class TcpClient extends Simulator {
     }
 
     public void run() {
-        //noinspection InfiniteLoopStatement
         boolean continueLoop = true;
+        //noinspection ConstantConditions,LoopConditionNotUpdatedInsideLoop
         while (continueLoop) {
             if (input != null) {
                 try {
