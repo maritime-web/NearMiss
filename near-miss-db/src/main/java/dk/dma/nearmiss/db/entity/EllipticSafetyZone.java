@@ -7,31 +7,42 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class EllipticSafetyZone {
 
-    /** Latitude of center */
+    /**
+     * Latitude of center
+     */
     @NotNull
     @Column(name = "ESZ_CENTER_LATITUDE")
     private Double latitude;
 
-    /** Longitude of center */
+    /**
+     * Longitude of center
+     */
     @NotNull
     @Column(name = "ESZ_CENTER_LONGITUDE")
     private Double longitude;
 
-    /** Orientation of major axis (in true degrees; 0 = north) */
+    /**
+     * Orientation of major axis (in true degrees; 0 = north)
+     */
     @NotNull
     @Column(name = "ESZ_ORIENT_MAJOR")
     private Integer orientationOfMajor;
 
-    /** Length of semi major axis (in meters) */
+    /**
+     * Length of semi major axis (in meters)
+     */
     @NotNull
     @Column(name = "ESZ_A")
     private Double semiMajor;
 
-    /** Length of semi minor axis (in meters) */
+    /**
+     * Length of semi minor axis (in meters)
+     */
     @NotNull
     @Column(name = "ESZ_B")
     private Double semiMinor;
 
+    @SuppressWarnings("unused")
     public EllipticSafetyZone() {
         this.latitude = null;
         this.longitude = null;
@@ -41,11 +52,11 @@ public class EllipticSafetyZone {
     }
 
     public EllipticSafetyZone(double latitude, double longitude, int orientationOfMajor, double semiMinor, double semiMajor) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.latitude = Double.isNaN(latitude) ? null : latitude;
+        this.longitude = Double.isNaN(longitude) ? null : longitude;
         this.orientationOfMajor = orientationOfMajor;
-        this.semiMinor = semiMinor;
-        this.semiMajor = semiMajor;
+        this.semiMinor = Double.isNaN(semiMinor) ? null : semiMinor;
+        this.semiMajor = Double.isNaN(semiMajor) ? null : semiMajor;
     }
 
     public Double getLatitude() {
@@ -56,6 +67,7 @@ public class EllipticSafetyZone {
         return longitude;
     }
 
+    @SuppressWarnings("unused")
     public Integer getOrientationOfMajor() {
         return orientationOfMajor;
     }

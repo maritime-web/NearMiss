@@ -7,17 +7,17 @@ import java.time.LocalDateTime;
 @SuppressWarnings({"JpaQlInspection", "unused"})
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(
-            name = "listVesselStates",
-            query = "select vs from VesselState vs where vs.latitude <> 'NaN' and vs.longitude <> 'NaN' " +
-                    " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
-    ),
-    @NamedQuery(
-            name = "listVesselStatesByMmsi",
-            query = "select vs from VesselState vs where vs.mmsi = :mmsi " +
-                    " and vs.latitude <> 'NaN' and vs.longitude <> 'NaN' " +
-                    " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
-    )
+        @NamedQuery(
+                name = "listVesselStates",
+                query = "select vs from VesselState vs where vs.latitude is not null and vs.longitude is not null " +
+                        " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
+        ),
+        @NamedQuery(
+                name = "listVesselStatesByMmsi",
+                query = "select vs from VesselState vs where vs.mmsi = :mmsi " +
+                        " and vs.latitude is not null and vs.longitude is not null " +
+                        " and vs.positionTime between :from and :to and vs.isNearMiss in :nearMissStates "
+        )
 
 })
 public class VesselState {
@@ -34,8 +34,8 @@ public class VesselState {
     private final String name;
     private final int loa;
     private final int beam;
-    private final double latitude;
-    private final double longitude;
+    private final Double latitude;
+    private final Double longitude;
     private final int hdg;
     private final int cog;
     private final int sog;
@@ -52,8 +52,8 @@ public class VesselState {
         this.name = name;
         this.loa = loa;
         this.beam = beam;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.latitude = Double.isNaN(latitude) ? null : latitude;
+        this.longitude = Double.isNaN(longitude) ? null : longitude;
         this.hdg = hdg;
         this.cog = cog;
         this.sog = sog;
