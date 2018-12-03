@@ -1,9 +1,7 @@
 package dk.dma.nearmiss.engine;
 
 import dk.dma.ais.binary.SixbitException;
-import dk.dma.ais.message.AisMessageException;
-import dk.dma.ais.message.AisPositionMessage;
-import dk.dma.ais.message.AisStaticCommon;
+import dk.dma.ais.message.*;
 import dk.dma.ais.packet.AisPacket;
 import dk.dma.ais.tracker.targetTracker.TargetInfo;
 import dk.dma.ais.tracker.targetTracker.TargetTracker;
@@ -55,7 +53,6 @@ public class NearMissEngine implements Observer {
     private final PositionPredictor positionPredictor;
     private final VesselVicinityScreener vicinityScreener;
     private final NearMissDetector detector;
-
 
 
     // Own vessel state
@@ -161,7 +158,7 @@ public class NearMissEngine implements Observer {
                     otherVessel.getCenterPosition().getLon(),
                     (int) otherVessel.getHdg(),
                     (int) otherVessel.getCog(),
-                    (int) otherVessel.getSog()  ,
+                    (int) otherVessel.getSog(),
                     otherVessel.getLastPositionReport(),
                     true,
                     null
@@ -242,13 +239,16 @@ public class NearMissEngine implements Observer {
 
         if (conf.isSaveAllPositions() && target != null) {
             AisStaticCommon aisStatic = null;
-            AisPositionMessage aisDynamic = null;
+            IPositionMessage aisDynamic = null;
             try {
                 if (target.hasStaticInfo())
                     aisStatic = (AisStaticCommon) target.getStaticAisPacket1().getAisMessage();
 
-                if (target.hasPositionInfo())
-                    aisDynamic = (AisPositionMessage) target.getPositionPacket().getAisMessage();
+                if (target.hasPositionInfo()) {
+                    AisMessage aisMessage = target.getPositionPacket().getAisMessage();
+                    if (aisMessage instanceof IPositionMessage)
+                        aisDynamic = (IPositionMessage) aisMessage;
+                }
             } catch (AisMessageException | SixbitException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
