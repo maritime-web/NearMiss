@@ -1,9 +1,11 @@
 = NearMiss
 
 == Introduction
-DMA NearMiss is an appliction use to detect near-miss situations seen from specific vessels point of view.
+DMA NearMiss is an application used to detect near-miss situations with other vessels seen from own vessel's
+point of view.
 
-Using the vessels own GPS data and received AIS messages near-miss situations are detected and saved to db.
+Using own vessels GPS data and received AIS messages from other vessels the near-miss situations are detected
+and saved to db.
 
 == How the prototype works
 This prototype consists of several modules.
@@ -16,13 +18,18 @@ This prototype consists of several modules.
 * near-miss-db
 * <<ais-simulator/README.adoc#,ais-simulator>>
 
-
-
 == Building the Application
-Use Maven:
+
+This application depends on AisLib. This module should be cloned from GitHub and build prior to building
+the NearMiss application prototype.
+
+Find AisLib here: https://github.com/dma-ais/AisLib
+Then clone and build using `mvn clean install`
+
+Then build the NearMiss prototype using:
 `mvn clean install`
 
-This can be done form the application root folder og from withing the individual module folders.
+This can be done from the application root folder or from within the individual module folders.
 
 The modules using db will use the in memory H2 database during unit testing, like when running:
 `mvn test`
@@ -53,13 +60,13 @@ docker-compose up
 docker-compose down
 ----
 
-The docker profile (application-docker.properties) will be used when running Docker.
+The docker profile (application-docker.properties) will be used when running Docker. When running under Docker
+MySql will be used as database.
+
 
 === Running Individual Modules
-If the application is to be started through individual Docker commands.
-
-Please refer to the `docker-compose.yml` file for
-dependencies between the individual modules of the application.
+If the application is to be started through individual Docker commands then refer to the `docker-compose.yml`
+file for dependencies between the individual modules of the application.
 
 
 === Running the Application locally
@@ -68,7 +75,7 @@ When the application is running locally a in memory H2 databse is used in server
 To run the full application locally do following:
 
 1. Start gps-simulator +
-`java -jar gps-simulator-0.0.1-SNAPSHOT-exec.jar`
+`java -jar gps-simulator-0.0.1-SNAPSHOT.jar`
 
 2. Start ais-simulator +
 `java -jar ais-simulator-0.0.1-SNAPSHOT.jar`
@@ -86,4 +93,4 @@ Refer to <<pilot-plug-simulator/README.adoc#,pilot-plug-simulator>> in the sub p
 6. Start near-miss-web using h2tcp profile. +
 `java -jar near-miss-web-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2tcp --spring.config.location=../src/main/resources`
 
-The h2tcp (application-h2tcp.properties) will be used when running locally.
+The dev profile (application-dev.properties) will be used when running locally.
