@@ -2,7 +2,7 @@
 
 == Purpose
 
-This gps-simulator is developed in context of the DMA near-miss project.
+This gps-simulator is developed in context of the DMA <<../README.adoc#NearMiss,near-miss>> project.
 
 The Purpose of the component is to generate and expose GPS test data to the ais-simulator and pilot-plug-simulator.
 
@@ -22,3 +22,6 @@ packaged mode.
 Running development mode use the profile `dev`
 
 Running in Docker use the profile `docker`
+
+== Back
+Back to <<../README.adoc#NearMiss,near-miss>> parent modul

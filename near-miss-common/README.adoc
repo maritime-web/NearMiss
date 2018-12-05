@@ -1,7 +1,7 @@
 = near-miss-common
 
 == Introduction
-This module holds common functionality for the various modules in the near-miss prototype.
+This module holds common functionality for the various modules in the <<../README.adoc#NearMiss,near-miss>> prototype.
 
 The modules using functionality from this module will depend on it in the Maven build file, thus this module
 will not run as a independent module.
@@ -22,4 +22,7 @@ or similar.
 
 The modules using functionality from this module will depend on it in the Maven build file, thus this module
 will not run as a independent module.
+
+== Back
+Back to <<../README.adoc#NearMiss,near-miss>> parent modul
 

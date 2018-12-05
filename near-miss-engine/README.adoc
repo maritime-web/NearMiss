@@ -2,7 +2,7 @@
 
 == Purpose
 
-This near-miss-engine is developed in context of the DMA near-miss project.
+This near-miss-engine is developed in context of the DMA <<../README.adoc#NearMiss,near-miss>> project.
 
 The Purpose of the component is to generate near-miss event information and save to database.
 
@@ -55,6 +55,8 @@ https://github.com/dma-ais/AisLib
 </dependency>
 ----
 
+== Back
+Back to <<../README.adoc#NearMiss,near-miss>> parent modul
 
 
 

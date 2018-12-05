@@ -2,7 +2,7 @@
 
 == Purpose
 
-This ais-simulator is developed in context of the DMA <<../README.adoc#,near-miss>> project.
+This ais-simulator is developed in context of the DMA <<../README.adoc#NearMiss,near-miss>> project.
 
 The Purpose of the component is to expose AIS test data to the pilot-plug-simulator.
 

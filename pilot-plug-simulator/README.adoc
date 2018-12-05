@@ -2,7 +2,7 @@
 
 == Purpose
 
-This pilot-plug-simulator is developed in context of the DMA near-miss project.
+This pilot-plug-simulator is developed in context of the DMA <<../README.adoc#NearMiss,near-miss>> project.
 
 Its intended use is to merge NMEA line based text data streams from different sources into a single TCP/IP stream available to any no. of clients.
 
@@ -81,3 +81,6 @@ where
 
 - `localPort` is the local port on which the merged text data are available, and
 - `remoteHost:remotePort` are the hostname and port no. of the remote text source(s) that the application should connect to.
+
+== Back
+Back to <<../README.adoc#NearMiss,near-miss>> parent modul
