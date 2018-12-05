@@ -4,7 +4,7 @@
 
 This ais-simulator is developed in context of the DMA <<../README.adoc#NearMiss,near-miss>> project.
 
-The Purpose of the component is to expose AIS test data to the pilot-plug-simulator.
+The Purpose of the component is to expose AIS test data to the <<../pilot-plug-simulator/README.adoc#Pilot-plug-simulator,pilot-plug-simulator>>.
 
 == Build
 
@@ -23,12 +23,25 @@ Running development mode use the profile `dev`
 
 Running in Docker use the profile `docker`
 
-== ToDO
+=== Run
 
-=== Default Profile
-Should be configured with no AIS data files. And the application should allow for this.
+Refer to the link:Dockerfile[Dockerfile] to see how to run.
 
-=== Document dependency to AisLib
+=== Configuration
+
+The ais-simulator has several configurations.
+
+Refer to the link:src/main/java/dk/dma/nearmiss/aissimulator/AisDataReaderConfiguration.java[AisDataReaderConfiguration.java] class.
+
+Also refer to the configurtion files:
+
+* link:src/main/resources/application.properties[application.properties]
+* link:src/main/resources/application-dev.properties[application-dev.properties]
+* link:src/main/resources/application-docker.properties[application-docker.properties]
+
+=== Dependency to AisLib
+
+This module does need AisLib to have been cloned from GitHub and build.
 
 https://github.com/dma-ais/AisLib
 
@@ -41,4 +54,4 @@ https://github.com/dma-ais/AisLib
 ----
 
 == Back
-Back to <<../README.adoc#NearMiss,near-miss>> parent modul
+Back to <<../README.adoc#NearMiss,near-miss>> parent module.

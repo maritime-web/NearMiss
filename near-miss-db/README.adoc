@@ -21,4 +21,4 @@ The component has been designed to run in development mode (locally or within de
 Running development mode use the profile `dev`
 
 == Back
-Back to <<../README.adoc#NearMiss,near-miss>> parent modul
+Back to <<../README.adoc#NearMiss,near-miss>> parent module.

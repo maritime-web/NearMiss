@@ -14,6 +14,22 @@ or similar.
 When running the build use the SpringBoot default profile (application.properties) for standalone execution of the
 tests.
 
+=== Run
+
+Refer to the link:Dockerfile[Dockerfile] to see how to run.
+
+=== Configuration
+
+The near-miss-engine has several configurations.
+
+Refer to the link:src/main/java/dk/dma/nearmiss/engine/NearMissEngineConfiguration.java[NearMissEngineConfiguration.java] class.
+
+Also refer to the configurtion files:
+
+* link:src/main/resources/application.properties[application.properties]
+* link:src/main/resources/application-dev.properties[application-dev.properties]
+* link:src/main/resources/application-docker.properties[application-docker.properties]
+
 == Usage
 
 The component has been designed to run in development mode (locally or within development environment). Or in a Docker
@@ -71,7 +87,9 @@ These formulas and constants are empirically and arbitrarily chosen with little 
 
 The actual code implementing the above algortihm can be found here https://github.com/maritime-web/NearMiss/blob/v0.0.3/near-miss-engine/src/main/java/dk/dma/nearmiss/engine/engineParts/EllipticSafetyZoneDetector.java#L30.
 
-=== Document dependency to AisLib
+=== Dependency to AisLib
+
+This module does need AisLib to have been cloned from GitHub and build.
 
 https://github.com/dma-ais/AisLib
 
@@ -98,7 +116,7 @@ https://github.com/dma-ais/AisLib
 
 
 == Back
-Back to <<../README.adoc#NearMiss,near-miss>> parent modul
+Back to <<../README.adoc#NearMiss,near-miss>> parent module.
 
 
 

@@ -10,6 +10,7 @@ and saved to db. From db the near-miss situations are accessible through a web s
 == How the prototype works
 This prototype consists of several modules.
 
+=== Modules
 * <<gps-simulator/README.adoc#GPS-Simulator,gps-simulator>>
 * <<ais-simulator/README.adoc#AIS-Simulator,ais-simulator>>
 * <<pilot-plug-simulator/README.adoc#Pilot-plug-simulator,pilot-plug-simulator>>
@@ -22,8 +23,8 @@ This prototype consists of several modules.
 1. <<gps-simulator/README.adoc#GPS-Simulator,gps-simulator>> is configured with a route (own vessel).
 2. <<ais-simulator/README.adoc#AIS-Simulator,ais-simulator>> is configured to read a file of AIS mesages (other vessels).
 3. <<pilot-plug-simulator/README.adoc#Pilot-plug-simulator,pilot-plug-simulator>> reads from <<gps-simulator/README.adoc#GPS-Simulator,gps-simulator>> and <<ais-simulator/README.adoc#AIS-Simulator,ais-simulator>> and feeds the information to <<near-miss-engine/README.adoc#NearMiss Engine,near-miss-engine>>.
-4. <<near-miss-engine/README.adoc#NearMiss Engine,near-miss-engine>> checks for near-misses from received GPS and AIS information and writes vessel state records to <<near-miss-db/README.adoc#NearMissDB,near-miss-db>>.
-5. <<near-miss-web/README.adoc#NearMiss-Web,near-miss-web>> exposes a Web service REST API for client applications to retrieve vessel state records from <<near-miss-db/README.adoc#NearMissDB,near-miss-db>>.
+4. <<near-miss-engine/README.adoc#NearMiss Engine,near-miss-engine>> checks for near-misses from received GPS and AIS information and writes vessel state records to the <<near-miss-db/README.adoc#NearMissDB,database>>.
+5. <<near-miss-web/README.adoc#NearMiss-Web,near-miss-web>> exposes a Web service REST API for client applications to retrieve vessel state records from the <<near-miss-db/README.adoc#NearMissDB,database>>.
 
 There has been made a experimental user interface in the Baltic Web application.
 
@@ -133,3 +134,6 @@ Refer to <<pilot-plug-simulator/README.adoc#,pilot-plug-simulator>> in the sub p
 
 The dev profile (application-dev.properties) will be used when running locally.
 
+== More information
+
+Refer to documentation for each <<Modules,module>> for more information.

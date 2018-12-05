@@ -37,4 +37,4 @@ The configuration API has not been fully developed and should propably be delete
 ====
 
 == Back
-Back to <<../README.adoc#NearMiss,near-miss>> parent modul
+Back to <<../README.adoc#NearMiss,near-miss>> parent module.

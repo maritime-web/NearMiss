@@ -83,4 +83,4 @@ where
 - `remoteHost:remotePort` are the hostname and port no. of the remote text source(s) that the application should connect to.
 
 == Back
-Back to <<../README.adoc#NearMiss,near-miss>> parent modul
+Back to <<../README.adoc#NearMiss,near-miss>> parent module.

@@ -38,4 +38,4 @@ Also refer to the configurtion files:
 * link:src/main/resources/application-docker.properties[application-docker.properties]
 
 == Back
-Back to <<../README.adoc#NearMiss,near-miss>> parent modul
+Back to <<../README.adoc#NearMiss,near-miss>> parent module.
