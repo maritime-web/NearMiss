@@ -41,7 +41,7 @@ Also refer to the configurtion files:
 
 === Dependency to AisLib
 
-This module does need AisLib to have been cloned from GitHub and build.
+This module does need AisLib to have been cloned from GitHub and built locally.
 
 https://github.com/dma-ais/AisLib
 

@@ -89,7 +89,7 @@ The actual code implementing the above algortihm can be found here https://githu
 
 === Dependency to AisLib
 
-This module does need AisLib to have been cloned from GitHub and build.
+This module does need AisLib to have been cloned from GitHub and built locally.
 
 https://github.com/dma-ais/AisLib
 
