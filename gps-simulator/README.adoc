@@ -23,7 +23,7 @@ Running development mode use the profile `dev`
 
 === Run
 
-Refer to the <<Dockerfile,Dockerfile>> to see how to run.
+Refer to the link:Dockerfile[Dockerfile] to see how to run.
 
 === Configuration
 
