@@ -16,12 +16,25 @@ tests.
 
 == Usage
 
+=== Run
+
 The component has been designed to run in development mode (locally or within development environment). Or in a Docker
 packaged mode.
 
 Running development mode use the profile `dev`
 
 Running in Docker use the profile `docker`
+
+=== REST interface
+
+When running the module browse to `http://localhost:8080` in order to access the API definition.
+
+Also the API is defined in the <<./src/main/resources/near-miss.yml,near-miss.yml>> file.
+
+[NOTE]
+====
+The configuration API has not been fully developed and should propably be deleted if not needed in the future.
+====
 
 == Back
 Back to <<../README.adoc#NearMiss,near-miss>> parent modul

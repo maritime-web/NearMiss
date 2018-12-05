@@ -21,7 +21,21 @@ packaged mode.
 
 Running development mode use the profile `dev`
 
-Running in Docker use the profile `docker`
+=== Run
+
+Refer to the <<Dockerfile,Dockerfile>> to see how to run.
+
+=== Configuration
+
+The gps-simulator has several configurations.
+
+Refer to the <<./src/main/java/dk/dma//nearmiss/gpssimulator/GpsSimulatorConfigurations.java,GpsSimulatorConfigurations.java>> class.
+
+Also refer to the configurtion files:
+
+* <<./src/main/java/resources/application.properties,application.properties>>
+* <<./src/main/java/resources/application-dev.properties,application-dev.properties>>
+* <<./src/main/java/resources/application-docker.properties,application-docker.properties>>
 
 == Back
 Back to <<../README.adoc#NearMiss,near-miss>> parent modul
