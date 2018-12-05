@@ -10,11 +10,13 @@ and saved to db.
 == How the prototype works
 This prototype consists of several modules.
 
-* <<gps-simulator/README.adoc#GPS Simulator,gps-simulator>>
-* <<ais-simulator/README.adoc#AIS Simulator,ais-simulator>>
-* <<pilot-simulator/README.adoc#Pilot-plug-simulator,pilot-plug-simulator>>
+https://github.com/maritime-web/NearMiss/blob/master/near-miss-web/README.adoc#nearmiss-web
+
+* <<gps-simulator/README.adoc#GPS-Simulator,gps-simulator>>
+* <<ais-simulator/README.adoc#AIS-Simulator,ais-simulator>>
+* <<pilot-plug-simulator/README.adoc#Pilot-plug-simulator,pilot-plug-simulator>>
 * <<near-miss-engine/README.adoc#NearMiss Engine,near-miss-engine>>
-* <<near-miss-web/README.adoc#NearMiss Web,near-miss-web>>
+* <<near-miss-web/README.adoc#NearMiss-Web,near-miss-web>>
 * <<near-miss-db/README.adoc#NearMissDB,near-miss-db>>
 * <<near-miss-common/README.adoc#near-miss-common,near-miss-common>>
 
