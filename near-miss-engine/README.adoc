@@ -69,7 +69,7 @@ The actual size and location of the safety zone ellipse around own vessel is sub
 
 These formulas and constants are empirically and arbitrarily chosen with little concern for existing academic literature. Further work should align the parameters of the safety zone with established academic standards such as the references mentioned below. Therefore current implementation of the near-collision detection engine is intentionally writted to be flexible so that different shapes, sizes and relative locations can be tested.
 
-The actual code implementing the above algortihm can be found here https://github.com/maritime-web/NearMiss/blob/0.0.1/near-miss-engine/src/main/java/dk/dma/nearmiss/engine/engineParts/EllipticSafetyZoneDetector.java#L30.
+The actual code implementing the above algortihm can be found here https://github.com/maritime-web/NearMiss/blob/v0.0.3/near-miss-engine/src/main/java/dk/dma/nearmiss/engine/engineParts/EllipticSafetyZoneDetector.java#L30.
 
 === Document dependency to AisLib
 
