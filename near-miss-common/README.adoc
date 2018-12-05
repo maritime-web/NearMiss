@@ -10,7 +10,7 @@ will not run as a independent module.
 
 The near-miss-common module is developed in context of the DMA near-miss project.
 
-The purpose of this component is hold common functionality for the various modules in the near-miss
+The purpose of this component is to hold common functionality for the various modules in the near-miss
 prototype.
 
 == Build
@@ -21,7 +21,7 @@ or similar.
 == Run
 
 The modules using functionality from this module will depend on it in the Maven build file, thus this module
-will not run as a independent module.
+will not run as an independent module.
 
 == Back
 Back to <<../README.adoc#NearMiss,near-miss>> parent module.
