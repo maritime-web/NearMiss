@@ -42,6 +42,34 @@ Running in Docker use the profile `docker`
 ----
 
 
+== Implementation
+
+=== Algorithm
+The implementation of near collision detection is a geometric algorithm based on the idea of _safety zones_. A safety zone is an area around a vessel, which at any time must be kept clear of any obstacles - including other vessels. Or in the words of <<szlap2>>: A safety zone "... is generally thought as the space around the ship, which the navigator wants to keep clear of other objects (including ships)".
+
+In line with this the near collision algorithm implemented in the software at hand is intended to detect the presence of any _other vessel_ inside the safety zone of _own vessel_.
+
+_Other vessels_ are modelled by 5-point geometric shapes determined by their size as reported via AIS.
+
+The safety zone of own vessel is continuously calculated as time progresses. In line with selected academic studies (<<sspa>>, <<wielgosz>>, <<szlap1>>, <<szlap2>>, <<futa>>) the safety zone around is defined by a geometric ellipse, which has its major axis oriented along own vessel's _course over ground_ (COG) and the length of its major axis varying with own vessel's _length over all_ (LOA) and _speed over ground_ (SOG).
+
+The actual size and location of the safety zone ellipse around own vessel is subject to further academic and empiric studies. But in the current implementation, the safety zone ellipse is defined by:
+
+* Center, c
+** Translated d meters along COG from vessel's geometric center, where
+** d = LOA * SOG / 50 + SOG * 3
+* Orientation, t
+** t = COG
+* Length of major axis, a
+** a = LOA * 1.2 + SOG * 20
+* Length of minor axis, b
+** b = BEAM * 4
+
+-- where LOA is own vessel's _length over all_ (in meters), BEAM is own vessel's largest breadth (in meters), SOG is own vessel's _speed over ground_ (in knots), and COG is own vessel's _course over ground_ (in true degrees relative to North).
+
+These formulas and constants are empirically and arbitrarily chosen with little concern for existing academic literature. Further work should align the parameters of the safety zone with established academic standards such as the references mentioned below. Therefore current implementation of the near-collision detection engine is intentionally writted to be flexible so that different shapes, sizes and relative locations can be tested.
+
+The actual code implementing the above algortihm can be found here https://github.com/maritime-web/NearMiss/blob/0.0.1/near-miss-engine/src/main/java/dk/dma/nearmiss/engine/engineParts/EllipticSafetyZoneDetector.java#L30.
 
 === Document dependency to AisLib
 
@@ -54,6 +82,20 @@ https://github.com/dma-ais/AisLib
     <version>2.4-SNAPSHOT</version>
 </dependency>
 ----
+
+[bibliography]
+== References
+
+- [[[sspa, 1]]] "A new method to identify close situations between vessels", by SSPA as part of the MonaLisa 2.0 project, https://www.sspa.se/safety-security-and-risk/new-method-identify-close-situations-between-vessels.
+
+- [[[wielgosz, 2]]] "The ship safety zones in vessel traffic monitoring and management systems",  Mirosław Wielgosz in Scientific Journals of the Maritime University of Szczecin, 2016, 48 (120), 153–158, http://repository.scientific-journals.eu/bitstream/handle/123456789/2340/21-zn-am-48-120-wielgosz.pdf.
+
+- [[[szlap1,3]]] "Review of ship safety domains: Models and applications" by Rafal Szlapczynskia and Joanna Szlapczynska in Ocean Engineering, Volume 145, 15 November 2017, pp. 277-289, https://www.sciencedirect.com/science/article/pii/S0029801817305395.
+
+- [[[szlap2,4]]] "A Simulative Comparison of Ship Domains and Their Polygonal Approximations" by Rafal Szlapczynskia and Joanna Szlapczynska in TransNav the International Journal on Marine Navigation and Safety of Sea Transportation, Volume 9, Number 1, March 2015, http://www.transnav.eu/Article_A_Simulative_Comparison_of_Ship_Sz%C5%82apczy%C5%84ski,33,566.html.
+
+- [[[futa, 5]]] Fuji Y., Tanaka K. 1971. "Traffic Capacity" in Journal of Navigation, 1971, 24, pp. 543‐552.
+
 
 == Back
 Back to <<../README.adoc#NearMiss,near-miss>> parent modul
