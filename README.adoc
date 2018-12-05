@@ -1,11 +1,11 @@
 = NearMiss
 
 == Introduction
-DMA NearMiss is an application used to detect near-miss situations with other vessels seen from own vessel's
+DMA NearMiss is an application prototype used to detect near-miss situations with other vessels seen from own vessel's
 point of view.
 
 Using own vessels GPS data and received AIS messages from other vessels the near-miss situations are detected
-and saved to db.
+and saved to db. From db the near-miss situations are accessible through a web service.
 
 == How the prototype works
 This prototype consists of several modules.
@@ -17,6 +17,43 @@ This prototype consists of several modules.
 * <<near-miss-web/README.adoc#NearMiss-Web,near-miss-web>>
 * <<near-miss-db/README.adoc#NearMissDB,near-miss-db>>
 * <<near-miss-common/README.adoc#near-miss-common,near-miss-common>>
+
+=== Flow
+1. <<gps-simulator/README.adoc#GPS-Simulator,gps-simulator>> is configured with a route (own vessel).
+2. <<ais-simulator/README.adoc#AIS-Simulator,ais-simulator>> is configured to read a file of AIS mesages (other vessels).
+3. <<pilot-plug-simulator/README.adoc#Pilot-plug-simulator,pilot-plug-simulator>> reads from <<gps-simulator/README.adoc#GPS-Simulator,gps-simulator>> and <<ais-simulator/README.adoc#AIS-Simulator,ais-simulator>> and feeds the information to <<near-miss-engine/README.adoc#NearMiss Engine,near-miss-engine>>.
+4. <<near-miss-engine/README.adoc#NearMiss Engine,near-miss-engine>> checks for near-misses from received GPS and AIS information and writes vessel state records to <<near-miss-db/README.adoc#NearMissDB,near-miss-db>>.
+5. <<near-miss-web/README.adoc#NearMiss-Web,near-miss-web>> exposes a Web service REST API for client applications to retrieve vessel state records from <<near-miss-db/README.adoc#NearMissDB,near-miss-db>>.
+
+There has been made a experimental user interface in the Baltic Web application.
+
+=== Architecture
+.NearMiss Architecture.
+[ditaa]
+----
+/----------\
+|          |
+|   AIS    +-o <-\   /-------------\          /-----------\          /----------\
+| Simulator|     |   |             |          |cGRE       |          |          |
+\----------/     \---|   Pilot Plug+---o <----| NearMiss  |--------->| NearMiss |
+                     |   Simulator |          |  Engine   |          |    Web   |
+/----------\     /---|             |          |           |---\   /->|          |
+|          |     |   \-------------/          \-----------/   |   |  \----------/
+|   GPS    +-o <-/                                            |   |
+| Simulator|                                                  |   |
+\----------/                                                  V   |
+                                                           /----------\
+                                                           |{s}       |
+                                                           | NearMiss |
+                                                           |    DB    |
+                                                           |          |
+                                                           \----------/
+
+
+              -=------------------------------->
+                   Direction of data flow
+----
+
 
 == Building the Application
 
