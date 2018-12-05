@@ -29,13 +29,16 @@ Refer to the link:Dockerfile[Dockerfile] to see how to run.
 
 The gps-simulator has several configurations.
 
-Refer to the link:src/main/java/dk/dma//nearmiss/gpssimulator/GpsSimulatorConfigurations.java[GpsSimulatorConfigurations.java] class.
+Refer to the link:src/main/java/dk/dma/nearmiss/GpsSimulatorConfiguration.java[GpsSimulatorConfiguration.java] class.
+
+https://github.com/maritime-web/NearMiss/blob/master/gps-simulator/src/main/java/dk/dma/nearmiss/GpsSimulatorConfiguration.java
 
 Also refer to the configurtion files:
 
-* link:src/main/java/resources/application.properties[application.properties]
-* link:src/main/java/resources/application-dev.properties[application-dev.properties]
-* link:src/main/java/resources/application-docker.properties[application-docker.properties]
+https://github.com/maritime-web/NearMiss/blob/master/gps-simulator/src/main/resources/application-dev.properties
+* link:src/main/resources/application.properties[application.properties]
+* link:src/main/resources/application-dev.properties[application-dev.properties]
+* link:src/main/resources/application-docker.properties[application-docker.properties]
 
 == Back
 Back to <<../README.adoc#NearMiss,near-miss>> parent modul
