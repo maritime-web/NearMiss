@@ -5,3 +5,21 @@ This module holds common functionality for the various modules in the near-miss 
 
 The modules using functionality from this module will depend on it in the Maven build file, thus this module
 will not run as a independent module.
+
+== Purpose
+
+The near-miss-common module is developed in context of the DMA near-miss project.
+
+The purpose of this component is hold common functionality for the various modules in the near-miss
+prototype.
+
+== Build
+
+The software is built as part of the parent maven build. To build this maven module separately just run `mvn package`
+or similar.
+
+== Run
+
+The modules using functionality from this module will depend on it in the Maven build file, thus this module
+will not run as a independent module.
+

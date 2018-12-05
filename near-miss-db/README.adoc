@@ -16,6 +16,6 @@ tests.
 
 == Usage
 
-The compoent has been designed to run in development mode (locally or within development environment.
+The component has been designed to run in development mode (locally or within development environment.
 
 Running development mode use the profile `dev`

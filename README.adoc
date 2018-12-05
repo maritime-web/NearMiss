@@ -16,7 +16,7 @@ This prototype consists of several modules.
 * near-miss-engine
 * near-miss-web
 * near-miss-db
-* <<ais-simulator/README.adoc#,ais-simulator>>
+* <<ais-simulator/README.adoc#AIS Simulator,ais-simulator>>
 
 == Building the Application
 
