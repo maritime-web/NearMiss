@@ -10,8 +10,6 @@ and saved to db.
 == How the prototype works
 This prototype consists of several modules.
 
-https://github.com/maritime-web/NearMiss/blob/master/near-miss-web/README.adoc#nearmiss-web
-
 * <<gps-simulator/README.adoc#GPS-Simulator,gps-simulator>>
 * <<ais-simulator/README.adoc#AIS-Simulator,ais-simulator>>
 * <<pilot-plug-simulator/README.adoc#Pilot-plug-simulator,pilot-plug-simulator>>
@@ -67,12 +65,13 @@ MySql will be used as database.
 
 
 === Running Individual Modules
-If the application is to be started through individual Docker commands then refer to the `docker-compose.yml`
+If the application is to be started through individual Docker commands then refer to the link:docker-compose.yml[docker-compose.yml]
 file for dependencies between the individual modules of the application.
 
 
 === Running the Application locally
-When the application is running locally a in memory H2 databse is used in server mode (TCP).
+
+When the application is running locally a in memory H2 database is used in server mode (TCP).
 
 To run the full application locally do following:
 

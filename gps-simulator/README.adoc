@@ -29,7 +29,7 @@ Refer to the link:Dockerfile[Dockerfile] to see how to run.
 
 The gps-simulator has several configurations.
 
-Refer to the link:src/main/java/dk/dma/nearmiss/GpsSimulatorConfiguration.java[GpsSimulatorConfiguration.java] class.
+Refer to the link:src/main/java/dk/dma/nearmiss/gpssimulator/GpsSimulatorConfiguration.java[GpsSimulatorConfiguration.java] class.
 
 Also refer to the configurtion files:
 
