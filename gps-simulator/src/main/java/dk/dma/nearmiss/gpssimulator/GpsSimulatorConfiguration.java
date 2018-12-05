@@ -1,4 +1,4 @@
-package dk.dma.nearmiss;
+package dk.dma.nearmiss.gpssimulator;
 
 import dk.dma.nearmiss.gpssimulator.location.Location;
 import org.springframework.beans.factory.annotation.Value;
