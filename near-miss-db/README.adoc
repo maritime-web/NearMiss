@@ -4,7 +4,7 @@
 
 This near-miss-db is developed in context of the DMA <<../README.adoc#NearMiss,near-miss>> project.
 
-The Purpose of the component is to define persistence layer and to an TCP H2 databse for developmed.
+The Purpose of the component is to define persistence layer and to create a TCP H2 database for development mode.
 
 == Build
 
