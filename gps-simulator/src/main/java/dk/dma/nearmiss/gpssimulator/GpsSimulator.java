@@ -1,6 +1,5 @@
 package dk.dma.nearmiss.gpssimulator;
 
-import dk.dma.nearmiss.GpsSimulatorConfiguration;
 import dk.dma.nearmiss.gpssimulator.location.GeoHelper;
 import dk.dma.nearmiss.gpssimulator.location.Location;
 import dk.dma.nearmiss.gpssimulator.location.Route;
